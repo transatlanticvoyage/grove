@@ -12,18 +12,47 @@ class Grove_Admin {
     }
     
     public function add_admin_menu() {
+        // Main menu page
         add_menu_page(
             'Grove Hub',
             'Grove Hub', 
             'manage_options',
             'grovehub',
-            array($this, 'grovehub_page'),
+            array($this, 'grove_driggs_mar_page'),
             'dashicons-palmtree',
             30
         );
+        
+        // Submenu pages
+        add_submenu_page(
+            'grovehub',
+            'Grove Driggs Manager',
+            'grove_driggs_mar',
+            'manage_options',
+            'grove_driggs_mar',
+            array($this, 'grove_driggs_mar_page')
+        );
+        
+        add_submenu_page(
+            'grovehub',
+            'Grove Locations Manager', 
+            'grove_locations_mar',
+            'manage_options',
+            'grove_locations_mar',
+            array($this, 'grove_locations_mar_page')
+        );
+        
+        add_submenu_page(
+            'grovehub',
+            'Grove Services Manager',
+            'grove_services_mar', 
+            'manage_options',
+            'grove_services_mar',
+            array($this, 'grove_services_mar_page')
+        );
     }
     
-    public function grovehub_page() {
+    public function grove_driggs_mar_page() {
         // AGGRESSIVE NOTICE SUPPRESSION - Remove ALL WordPress admin notices
         $this->suppress_all_admin_notices();
         
@@ -764,6 +793,94 @@ class Grove_Admin {
         } catch (Exception $e) {
             wp_send_json_error('Error updating field: ' . $e->getMessage());
         }
+    }
+    
+    /**
+     * Grove Locations Manager Page
+     */
+    public function grove_locations_mar_page() {
+        // AGGRESSIVE NOTICE SUPPRESSION - Remove ALL WordPress admin notices
+        $this->suppress_all_admin_notices();
+        
+        global $wpdb;
+        $table_name = $wpdb->prefix . 'zen_locations';
+        
+        ?>
+        <div class="wrap" style="margin: 0; padding: 0;">
+            <!-- Allow space for WordPress notices -->
+            <div style="height: 20px;"></div>
+            
+            <div style="padding: 20px;">
+                <h1 style="margin-bottom: 20px;">🌳📍 Grove Locations Manager</h1>
+                
+                <!-- Control Bar -->
+                <div style="background: white; border: 1px solid #ddd; padding: 15px; margin-bottom: 20px; border-radius: 5px;">
+                    <div style="display: flex; justify-content: space-between; align-items: center;">
+                        <div>
+                            <strong>Table:</strong> <?php echo esc_html($table_name); ?>
+                        </div>
+                        <div>
+                            <button class="button button-primary">Create New Location</button>
+                            <button class="button button-secondary">Bulk Actions</button>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- Main Table -->
+                <div style="background: white; border: 1px solid #ddd; border-radius: 5px; overflow: hidden;">
+                    <div style="padding: 20px; text-align: center;">
+                        <p><strong>Grove Locations Manager</strong></p>
+                        <p>This page will manage the <code><?php echo esc_html($table_name); ?></code> table.</p>
+                        <p><em>Full interface implementation coming soon...</em></p>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <?php
+    }
+    
+    /**
+     * Grove Services Manager Page
+     */
+    public function grove_services_mar_page() {
+        // AGGRESSIVE NOTICE SUPPRESSION - Remove ALL WordPress admin notices
+        $this->suppress_all_admin_notices();
+        
+        global $wpdb;
+        $table_name = $wpdb->prefix . 'zen_services';
+        
+        ?>
+        <div class="wrap" style="margin: 0; padding: 0;">
+            <!-- Allow space for WordPress notices -->
+            <div style="height: 20px;"></div>
+            
+            <div style="padding: 20px;">
+                <h1 style="margin-bottom: 20px;">🌳🔧 Grove Services Manager</h1>
+                
+                <!-- Control Bar -->
+                <div style="background: white; border: 1px solid #ddd; padding: 15px; margin-bottom: 20px; border-radius: 5px;">
+                    <div style="display: flex; justify-content: space-between; align-items: center;">
+                        <div>
+                            <strong>Table:</strong> <?php echo esc_html($table_name); ?>
+                        </div>
+                        <div>
+                            <button class="button button-primary">Create New Service</button>
+                            <button class="button button-secondary">Bulk Actions</button>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- Main Table -->
+                <div style="background: white; border: 1px solid #ddd; border-radius: 5px; overflow: hidden;">
+                    <div style="padding: 20px; text-align: center;">
+                        <p><strong>Grove Services Manager</strong></p>
+                        <p>This page will manage the <code><?php echo esc_html($table_name); ?></code> table.</p>
+                        <p><em>Full interface implementation coming soon...</em></p>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <?php
     }
     
     /**
