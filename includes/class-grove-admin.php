@@ -263,25 +263,42 @@ class Grove_Admin {
                 
                 fields.forEach(function(field) {
                     let tr = $('<tr style="cursor: pointer;"></tr>');
-                    tr.hover(function() {
-                        $(this).css('background-color', '#f9f9f9');
-                    }, function() {
-                        $(this).css('background-color', '');
-                    });
+                    
+                    // Apply special background color to specific rows
+                    const specialBgFields = ['wppma_id', 'wppma_db_only_created_at', 'wppma_db_only_updated_at', 'id', 'created_at'];
+                    const isSpecialBg = specialBgFields.includes(field.key);
+                    
+                    if (isSpecialBg) {
+                        tr.css('background-color', '#9b9b9b');
+                        tr.hover(function() {
+                            $(this).css('background-color', '#8b8b8b');
+                        }, function() {
+                            $(this).css('background-color', '#9b9b9b');
+                        });
+                    } else {
+                        tr.hover(function() {
+                            $(this).css('background-color', '#f9f9f9');
+                        }, function() {
+                            $(this).css('background-color', '');
+                        });
+                    }
                     
                     // Checkbox column
                     let checkboxTd = $('<td style="padding: 8px; border: 1px solid #ddd; text-align: center;"></td>');
+                    if (isSpecialBg) checkboxTd.css('background-color', '#9b9b9b');
                     let checkbox = $('<input type="checkbox" style="width: 20px; height: 20px;" data-field="' + field.key + '">');
                     checkboxTd.append(checkbox);
                     tr.append(checkboxTd);
                     
                     // Field name column - bold DB field names
                     let fieldNameTd = $('<td style="padding: 8px; border: 1px solid #ddd; font-weight: bold; color: #23282d; font-family: monospace;"></td>');
+                    if (isSpecialBg) fieldNameTd.css('background-color', '#9b9b9b');
                     fieldNameTd.text(field.label);
                     tr.append(fieldNameTd);
                     
                     // Value column
                     let valueTd = $('<td style="padding: 8px; border: 1px solid #ddd;"></td>');
+                    if (isSpecialBg) valueTd.css('background-color', '#9b9b9b');
                     let value = currentData[field.key] || '';
                     
                     if (field.type === 'boolean') {
@@ -364,6 +381,7 @@ class Grove_Admin {
                     
                     // Add stuff3 column with roaring_div as shortcode copy button
                     let stuff3Td = $('<td class="stuff3-cell" style="padding: 0; border: 1px solid #ddd; width: 20px;"></td>');
+                    if (isSpecialBg) stuff3Td.css('background-color', '#9b9b9b');
                     let roaring_div = $('<div class="roaring_div">R</div>');
                     
                     // Add click handler to copy shortcode
