@@ -12,16 +12,27 @@ class Grove_Admin {
     }
     
     public function add_admin_menu() {
-        // Main menu page
+        // Main menu page (parent only - no actual page)
         add_menu_page(
             'Grove Hub',
             'Grove Hub', 
             'manage_options',
             'grovehub',
-            array($this, 'grove_driggs_mar_page'),
+            '', // No callback - makes it non-clickable
             'dashicons-palmtree',
             30
         );
+        
+        // Remove the auto-generated submenu link to the parent page
+        global $submenu;
+        if (isset($submenu['grovehub'])) {
+            foreach ($submenu['grovehub'] as $key => $menu_item) {
+                if ($menu_item[2] === 'grovehub') {
+                    unset($submenu['grovehub'][$key]);
+                    break;
+                }
+            }
+        }
         
         // Submenu pages
         add_submenu_page(
