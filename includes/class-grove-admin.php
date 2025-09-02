@@ -17,6 +17,8 @@ class Grove_Admin {
         add_action('wp_ajax_grove_services_update_field', array($this, 'grove_services_update_field'));
         add_action('wp_ajax_grove_services_delete', array($this, 'grove_services_delete'));
         add_action('wp_ajax_grove_services_create', array($this, 'grove_services_create'));
+        add_action('wp_ajax_grove_shortcode_update_mode', array($this, 'grove_shortcode_update_mode'));
+        add_action('wp_ajax_grove_shortcode_test', array($this, 'grove_shortcode_test'));
     }
     
     public function add_admin_menu() {
@@ -68,6 +70,15 @@ class Grove_Admin {
             'manage_options',
             'grove_services_mar',
             array($this, 'grove_services_mar_page')
+        );
+        
+        add_submenu_page(
+            'grovehub',
+            'Shortcode Commander',
+            'shortcodecommander',
+            'manage_options',
+            'shortcodecommander',
+            array($this, 'shortcodecommander_page')
         );
     }
     
@@ -1458,6 +1469,219 @@ class Grove_Admin {
     }
     
     /**
+     * Shortcode Commander Page
+     */
+    public function shortcodecommander_page() {
+        // AGGRESSIVE NOTICE SUPPRESSION - Remove ALL WordPress admin notices
+        $this->suppress_all_admin_notices();
+        
+        $current_mode = get_option('grove_shortcode_mode', 'automatic');
+        $snefuruplin_active = is_plugin_active('snefuruplin/snefuruplin.php');
+        
+        // Get shortcode status
+        $grove_shortcodes = new Grove_Zen_Shortcodes();
+        $grove_controlling = $grove_shortcodes->is_grove_controlling_shortcodes();
+        
+        // Get database stats
+        global $wpdb;
+        $services_count = $wpdb->get_var("SELECT COUNT(*) FROM {$wpdb->prefix}zen_services");
+        $locations_count = $wpdb->get_var("SELECT COUNT(*) FROM {$wpdb->prefix}zen_locations");
+        $sitespren_count = $wpdb->get_var("SELECT COUNT(*) FROM {$wpdb->prefix}zen_sitespren");
+        
+        // Check which shortcodes are registered
+        $shortcodes_to_check = ['zen_services', 'zen_locations', 'zen_service', 'zen_location', 'sitespren', 'zen_pinned_services', 'zen_pinned_locations', 'zen_service_image', 'zen_location_image'];
+        $registered_shortcodes = 0;
+        foreach ($shortcodes_to_check as $shortcode) {
+            if (shortcode_exists($shortcode)) {
+                $registered_shortcodes++;
+            }
+        }
+        
+        ?>
+        <div class="wrap" style="margin: 0; padding: 0;">
+            <!-- Allow space for WordPress notices -->
+            <div style="height: 20px;"></div>
+            
+            <div style="padding: 20px;">
+                <h1 style="margin-bottom: 20px;">🌳📡 Shortcode Commander</h1>
+                
+                <!-- Status Dashboard -->
+                <div style="background: white; border: 1px solid #ddd; padding: 20px; margin-bottom: 20px; border-radius: 5px;">
+                    <h2 style="margin-top: 0;">System Status</h2>
+                    
+                    <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 20px; margin-bottom: 20px;">
+                        <div>
+                            <div style="display: flex; align-items: center; margin-bottom: 10px;">
+                                <?php if ($grove_controlling): ?>
+                                    <span style="color: #46b450; font-size: 18px; margin-right: 10px;">🟢</span>
+                                    <strong>Shortcode Status: ACTIVE</strong>
+                                    <span style="background: #46b450; color: white; padding: 2px 8px; border-radius: 3px; font-size: 11px; margin-left: 10px;">GROVE CONTROLLING</span>
+                                <?php else: ?>
+                                    <span style="color: #dc3232; font-size: 18px; margin-right: 10px;">🔴</span>
+                                    <strong>Shortcode Status: INACTIVE</strong>
+                                    <?php if ($snefuruplin_active): ?>
+                                        <span style="background: #0073aa; color: white; padding: 2px 8px; border-radius: 3px; font-size: 11px; margin-left: 10px;">SNEFURUPLIN ACTIVE</span>
+                                    <?php else: ?>
+                                        <span style="background: #dc3232; color: white; padding: 2px 8px; border-radius: 3px; font-size: 11px; margin-left: 10px;">DISABLED</span>
+                                    <?php endif; ?>
+                                <?php endif; ?>
+                            </div>
+                            
+                            <div style="margin-bottom: 10px;">
+                                <strong>Registered Shortcodes:</strong> <?php echo $registered_shortcodes; ?>/<?php echo count($shortcodes_to_check); ?> found
+                            </div>
+                            
+                            <div style="margin-bottom: 10px;">
+                                <strong>Current Mode:</strong> <?php echo ucwords(str_replace('_', ' ', $current_mode)); ?>
+                            </div>
+                        </div>
+                        
+                        <div>
+                            <div style="margin-bottom: 10px;">
+                                <strong>Snefuruplin Status:</strong> <?php echo $snefuruplin_active ? '<span style="color: #46b450;">✅ Active</span>' : '<span style="color: #666;">❌ Not detected</span>'; ?>
+                            </div>
+                            
+                            <div style="margin-bottom: 10px;">
+                                <strong>Database Tables:</strong><br>
+                                <small>
+                                    • zen_services: <?php echo $services_count ? '<span style="color: #46b450;">✅ ' . $services_count . ' records</span>' : '<span style="color: #dc3232;">❌ No data</span>'; ?><br>
+                                    • zen_locations: <?php echo $locations_count ? '<span style="color: #46b450;">✅ ' . $locations_count . ' records</span>' : '<span style="color: #dc3232;">❌ No data</span>'; ?><br>
+                                    • zen_sitespren: <?php echo $sitespren_count ? '<span style="color: #46b450;">✅ ' . $sitespren_count . ' records</span>' : '<span style="color: #dc3232;">❌ No data</span>'; ?>
+                                </small>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- Control Panel -->
+                <div style="background: white; border: 1px solid #ddd; padding: 20px; margin-bottom: 20px; border-radius: 5px;">
+                    <h2 style="margin-top: 0;">Shortcode Control</h2>
+                    
+                    <form id="shortcode-mode-form">
+                        <div style="margin-bottom: 20px;">
+                            <label style="display: block; font-weight: bold; margin-bottom: 10px;">Control Mode:</label>
+                            
+                            <div style="margin-bottom: 10px;">
+                                <label style="display: flex; align-items: center; cursor: pointer;">
+                                    <input type="radio" name="grove_shortcode_mode" value="automatic" <?php checked($current_mode, 'automatic'); ?> style="margin-right: 10px;">
+                                    <div>
+                                        <strong>Automatic (Recommended)</strong><br>
+                                        <small style="color: #666;">Take control only when Snefuruplin is missing. Seamless failover protection.</small>
+                                    </div>
+                                </label>
+                            </div>
+                            
+                            <div style="margin-bottom: 10px;">
+                                <label style="display: flex; align-items: center; cursor: pointer;">
+                                    <input type="radio" name="grove_shortcode_mode" value="force_active" <?php checked($current_mode, 'force_active'); ?> style="margin-right: 10px;">
+                                    <div>
+                                        <strong>Force Active</strong><br>
+                                        <small style="color: #666;">Always control shortcodes, even if Snefuruplin is active. Override mode.</small>
+                                    </div>
+                                </label>
+                            </div>
+                            
+                            <div style="margin-bottom: 10px;">
+                                <label style="display: flex; align-items: center; cursor: pointer;">
+                                    <input type="radio" name="grove_shortcode_mode" value="disabled" <?php checked($current_mode, 'disabled'); ?> style="margin-right: 10px;">
+                                    <div>
+                                        <strong>Disabled</strong><br>
+                                        <small style="color: #666;">Never register shortcodes. Completely disable Grove shortcode system.</small>
+                                    </div>
+                                </label>
+                            </div>
+                        </div>
+                        
+                        <button type="submit" class="button button-primary">Save Settings</button>
+                        <button type="button" id="test-shortcode-btn" class="button button-secondary" style="margin-left: 10px;">Test Shortcodes</button>
+                    </form>
+                </div>
+                
+                <!-- Test Results -->
+                <div id="test-results" style="display: none; background: white; border: 1px solid #ddd; padding: 20px; margin-bottom: 20px; border-radius: 5px;">
+                    <h2 style="margin-top: 0;">Shortcode Test Results</h2>
+                    <div id="test-output"></div>
+                </div>
+                
+                <!-- Information Panel -->
+                <div style="background: #f9f9f9; border: 1px solid #ddd; padding: 20px; border-radius: 5px;">
+                    <h3 style="margin-top: 0;">How It Works</h3>
+                    <ul>
+                        <li><strong>Automatic Mode:</strong> Grove monitors for Snefuruplin and only takes control when it's not present. This provides seamless backup protection without conflicts.</li>
+                        <li><strong>Force Active Mode:</strong> Grove always controls shortcodes, overriding Snefuruplin. Use for testing or when you want Grove to be the primary shortcode provider.</li>
+                        <li><strong>Disabled Mode:</strong> Grove never registers shortcodes. Use when you want Snefuruplin to handle all shortcodes exclusively.</li>
+                    </ul>
+                    
+                    <h3>Available Shortcodes</h3>
+                    <p><small>When Grove is controlling shortcodes, these are available:</small></p>
+                    <code style="background: white; padding: 10px; display: block; margin: 10px 0;">
+                        [zen_services], [zen_service], [zen_service_image]<br>
+                        [zen_locations], [zen_location], [zen_location_image]<br>
+                        [zen_pinned_services], [zen_pinned_locations]<br>
+                        [sitespren wppma_id="1" field="field_name"]
+                    </code>
+                </div>
+            </div>
+        </div>
+        
+        <script type="text/javascript">
+        jQuery(document).ready(function($) {
+            $('#shortcode-mode-form').on('submit', function(e) {
+                e.preventDefault();
+                
+                var mode = $('input[name="grove_shortcode_mode"]:checked').val();
+                
+                $.ajax({
+                    url: ajaxurl,
+                    type: 'POST',
+                    data: {
+                        action: 'grove_shortcode_update_mode',
+                        nonce: '<?php echo wp_create_nonce('grove_shortcode_nonce'); ?>',
+                        mode: mode
+                    },
+                    success: function(response) {
+                        if (response.success) {
+                            alert('Settings saved successfully! Please refresh the page to see status updates.');
+                            location.reload();
+                        } else {
+                            alert('Error saving settings: ' + response.data);
+                        }
+                    },
+                    error: function() {
+                        alert('Error saving settings');
+                    }
+                });
+            });
+            
+            $('#test-shortcode-btn').on('click', function() {
+                $.ajax({
+                    url: ajaxurl,
+                    type: 'POST',
+                    data: {
+                        action: 'grove_shortcode_test',
+                        nonce: '<?php echo wp_create_nonce('grove_shortcode_nonce'); ?>'
+                    },
+                    success: function(response) {
+                        if (response.success) {
+                            $('#test-output').html(response.data);
+                            $('#test-results').show();
+                        } else {
+                            $('#test-output').html('<div style="color: #dc3232;">Test failed: ' + response.data + '</div>');
+                            $('#test-results').show();
+                        }
+                    },
+                    error: function() {
+                        $('#test-output').html('<div style="color: #dc3232;">Test request failed</div>');
+                        $('#test-results').show();
+                    }
+                });
+            });
+        });
+        </script>
+        <?php
+    }
+    
+    /**
      * AJAX: Get locations data
      */
     public function grove_locations_get_data() {
@@ -1740,6 +1964,75 @@ class Grove_Admin {
         } catch (Exception $e) {
             wp_send_json_error('Error deleting service: ' . $e->getMessage());
         }
+    }
+    
+    /**
+     * AJAX: Update shortcode mode
+     */
+    public function grove_shortcode_update_mode() {
+        check_ajax_referer('grove_shortcode_nonce', 'nonce');
+        
+        if (!current_user_can('manage_options')) {
+            wp_die('Unauthorized');
+        }
+        
+        $mode = sanitize_text_field($_POST['mode']);
+        $allowed_modes = ['automatic', 'force_active', 'disabled'];
+        
+        if (!in_array($mode, $allowed_modes)) {
+            wp_send_json_error('Invalid mode');
+            return;
+        }
+        
+        update_option('grove_shortcode_mode', $mode);
+        wp_send_json_success('Mode updated to: ' . $mode);
+    }
+    
+    /**
+     * AJAX: Test shortcode functionality
+     */
+    public function grove_shortcode_test() {
+        check_ajax_referer('grove_shortcode_nonce', 'nonce');
+        
+        if (!current_user_can('manage_options')) {
+            wp_die('Unauthorized');
+        }
+        
+        $output = '<h4>Shortcode Test Results</h4>';
+        
+        // Test each shortcode
+        $shortcodes_to_test = [
+            'zen_services' => '[zen_services limit="1"]',
+            'zen_locations' => '[zen_locations limit="1"]',
+            'sitespren' => '[sitespren wppma_id="1" field="driggs_brand_name"]'
+        ];
+        
+        foreach ($shortcodes_to_test as $name => $shortcode) {
+            $exists = shortcode_exists($name);
+            $result = '';
+            
+            if ($exists) {
+                $result = do_shortcode($shortcode);
+                $status = '<span style="color: #46b450;">✅ Active</span>';
+                if (empty(trim($result))) {
+                    $status .= ' <small>(No data returned)</small>';
+                }
+            } else {
+                $status = '<span style="color: #dc3232;">❌ Not registered</span>';
+            }
+            
+            $output .= '<div style="margin: 10px 0; padding: 10px; border: 1px solid #ddd; border-radius: 3px;">';
+            $output .= '<strong>' . $shortcode . '</strong> ' . $status;
+            
+            if ($exists && !empty(trim($result))) {
+                $output .= '<div style="margin-top: 10px; padding: 10px; background: #f9f9f9; border-radius: 3px; font-size: 12px;">'; 
+                $output .= '<strong>Output:</strong><br>' . wp_kses_post($result);
+                $output .= '</div>';
+            }
+            $output .= '</div>';
+        }
+        
+        wp_send_json_success($output);
     }
     
     /**
