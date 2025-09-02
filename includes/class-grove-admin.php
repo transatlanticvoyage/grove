@@ -9,6 +9,14 @@ class Grove_Admin {
         add_action('admin_menu', array($this, 'add_admin_menu'));
         add_action('wp_ajax_grove_driggs_get_data', array($this, 'grove_driggs_get_data'));
         add_action('wp_ajax_grove_driggs_update_field', array($this, 'grove_driggs_update_field'));
+        add_action('wp_ajax_grove_locations_get_data', array($this, 'grove_locations_get_data'));
+        add_action('wp_ajax_grove_locations_update_field', array($this, 'grove_locations_update_field'));
+        add_action('wp_ajax_grove_locations_delete', array($this, 'grove_locations_delete'));
+        add_action('wp_ajax_grove_locations_create', array($this, 'grove_locations_create'));
+        add_action('wp_ajax_grove_services_get_data', array($this, 'grove_services_get_data'));
+        add_action('wp_ajax_grove_services_update_field', array($this, 'grove_services_update_field'));
+        add_action('wp_ajax_grove_services_delete', array($this, 'grove_services_delete'));
+        add_action('wp_ajax_grove_services_create', array($this, 'grove_services_create'));
     }
     
     public function add_admin_menu() {
@@ -810,11 +818,19 @@ class Grove_Admin {
      * Grove Locations Manager Page
      */
     public function grove_locations_mar_page() {
+        global $wpdb;
+        $table_name = $wpdb->prefix . 'zen_locations';
+        
         // AGGRESSIVE NOTICE SUPPRESSION - Remove ALL WordPress admin notices
         $this->suppress_all_admin_notices();
         
-        global $wpdb;
-        $table_name = $wpdb->prefix . 'zen_locations';
+        // Handle AJAX requests
+        if (isset($_POST['action'])) {
+            return;
+        }
+        
+        // Enqueue WordPress media scripts
+        wp_enqueue_media();
         
         ?>
         <div class="wrap" style="margin: 0; padding: 0;">
@@ -823,30 +839,313 @@ class Grove_Admin {
             
             <div style="padding: 20px;">
                 <h1 style="margin-bottom: 20px;">🌳📍 Grove Locations Manager</h1>
-                
-                <!-- Control Bar -->
-                <div style="background: white; border: 1px solid #ddd; padding: 15px; margin-bottom: 20px; border-radius: 5px;">
-                    <div style="display: flex; justify-content: space-between; align-items: center;">
-                        <div>
-                            <strong>Table:</strong> <?php echo esc_html($table_name); ?>
-                        </div>
-                        <div>
-                            <button class="button button-primary">Create New Location</button>
-                            <button class="button button-secondary">Bulk Actions</button>
-                        </div>
+            
+            <!-- Control Bar -->
+            <div style="background: white; border: 1px solid #ddd; padding: 15px; margin-bottom: 20px; border-radius: 5px;">
+                <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 15px;">
+                    <div style="display: flex; gap: 10px; align-items: center;">
+                        <button id="create-inline-btn" class="button button-primary">Create New (Inline)</button>
+                        <button id="create-popup-btn" class="button button-secondary">Create New (Popup)</button>
+                        <button id="delete-selected-btn" class="button" style="background: #dc3545; color: white; border-color: #dc3545;">Delete Selected</button>
                     </div>
                 </div>
                 
-                <!-- Main Table -->
-                <div style="background: white; border: 1px solid #ddd; border-radius: 5px; overflow: hidden;">
-                    <div style="padding: 20px; text-align: center;">
-                        <p><strong>Grove Locations Manager</strong></p>
-                        <p>This page will manage the <code><?php echo esc_html($table_name); ?></code> table.</p>
-                        <p><em>Full interface implementation coming soon...</em></p>
+                <!-- Pagination and Search Controls -->
+                <div style="display: flex; justify-content: space-between; align-items: center;">
+                    <div style="display: flex; gap: 15px; align-items: center;">
+                        <!-- Items per page -->
+                        <div style="display: flex; gap: 0; border: 1px solid #ccc;">
+                            <button class="per-page-btn" data-value="10" style="border: none; padding: 10px 15px; background: #f9f9f9; cursor: pointer; font-size: 14px;">10</button>
+                            <button class="per-page-btn" data-value="20" style="border: none; padding: 10px 15px; background: #f9f9f9; cursor: pointer; font-size: 14px; border-left: 1px solid #ccc;">20</button>
+                            <button class="per-page-btn" data-value="50" style="border: none; padding: 10px 15px; background: #f9f9f9; cursor: pointer; font-size: 14px; border-left: 1px solid #ccc;">50</button>
+                            <button class="per-page-btn active" data-value="100" style="border: none; padding: 10px 15px; background: #0073aa; color: white; cursor: pointer; font-size: 14px; border-left: 1px solid #ccc;">100</button>
+                            <button class="per-page-btn" data-value="200" style="border: none; padding: 10px 15px; background: #f9f9f9; cursor: pointer; font-size: 14px; border-left: 1px solid #ccc;">200</button>
+                            <button class="per-page-btn" data-value="500" style="border: none; padding: 10px 15px; background: #f9f9f9; cursor: pointer; font-size: 14px; border-left: 1px solid #ccc;">500</button>
+                            <button class="per-page-btn" data-value="all" style="border: none; padding: 10px 15px; background: #f9f9f9; cursor: pointer; font-size: 14px; border-left: 1px solid #ccc;">All</button>
+                        </div>
+                        
+                        <!-- Page navigation -->
+                        <div id="page-nav" style="display: flex; gap: 0; border: 1px solid #ccc;">
+                            <!-- Dynamic page buttons will go here -->
+                        </div>
+                    </div>
+                    
+                    <!-- Search -->
+                    <div style="position: relative;">
+                        <input type="text" id="search-box" placeholder="Search locations..." style="padding: 8px 40px 8px 12px; border: 1px solid #ccc; border-radius: 4px; width: 250px; font-size: 14px;">
+                        <button id="clear-search" style="position: absolute; right: 8px; top: 50%; transform: translateY(-50%); background: #ffeb3b; border: none; padding: 4px 8px; font-size: 12px; font-weight: bold; border-radius: 3px; cursor: pointer;">CL</button>
                     </div>
                 </div>
             </div>
+            
+            <!-- Main Table -->
+            <div style="background: white; border: 1px solid #ddd; border-radius: 5px; overflow: hidden;">
+                <div style="overflow-x: auto;">
+                    <table id="locations-table" style="width: 100%; border-collapse: collapse; font-size: 14px;">
+                        <thead style="background: #f8f9fa;">
+                            <tr>
+                                <th style="padding: 12px 8px; border: 1px solid #ddd; font-weight: bold; text-align: left; background: #f0f0f0; width: 50px;">
+                                    <input type="checkbox" id="select-all" style="width: 20px; height: 20px;">
+                                </th>
+                                <th data-sort="location_id" style="padding: 12px 8px; border: 1px solid #ddd; font-weight: bold; text-transform: lowercase; cursor: pointer; background: #f8f9fa;">location_id</th>
+                                <th data-sort="location_name" style="padding: 12px 8px; border: 1px solid #ddd; font-weight: bold; text-transform: lowercase; cursor: pointer; background: #f8f9fa;">location_name</th>
+                                <th data-sort="location_placard" style="padding: 12px 8px; border: 1px solid #ddd; font-weight: bold; text-transform: lowercase; cursor: pointer; background: #f8f9fa;">location_placard</th>
+                                <th data-sort="location_moniker" style="padding: 12px 8px; border: 1px solid #ddd; font-weight: bold; text-transform: lowercase; cursor: pointer; background: #f8f9fa;">location_moniker</th>
+                                <th data-sort="location_sobriquet" style="padding: 12px 8px; border: 1px solid #ddd; font-weight: bold; text-transform: lowercase; cursor: pointer; background: #f8f9fa;">location_sobriquet</th>
+                                <th data-sort="street" style="padding: 12px 8px; border: 1px solid #ddd; font-weight: bold; text-transform: lowercase; cursor: pointer; background: #f8f9fa;">street</th>
+                                <th data-sort="city" style="padding: 12px 8px; border: 1px solid #ddd; font-weight: bold; text-transform: lowercase; cursor: pointer; background: #f8f9fa;">city</th>
+                                <th data-sort="state_code" style="padding: 12px 8px; border: 1px solid #ddd; font-weight: bold; text-transform: lowercase; cursor: pointer; background: #f8f9fa;">state_code</th>
+                                <th data-sort="zip_code" style="padding: 12px 8px; border: 1px solid #ddd; font-weight: bold; text-transform: lowercase; cursor: pointer; background: #f8f9fa;">zip_code</th>
+                                <th data-sort="country" style="padding: 12px 8px; border: 1px solid #ddd; font-weight: bold; text-transform: lowercase; cursor: pointer; background: #f8f9fa;">country</th>
+                                <th data-sort="is_pinned_location" style="padding: 12px 8px; border: 1px solid #ddd; font-weight: bold; text-transform: lowercase; cursor: pointer; background: #f8f9fa;">is_pinned_location</th>
+                                <th style="padding: 12px 8px; border: 1px solid #ddd; font-weight: bold; background: #f8f9fa;">Actions</th>
+                            </tr>
+                        </thead>
+                        <tbody id="table-body">
+                            <!-- Data will be loaded here via AJAX -->
+                        </tbody>
+                    </table>
+                </div>
+            </div>
         </div>
+        
+        <!-- Create Popup Modal -->
+        <div id="create-modal" style="display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.5); z-index: 1000;">
+            <div style="position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); background: white; padding: 30px; border-radius: 8px; width: 600px; max-height: 80vh; overflow-y: auto;">
+                <h2 style="margin-top: 0;">Create New Location</h2>
+                <form id="create-form">
+                    <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 15px; margin-bottom: 20px;">
+                        <div>
+                            <label style="display: block; font-weight: bold; margin-bottom: 5px;">Location Name:</label>
+                            <input type="text" name="location_name" style="width: 100%; padding: 8px; border: 1px solid #ccc; border-radius: 4px;">
+                        </div>
+                        <div>
+                            <label style="display: block; font-weight: bold; margin-bottom: 5px;">Location Placard:</label>
+                            <input type="text" name="location_placard" style="width: 100%; padding: 8px; border: 1px solid #ccc; border-radius: 4px;">
+                        </div>
+                        <div>
+                            <label style="display: block; font-weight: bold; margin-bottom: 5px;">Street:</label>
+                            <input type="text" name="street" style="width: 100%; padding: 8px; border: 1px solid #ccc; border-radius: 4px;">
+                        </div>
+                        <div>
+                            <label style="display: block; font-weight: bold; margin-bottom: 5px;">City:</label>
+                            <input type="text" name="city" style="width: 100%; padding: 8px; border: 1px solid #ccc; border-radius: 4px;">
+                        </div>
+                        <div>
+                            <label style="display: block; font-weight: bold; margin-bottom: 5px;">State Code:</label>
+                            <input type="text" name="state_code" style="width: 100%; padding: 8px; border: 1px solid #ccc; border-radius: 4px;">
+                        </div>
+                        <div>
+                            <label style="display: block; font-weight: bold; margin-bottom: 5px;">Zip Code:</label>
+                            <input type="text" name="zip_code" style="width: 100%; padding: 8px; border: 1px solid #ccc; border-radius: 4px;">
+                        </div>
+                    </div>
+                    <div style="text-align: right;">
+                        <button type="button" id="cancel-btn" class="button button-secondary" style="margin-right: 10px;">Cancel</button>
+                        <button type="submit" class="button button-primary">Create Location</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+        
+        <script type="text/javascript">
+        jQuery(document).ready(function($) {
+            let currentData = [];
+            let filteredData = [];
+            
+            // Load initial data
+            loadLocationsData();
+            
+            function loadLocationsData() {
+                $.ajax({
+                    url: ajaxurl,
+                    type: 'POST',
+                    data: {
+                        action: 'grove_locations_get_data',
+                        nonce: '<?php echo wp_create_nonce('grove_locations_nonce'); ?>'
+                    },
+                    success: function(response) {
+                        if (response.success) {
+                            currentData = response.data;
+                            filteredData = currentData;
+                            displayData();
+                        } else {
+                            alert('Error loading locations data: ' + response.data);
+                        }
+                    },
+                    error: function() {
+                        alert('Error loading locations data');
+                    }
+                });
+            }
+            
+            function displayData() {
+                let tbody = $('#table-body');
+                tbody.empty();
+                
+                filteredData.forEach(function(location) {
+                    let tr = $('<tr></tr>');
+                    
+                    // Checkbox
+                    tr.append('<td style="padding: 8px; border: 1px solid #ddd; text-align: center;"><input type="checkbox" class="row-select" data-id="' + location.location_id + '"></td>');
+                    
+                    // Data columns
+                    tr.append('<td style="padding: 8px; border: 1px solid #ddd;">' + (location.location_id || '') + '</td>');
+                    tr.append('<td style="padding: 8px; border: 1px solid #ddd; cursor: pointer;" data-field="location_name" data-id="' + location.location_id + '">' + (location.location_name || '') + '</td>');
+                    tr.append('<td style="padding: 8px; border: 1px solid #ddd; cursor: pointer;" data-field="location_placard" data-id="' + location.location_id + '">' + (location.location_placard || '') + '</td>');
+                    tr.append('<td style="padding: 8px; border: 1px solid #ddd; cursor: pointer;" data-field="location_moniker" data-id="' + location.location_id + '">' + (location.location_moniker || '') + '</td>');
+                    tr.append('<td style="padding: 8px; border: 1px solid #ddd; cursor: pointer;" data-field="location_sobriquet" data-id="' + location.location_id + '">' + (location.location_sobriquet || '') + '</td>');
+                    tr.append('<td style="padding: 8px; border: 1px solid #ddd; cursor: pointer;" data-field="street" data-id="' + location.location_id + '">' + (location.street || '') + '</td>');
+                    tr.append('<td style="padding: 8px; border: 1px solid #ddd; cursor: pointer;" data-field="city" data-id="' + location.location_id + '">' + (location.city || '') + '</td>');
+                    tr.append('<td style="padding: 8px; border: 1px solid #ddd; cursor: pointer;" data-field="state_code" data-id="' + location.location_id + '">' + (location.state_code || '') + '</td>');
+                    tr.append('<td style="padding: 8px; border: 1px solid #ddd; cursor: pointer;" data-field="zip_code" data-id="' + location.location_id + '">' + (location.zip_code || '') + '</td>');
+                    tr.append('<td style="padding: 8px; border: 1px solid #ddd; cursor: pointer;" data-field="country" data-id="' + location.location_id + '">' + (location.country || '') + '</td>');
+                    tr.append('<td style="padding: 8px; border: 1px solid #ddd; text-align: center;">' + (location.is_pinned_location ? 'Yes' : 'No') + '</td>');
+                    tr.append('<td style="padding: 8px; border: 1px solid #ddd;"><button class="button button-small delete-btn" data-id="' + location.location_id + '">Delete</button></td>');
+                    
+                    tbody.append(tr);
+                });
+                
+                // Inline editing
+                $('[data-field]').click(function() {
+                    let cell = $(this);
+                    let field = cell.data('field');
+                    let id = cell.data('id');
+                    let currentValue = cell.text();
+                    
+                    let input = $('<input type="text" style="width: 100%; padding: 4px;">');
+                    input.val(currentValue);
+                    cell.html(input);
+                    input.focus();
+                    
+                    input.blur(function() {
+                        let newValue = input.val();
+                        updateField(id, field, newValue, cell);
+                    });
+                    
+                    input.keydown(function(e) {
+                        if (e.key === 'Enter') {
+                            input.blur();
+                        } else if (e.key === 'Escape') {
+                            cell.text(currentValue);
+                        }
+                    });
+                });
+            }
+            
+            function updateField(id, field, value, cell) {
+                $.ajax({
+                    url: ajaxurl,
+                    type: 'POST',
+                    data: {
+                        action: 'grove_locations_update_field',
+                        nonce: '<?php echo wp_create_nonce('grove_locations_nonce'); ?>',
+                        id: id,
+                        field: field,
+                        value: value
+                    },
+                    success: function(response) {
+                        if (response.success) {
+                            cell.text(value);
+                        } else {
+                            alert('Error updating field: ' + response.data);
+                        }
+                    },
+                    error: function() {
+                        alert('Error updating field');
+                    }
+                });
+            }
+            
+            // Create popup modal
+            $('#create-popup-btn').click(function() {
+                $('#create-modal').show();
+            });
+            
+            $('#cancel-btn, #create-modal').click(function(e) {
+                if (e.target === this) {
+                    $('#create-modal').hide();
+                    $('#create-form')[0].reset();
+                }
+            });
+            
+            // Create form submission
+            $('#create-form').submit(function(e) {
+                e.preventDefault();
+                
+                let formData = {
+                    action: 'grove_locations_create',
+                    nonce: '<?php echo wp_create_nonce('grove_locations_nonce'); ?>'
+                };
+                
+                $(this).serializeArray().forEach(function(field) {
+                    formData[field.name] = field.value;
+                });
+                
+                $.ajax({
+                    url: ajaxurl,
+                    type: 'POST',
+                    data: formData,
+                    success: function(response) {
+                        if (response.success) {
+                            $('#create-modal').hide();
+                            $('#create-form')[0].reset();
+                            loadLocationsData();
+                        } else {
+                            alert('Error creating location: ' + response.data);
+                        }
+                    },
+                    error: function() {
+                        alert('Error creating location');
+                    }
+                });
+            });
+            
+            // Delete functionality
+            $(document).on('click', '.delete-btn', function() {
+                let id = $(this).data('id');
+                if (confirm('Are you sure you want to delete this location?')) {
+                    $.ajax({
+                        url: ajaxurl,
+                        type: 'POST',
+                        data: {
+                            action: 'grove_locations_delete',
+                            nonce: '<?php echo wp_create_nonce('grove_locations_nonce'); ?>',
+                            id: id
+                        },
+                        success: function(response) {
+                            if (response.success) {
+                                loadLocationsData();
+                            } else {
+                                alert('Error deleting location: ' + response.data);
+                            }
+                        }
+                    });
+                }
+            });
+            
+            // Search functionality
+            $('#search-box').on('input', function() {
+                let searchTerm = $(this).val().toLowerCase();
+                if (searchTerm === '') {
+                    filteredData = currentData;
+                } else {
+                    filteredData = currentData.filter(function(location) {
+                        return Object.values(location).some(function(value) {
+                            return String(value).toLowerCase().includes(searchTerm);
+                        });
+                    });
+                }
+                displayData();
+            });
+            
+            $('#clear-search').click(function() {
+                $('#search-box').val('');
+                filteredData = currentData;
+                displayData();
+            });
+        });
+        </script>
         <?php
     }
     
@@ -854,11 +1153,14 @@ class Grove_Admin {
      * Grove Services Manager Page
      */
     public function grove_services_mar_page() {
+        global $wpdb;
+        $table_name = $wpdb->prefix . 'zen_services';
+        
         // AGGRESSIVE NOTICE SUPPRESSION - Remove ALL WordPress admin notices
         $this->suppress_all_admin_notices();
         
-        global $wpdb;
-        $table_name = $wpdb->prefix . 'zen_services';
+        // Enqueue WordPress media scripts
+        wp_enqueue_media();
         
         ?>
         <div class="wrap" style="margin: 0; padding: 0;">
@@ -867,31 +1169,577 @@ class Grove_Admin {
             
             <div style="padding: 20px;">
                 <h1 style="margin-bottom: 20px;">🌳🔧 Grove Services Manager</h1>
-                
-                <!-- Control Bar -->
-                <div style="background: white; border: 1px solid #ddd; padding: 15px; margin-bottom: 20px; border-radius: 5px;">
-                    <div style="display: flex; justify-content: space-between; align-items: center;">
-                        <div>
-                            <strong>Table:</strong> <?php echo esc_html($table_name); ?>
-                        </div>
-                        <div>
-                            <button class="button button-primary">Create New Service</button>
-                            <button class="button button-secondary">Bulk Actions</button>
-                        </div>
+            
+            <!-- Control Bar -->
+            <div style="background: white; border: 1px solid #ddd; padding: 15px; margin-bottom: 20px; border-radius: 5px;">
+                <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 15px;">
+                    <div style="display: flex; gap: 10px; align-items: center;">
+                        <button id="create-popup-btn" class="button button-primary">Create New Service</button>
+                        <button id="delete-selected-btn" class="button" style="background: #dc3545; color: white; border-color: #dc3545;">Delete Selected</button>
                     </div>
                 </div>
                 
-                <!-- Main Table -->
-                <div style="background: white; border: 1px solid #ddd; border-radius: 5px; overflow: hidden;">
-                    <div style="padding: 20px; text-align: center;">
-                        <p><strong>Grove Services Manager</strong></p>
-                        <p>This page will manage the <code><?php echo esc_html($table_name); ?></code> table.</p>
-                        <p><em>Full interface implementation coming soon...</em></p>
+                <!-- Search -->
+                <div style="display: flex; justify-content: flex-end; align-items: center;">
+                    <div style="position: relative;">
+                        <input type="text" id="search-box" placeholder="Search services..." style="padding: 8px 40px 8px 12px; border: 1px solid #ccc; border-radius: 4px; width: 250px; font-size: 14px;">
+                        <button id="clear-search" style="position: absolute; right: 8px; top: 50%; transform: translateY(-50%); background: #ffeb3b; border: none; padding: 4px 8px; font-size: 12px; font-weight: bold; border-radius: 3px; cursor: pointer;">CL</button>
                     </div>
                 </div>
             </div>
+            
+            <!-- Main Table -->
+            <div style="background: white; border: 1px solid #ddd; border-radius: 5px; overflow: hidden;">
+                <div style="overflow-x: auto;">
+                    <table id="services-table" style="width: 100%; border-collapse: collapse; font-size: 14px;">
+                        <thead style="background: #f8f9fa;">
+                            <tr>
+                                <th style="padding: 12px 8px; border: 1px solid #ddd; font-weight: bold; text-align: left; background: #f0f0f0; width: 50px;">
+                                    <input type="checkbox" id="select-all" style="width: 20px; height: 20px;">
+                                </th>
+                                <th data-sort="service_id" style="padding: 12px 8px; border: 1px solid #ddd; font-weight: bold; text-transform: lowercase; cursor: pointer; background: #f8f9fa;">service_id</th>
+                                <th data-sort="service_name" style="padding: 12px 8px; border: 1px solid #ddd; font-weight: bold; text-transform: lowercase; cursor: pointer; background: #f8f9fa;">service_name</th>
+                                <th data-sort="service_placard" style="padding: 12px 8px; border: 1px solid #ddd; font-weight: bold; text-transform: lowercase; cursor: pointer; background: #f8f9fa;">service_placard</th>
+                                <th data-sort="service_moniker" style="padding: 12px 8px; border: 1px solid #ddd; font-weight: bold; text-transform: lowercase; cursor: pointer; background: #f8f9fa;">service_moniker</th>
+                                <th data-sort="description1_short" style="padding: 12px 8px; border: 1px solid #ddd; font-weight: bold; text-transform: lowercase; cursor: pointer; background: #f8f9fa;">description1_short</th>
+                                <th data-sort="description1_long" style="padding: 12px 8px; border: 1px solid #ddd; font-weight: bold; text-transform: lowercase; cursor: pointer; background: #f8f9fa;">description1_long</th>
+                                <th data-sort="is_pinned_service" style="padding: 12px 8px; border: 1px solid #ddd; font-weight: bold; text-transform: lowercase; cursor: pointer; background: #f8f9fa;">is_pinned_service</th>
+                                <th style="padding: 12px 8px; border: 1px solid #ddd; font-weight: bold; background: #f8f9fa;">Actions</th>
+                            </tr>
+                        </thead>
+                        <tbody id="table-body">
+                            <!-- Data will be loaded here via AJAX -->
+                        </tbody>
+                    </table>
+                </div>
+            </div>
         </div>
+        
+        <!-- Create Popup Modal -->
+        <div id="create-modal" style="display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.5); z-index: 1000;">
+            <div style="position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); background: white; padding: 30px; border-radius: 8px; width: 700px; max-height: 80vh; overflow-y: auto;">
+                <h2 style="margin-top: 0;">Create New Service</h2>
+                <form id="create-form">
+                    <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 15px; margin-bottom: 20px;">
+                        <div>
+                            <label style="display: block; font-weight: bold; margin-bottom: 5px;">Service Name:</label>
+                            <input type="text" name="service_name" style="width: 100%; padding: 8px; border: 1px solid #ccc; border-radius: 4px;">
+                        </div>
+                        <div>
+                            <label style="display: block; font-weight: bold; margin-bottom: 5px;">Service Placard:</label>
+                            <input type="text" name="service_placard" style="width: 100%; padding: 8px; border: 1px solid #ccc; border-radius: 4px;">
+                        </div>
+                        <div>
+                            <label style="display: block; font-weight: bold; margin-bottom: 5px;">Service Moniker:</label>
+                            <input type="text" name="service_moniker" style="width: 100%; padding: 8px; border: 1px solid #ccc; border-radius: 4px;">
+                        </div>
+                        <div>
+                            <label style="display: block; font-weight: bold; margin-bottom: 5px;">Service Sobriquet:</label>
+                            <input type="text" name="service_sobriquet" style="width: 100%; padding: 8px; border: 1px solid #ccc; border-radius: 4px;">
+                        </div>
+                    </div>
+                    <div style="margin-bottom: 20px;">
+                        <label style="display: block; font-weight: bold; margin-bottom: 5px;">Short Description:</label>
+                        <textarea name="description1_short" rows="3" style="width: 100%; padding: 8px; border: 1px solid #ccc; border-radius: 4px; resize: vertical;"></textarea>
+                    </div>
+                    <div style="margin-bottom: 20px;">
+                        <label style="display: block; font-weight: bold; margin-bottom: 5px;">Long Description:</label>
+                        <textarea name="description1_long" rows="5" style="width: 100%; padding: 8px; border: 1px solid #ccc; border-radius: 4px; resize: vertical;"></textarea>
+                    </div>
+                    <div style="text-align: right;">
+                        <button type="button" id="cancel-btn" class="button button-secondary" style="margin-right: 10px;">Cancel</button>
+                        <button type="submit" class="button button-primary">Create Service</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+        
+        <script type="text/javascript">
+        jQuery(document).ready(function($) {
+            let currentData = [];
+            let filteredData = [];
+            
+            // Load initial data
+            loadServicesData();
+            
+            function loadServicesData() {
+                $.ajax({
+                    url: ajaxurl,
+                    type: 'POST',
+                    data: {
+                        action: 'grove_services_get_data',
+                        nonce: '<?php echo wp_create_nonce('grove_services_nonce'); ?>'
+                    },
+                    success: function(response) {
+                        if (response.success) {
+                            currentData = response.data;
+                            filteredData = currentData;
+                            displayData();
+                        } else {
+                            alert('Error loading services data: ' + response.data);
+                        }
+                    },
+                    error: function() {
+                        alert('Error loading services data');
+                    }
+                });
+            }
+            
+            function displayData() {
+                let tbody = $('#table-body');
+                tbody.empty();
+                
+                filteredData.forEach(function(service) {
+                    let tr = $('<tr></tr>');
+                    
+                    // Checkbox
+                    tr.append('<td style="padding: 8px; border: 1px solid #ddd; text-align: center;"><input type="checkbox" class="row-select" data-id="' + service.service_id + '"></td>');
+                    
+                    // Data columns
+                    tr.append('<td style="padding: 8px; border: 1px solid #ddd;">' + (service.service_id || '') + '</td>');
+                    tr.append('<td style="padding: 8px; border: 1px solid #ddd; cursor: pointer;" data-field="service_name" data-id="' + service.service_id + '">' + (service.service_name || '') + '</td>');
+                    tr.append('<td style="padding: 8px; border: 1px solid #ddd; cursor: pointer;" data-field="service_placard" data-id="' + service.service_id + '">' + (service.service_placard || '') + '</td>');
+                    tr.append('<td style="padding: 8px; border: 1px solid #ddd; cursor: pointer;" data-field="service_moniker" data-id="' + service.service_id + '">' + (service.service_moniker || '') + '</td>');
+                    tr.append('<td style="padding: 8px; border: 1px solid #ddd; cursor: pointer;" data-field="description1_short" data-id="' + service.service_id + '">' + (service.description1_short || '') + '</td>');
+                    tr.append('<td style="padding: 8px; border: 1px solid #ddd; cursor: pointer;" data-field="description1_long" data-id="' + service.service_id + '">' + (service.description1_long || '') + '</td>');
+                    tr.append('<td style="padding: 8px; border: 1px solid #ddd; text-align: center;">' + (service.is_pinned_service ? 'Yes' : 'No') + '</td>');
+                    tr.append('<td style="padding: 8px; border: 1px solid #ddd;"><button class="button button-small delete-btn" data-id="' + service.service_id + '">Delete</button></td>');
+                    
+                    tbody.append(tr);
+                });
+                
+                // Inline editing
+                $('[data-field]').click(function() {
+                    let cell = $(this);
+                    let field = cell.data('field');
+                    let id = cell.data('id');
+                    let currentValue = cell.text();
+                    
+                    let input;
+                    if (field.includes('description')) {
+                        input = $('<textarea style="width: 100%; height: 60px; padding: 4px; resize: vertical;"></textarea>');
+                    } else {
+                        input = $('<input type="text" style="width: 100%; padding: 4px;">');
+                    }
+                    
+                    input.val(currentValue);
+                    cell.html(input);
+                    input.focus();
+                    
+                    input.blur(function() {
+                        let newValue = input.val();
+                        updateField(id, field, newValue, cell);
+                    });
+                    
+                    input.keydown(function(e) {
+                        if (e.key === 'Enter' && !field.includes('description')) {
+                            input.blur();
+                        } else if (e.key === 'Escape') {
+                            cell.text(currentValue);
+                        }
+                    });
+                });
+            }
+            
+            function updateField(id, field, value, cell) {
+                $.ajax({
+                    url: ajaxurl,
+                    type: 'POST',
+                    data: {
+                        action: 'grove_services_update_field',
+                        nonce: '<?php echo wp_create_nonce('grove_services_nonce'); ?>',
+                        id: id,
+                        field: field,
+                        value: value
+                    },
+                    success: function(response) {
+                        if (response.success) {
+                            cell.text(value);
+                        } else {
+                            alert('Error updating field: ' + response.data);
+                        }
+                    },
+                    error: function() {
+                        alert('Error updating field');
+                    }
+                });
+            }
+            
+            // Modal functionality
+            $('#create-popup-btn').click(function() {
+                $('#create-modal').show();
+            });
+            
+            $('#cancel-btn, #create-modal').click(function(e) {
+                if (e.target === this) {
+                    $('#create-modal').hide();
+                    $('#create-form')[0].reset();
+                }
+            });
+            
+            // Create form submission
+            $('#create-form').submit(function(e) {
+                e.preventDefault();
+                
+                let formData = {
+                    action: 'grove_services_create',
+                    nonce: '<?php echo wp_create_nonce('grove_services_nonce'); ?>'
+                };
+                
+                $(this).serializeArray().forEach(function(field) {
+                    formData[field.name] = field.value;
+                });
+                
+                $.ajax({
+                    url: ajaxurl,
+                    type: 'POST',
+                    data: formData,
+                    success: function(response) {
+                        if (response.success) {
+                            $('#create-modal').hide();
+                            $('#create-form')[0].reset();
+                            loadServicesData();
+                        } else {
+                            alert('Error creating service: ' + response.data);
+                        }
+                    },
+                    error: function() {
+                        alert('Error creating service');
+                    }
+                });
+            });
+            
+            // Delete functionality
+            $(document).on('click', '.delete-btn', function() {
+                let id = $(this).data('id');
+                if (confirm('Are you sure you want to delete this service?')) {
+                    $.ajax({
+                        url: ajaxurl,
+                        type: 'POST',
+                        data: {
+                            action: 'grove_services_delete',
+                            nonce: '<?php echo wp_create_nonce('grove_services_nonce'); ?>',
+                            id: id
+                        },
+                        success: function(response) {
+                            if (response.success) {
+                                loadServicesData();
+                            } else {
+                                alert('Error deleting service: ' + response.data);
+                            }
+                        }
+                    });
+                }
+            });
+            
+            // Search functionality
+            $('#search-box').on('input', function() {
+                let searchTerm = $(this).val().toLowerCase();
+                if (searchTerm === '') {
+                    filteredData = currentData;
+                } else {
+                    filteredData = currentData.filter(function(service) {
+                        return Object.values(service).some(function(value) {
+                            return String(value).toLowerCase().includes(searchTerm);
+                        });
+                    });
+                }
+                displayData();
+            });
+            
+            $('#clear-search').click(function() {
+                $('#search-box').val('');
+                filteredData = currentData;
+                displayData();
+            });
+        });
+        </script>
         <?php
+    }
+    
+    /**
+     * AJAX: Get locations data
+     */
+    public function grove_locations_get_data() {
+        check_ajax_referer('grove_locations_nonce', 'nonce');
+        
+        if (!current_user_can('manage_options')) {
+            wp_die('Unauthorized');
+        }
+        
+        global $wpdb;
+        $table_name = $wpdb->prefix . 'zen_locations';
+        
+        try {
+            $results = $wpdb->get_results("SELECT * FROM $table_name ORDER BY location_id", ARRAY_A);
+            
+            if ($wpdb->last_error) {
+                wp_send_json_error('Database error: ' . $wpdb->last_error);
+                return;
+            }
+            
+            wp_send_json_success($results);
+        } catch (Exception $e) {
+            wp_send_json_error('Error loading locations data: ' . $e->getMessage());
+        }
+    }
+    
+    /**
+     * AJAX: Update locations field
+     */
+    public function grove_locations_update_field() {
+        check_ajax_referer('grove_locations_nonce', 'nonce');
+        
+        if (!current_user_can('manage_options')) {
+            wp_die('Unauthorized');
+        }
+        
+        $id = intval($_POST['id']);
+        $field = sanitize_text_field($_POST['field']);
+        $value = sanitize_text_field($_POST['value']);
+        
+        $allowed_fields = ['location_name', 'location_placard', 'location_moniker', 'location_sobriquet', 'street', 'city', 'state_code', 'zip_code', 'country'];
+        
+        if (!in_array($field, $allowed_fields)) {
+            wp_send_json_error('Invalid field name');
+            return;
+        }
+        
+        global $wpdb;
+        $table_name = $wpdb->prefix . 'zen_locations';
+        
+        try {
+            $result = $wpdb->update(
+                $table_name,
+                array($field => $value),
+                array('location_id' => $id),
+                array('%s'),
+                array('%d')
+            );
+            
+            if ($result === false) {
+                wp_send_json_error('Database update failed: ' . $wpdb->last_error);
+                return;
+            }
+            
+            wp_send_json_success('Field updated successfully');
+        } catch (Exception $e) {
+            wp_send_json_error('Error updating field: ' . $e->getMessage());
+        }
+    }
+    
+    /**
+     * AJAX: Create new location
+     */
+    public function grove_locations_create() {
+        check_ajax_referer('grove_locations_nonce', 'nonce');
+        
+        if (!current_user_can('manage_options')) {
+            wp_die('Unauthorized');
+        }
+        
+        global $wpdb;
+        $table_name = $wpdb->prefix . 'zen_locations';
+        
+        $data = array(
+            'location_name' => sanitize_text_field($_POST['location_name']),
+            'location_placard' => sanitize_text_field($_POST['location_placard']),
+            'street' => sanitize_text_field($_POST['street']),
+            'city' => sanitize_text_field($_POST['city']),
+            'state_code' => sanitize_text_field($_POST['state_code']),
+            'zip_code' => sanitize_text_field($_POST['zip_code']),
+            'country' => sanitize_text_field($_POST['country'] ?: 'USA'),
+            'is_pinned_location' => 0,
+            'position_in_custom_order' => 0
+        );
+        
+        try {
+            $result = $wpdb->insert($table_name, $data);
+            
+            if ($result === false) {
+                wp_send_json_error('Database insert failed: ' . $wpdb->last_error);
+                return;
+            }
+            
+            wp_send_json_success('Location created successfully');
+        } catch (Exception $e) {
+            wp_send_json_error('Error creating location: ' . $e->getMessage());
+        }
+    }
+    
+    /**
+     * AJAX: Delete location
+     */
+    public function grove_locations_delete() {
+        check_ajax_referer('grove_locations_nonce', 'nonce');
+        
+        if (!current_user_can('manage_options')) {
+            wp_die('Unauthorized');
+        }
+        
+        $id = intval($_POST['id']);
+        
+        global $wpdb;
+        $table_name = $wpdb->prefix . 'zen_locations';
+        
+        try {
+            $result = $wpdb->delete(
+                $table_name,
+                array('location_id' => $id),
+                array('%d')
+            );
+            
+            if ($result === false) {
+                wp_send_json_error('Database delete failed: ' . $wpdb->last_error);
+                return;
+            }
+            
+            wp_send_json_success('Location deleted successfully');
+        } catch (Exception $e) {
+            wp_send_json_error('Error deleting location: ' . $e->getMessage());
+        }
+    }
+    
+    /**
+     * AJAX: Get services data
+     */
+    public function grove_services_get_data() {
+        check_ajax_referer('grove_services_nonce', 'nonce');
+        
+        if (!current_user_can('manage_options')) {
+            wp_die('Unauthorized');
+        }
+        
+        global $wpdb;
+        $table_name = $wpdb->prefix . 'zen_services';
+        
+        try {
+            $results = $wpdb->get_results("SELECT * FROM $table_name ORDER BY service_id", ARRAY_A);
+            
+            if ($wpdb->last_error) {
+                wp_send_json_error('Database error: ' . $wpdb->last_error);
+                return;
+            }
+            
+            wp_send_json_success($results);
+        } catch (Exception $e) {
+            wp_send_json_error('Error loading services data: ' . $e->getMessage());
+        }
+    }
+    
+    /**
+     * AJAX: Update services field
+     */
+    public function grove_services_update_field() {
+        check_ajax_referer('grove_services_nonce', 'nonce');
+        
+        if (!current_user_can('manage_options')) {
+            wp_die('Unauthorized');
+        }
+        
+        $id = intval($_POST['id']);
+        $field = sanitize_text_field($_POST['field']);
+        $value = sanitize_textarea_field($_POST['value']);
+        
+        $allowed_fields = ['service_name', 'service_placard', 'service_moniker', 'service_sobriquet', 'description1_short', 'description1_long'];
+        
+        if (!in_array($field, $allowed_fields)) {
+            wp_send_json_error('Invalid field name');
+            return;
+        }
+        
+        global $wpdb;
+        $table_name = $wpdb->prefix . 'zen_services';
+        
+        try {
+            $result = $wpdb->update(
+                $table_name,
+                array($field => $value),
+                array('service_id' => $id),
+                array('%s'),
+                array('%d')
+            );
+            
+            if ($result === false) {
+                wp_send_json_error('Database update failed: ' . $wpdb->last_error);
+                return;
+            }
+            
+            wp_send_json_success('Field updated successfully');
+        } catch (Exception $e) {
+            wp_send_json_error('Error updating field: ' . $e->getMessage());
+        }
+    }
+    
+    /**
+     * AJAX: Create new service
+     */
+    public function grove_services_create() {
+        check_ajax_referer('grove_services_nonce', 'nonce');
+        
+        if (!current_user_can('manage_options')) {
+            wp_die('Unauthorized');
+        }
+        
+        global $wpdb;
+        $table_name = $wpdb->prefix . 'zen_services';
+        
+        $data = array(
+            'service_name' => sanitize_text_field($_POST['service_name']),
+            'service_placard' => sanitize_text_field($_POST['service_placard']),
+            'service_moniker' => sanitize_text_field($_POST['service_moniker']),
+            'service_sobriquet' => sanitize_text_field($_POST['service_sobriquet']),
+            'description1_short' => sanitize_textarea_field($_POST['description1_short']),
+            'description1_long' => sanitize_textarea_field($_POST['description1_long']),
+            'is_pinned_service' => 0,
+            'position_in_custom_order' => 0
+        );
+        
+        try {
+            $result = $wpdb->insert($table_name, $data);
+            
+            if ($result === false) {
+                wp_send_json_error('Database insert failed: ' . $wpdb->last_error);
+                return;
+            }
+            
+            wp_send_json_success('Service created successfully');
+        } catch (Exception $e) {
+            wp_send_json_error('Error creating service: ' . $e->getMessage());
+        }
+    }
+    
+    /**
+     * AJAX: Delete service
+     */
+    public function grove_services_delete() {
+        check_ajax_referer('grove_services_nonce', 'nonce');
+        
+        if (!current_user_can('manage_options')) {
+            wp_die('Unauthorized');
+        }
+        
+        $id = intval($_POST['id']);
+        
+        global $wpdb;
+        $table_name = $wpdb->prefix . 'zen_services';
+        
+        try {
+            $result = $wpdb->delete(
+                $table_name,
+                array('service_id' => $id),
+                array('%d')
+            );
+            
+            if ($result === false) {
+                wp_send_json_error('Database delete failed: ' . $wpdb->last_error);
+                return;
+            }
+            
+            wp_send_json_success('Service deleted successfully');
+        } catch (Exception $e) {
+            wp_send_json_error('Error deleting service: ' . $e->getMessage());
+        }
     }
     
     /**
