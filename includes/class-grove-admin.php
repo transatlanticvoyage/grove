@@ -131,6 +131,7 @@ class Grove_Admin {
                                     </th>
                                     <th style="padding: 12px 8px; border: 1px solid #ddd; font-weight: bold; text-transform: lowercase; background: #f8f9fa; width: 250px;">Field Name</th>
                                     <th style="padding: 12px 8px; border: 1px solid #ddd; font-weight: bold; text-transform: lowercase; background: #f8f9fa;">Value</th>
+                                    <th style="padding: 12px 8px; border: 1px solid #ddd; font-weight: bold; text-transform: lowercase; background: #f8f9fa; width: 300px;">shortcode 1</th>
                                     <th style="padding: 0; border: 1px solid #ddd; font-weight: bold; text-transform: lowercase; background: #f8f9fa; width: 20px;">stuff3</th>
                                 </tr>
                             </thead>
@@ -437,6 +438,68 @@ class Grove_Admin {
                     }
                     
                     tr.append(valueTd);
+                    
+                    // Add new shortcode 1 column
+                    let shortcodeTd = $('<td style="padding: 8px; border: 1px solid #ddd; position: relative;"></td>');
+                    if (isSpecialBg) shortcodeTd.css('background-color', '#9b9b9b');
+                    
+                    // Create shortcode text
+                    let shortcodeText = '[sitespren dbcol="' + field.key + '"]';
+                    let shortcodeSpan = $('<span style="font-family: monospace; font-size: 12px; color: #333; margin-right: 10px;"></span>');
+                    shortcodeSpan.text(shortcodeText);
+                    
+                    // Create copy button
+                    let copyBtn = $('<button style="padding: 4px 8px; background: #f0f0f0; border: 1px solid #ccc; border-radius: 3px; cursor: pointer; font-size: 12px; color: #333; transition: background-color 0.2s;">Copy</button>');
+                    
+                    // Add hover effect with yellow background
+                    copyBtn.hover(
+                        function() { $(this).css('background-color', '#ffeb3b'); },
+                        function() { $(this).css('background-color', '#f0f0f0'); }
+                    );
+                    
+                    // Add click handler for copy functionality
+                    copyBtn.on('click', function() {
+                        // Copy to clipboard
+                        if (navigator.clipboard && navigator.clipboard.writeText) {
+                            navigator.clipboard.writeText(shortcodeText).then(function() {
+                                // Success feedback
+                                let originalText = copyBtn.text();
+                                copyBtn.text('Copied!');
+                                copyBtn.css('background-color', '#4caf50');
+                                copyBtn.css('color', '#fff');
+                                setTimeout(function() {
+                                    copyBtn.text(originalText);
+                                    copyBtn.css('background-color', '#f0f0f0');
+                                    copyBtn.css('color', '#333');
+                                }, 1500);
+                            }).catch(function(err) {
+                                console.error('Failed to copy:', err);
+                                alert('Failed to copy shortcode');
+                            });
+                        } else {
+                            // Fallback for older browsers
+                            let tempInput = $('<input>');
+                            $('body').append(tempInput);
+                            tempInput.val(shortcodeText).select();
+                            document.execCommand('copy');
+                            tempInput.remove();
+                            
+                            // Success feedback
+                            let originalText = copyBtn.text();
+                            copyBtn.text('Copied!');
+                            copyBtn.css('background-color', '#4caf50');
+                            copyBtn.css('color', '#fff');
+                            setTimeout(function() {
+                                copyBtn.text(originalText);
+                                copyBtn.css('background-color', '#f0f0f0');
+                                copyBtn.css('color', '#333');
+                            }, 1500);
+                        }
+                    });
+                    
+                    shortcodeTd.append(shortcodeSpan);
+                    shortcodeTd.append(copyBtn);
+                    tr.append(shortcodeTd);
                     
                     // Add stuff3 column with roaring_div as shortcode copy button
                     let stuff3Td = $('<td class="stuff3-cell" style="padding: 0; border: 1px solid #ddd; width: 20px;"></td>');
