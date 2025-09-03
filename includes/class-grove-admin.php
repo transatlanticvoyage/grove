@@ -110,8 +110,18 @@ class Grove_Admin {
                 <!-- Control Bar -->
                 <div style="background: white; border: 1px solid #ddd; padding: 15px; margin-bottom: 20px; border-radius: 5px;">
                     <div style="display: flex; justify-content: space-between; align-items: center;">
-                        <div>
-                            <strong>Current Site:</strong> <?php echo esc_html($current_site_url); ?>
+                        <div style="display: flex; align-items: center; gap: 20px;">
+                            <div>
+                                <strong>Current Site:</strong> <?php echo esc_html($current_site_url); ?>
+                            </div>
+                            <!-- Export Button Bar -->
+                            <div style="display: flex; gap: 5px; align-items: center; border-left: 2px solid #ddd; padding-left: 20px;">
+                                <button id="export-sharkintax-btn" class="button button-secondary" style="padding: 5px 12px; font-size: 13px;">copy all sharkintax</button>
+                                <button id="export-walrustax-btn" class="button button-secondary" style="padding: 5px 12px; font-size: 13px;">copy all walrustax</button>
+                                <button id="export-xls-btn" class="button button-secondary" style="padding: 5px 12px; font-size: 13px;">xls</button>
+                                <button id="export-csv-btn" class="button button-secondary" style="padding: 5px 12px; font-size: 13px;">csv</button>
+                                <button id="export-sql-btn" class="button button-secondary" style="padding: 5px 12px; font-size: 13px;">sql</button>
+                            </div>
                         </div>
                         <div>
                             <button id="save-all-btn" class="button button-primary">Save All Changes</button>
