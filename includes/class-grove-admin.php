@@ -19,6 +19,12 @@ class Grove_Admin {
         add_action('wp_ajax_grove_services_create', array($this, 'grove_services_create'));
         add_action('wp_ajax_grove_shortcode_update_mode', array($this, 'grove_shortcode_update_mode'));
         add_action('wp_ajax_grove_shortcode_test', array($this, 'grove_shortcode_test'));
+        // Export handlers
+        add_action('wp_ajax_grove_export_sharkintax', array($this, 'grove_export_sharkintax'));
+        add_action('wp_ajax_grove_export_walrustax', array($this, 'grove_export_walrustax'));
+        add_action('wp_ajax_grove_export_csv', array($this, 'grove_export_csv'));
+        add_action('wp_ajax_grove_export_xls', array($this, 'grove_export_xls'));
+        add_action('wp_ajax_grove_export_sql', array($this, 'grove_export_sql'));
     }
     
     public function add_admin_menu() {
@@ -100,7 +106,7 @@ class Grove_Admin {
         }
         
         ?>
-        <div class="wrap" style="margin: 0; padding: 0;">
+        <div class="wrap grove-content" style="margin: 0; padding: 0;">
             <!-- Allow space for WordPress notices -->
             <div style="height: 20px;"></div>
             
@@ -725,6 +731,157 @@ class Grove_Admin {
                     alert('Reset functionality would be implemented here.');
                 }
             });
+            
+            // Export button handlers
+            $('#export-sharkintax-btn').on('click', function() {
+                $.ajax({
+                    url: ajaxurl,
+                    type: 'POST',
+                    data: {
+                        action: 'grove_export_sharkintax',
+                        nonce: '<?php echo wp_create_nonce('grove_export_nonce'); ?>'
+                    },
+                    success: function(response) {
+                        if (response.success) {
+                            // Copy to clipboard
+                            if (navigator.clipboard && navigator.clipboard.writeText) {
+                                navigator.clipboard.writeText(response.data).then(function() {
+                                    alert('Sharkintax data copied to clipboard!');
+                                }).catch(function(err) {
+                                    console.error('Failed to copy:', err);
+                                    fallbackCopy(response.data, 'Sharkintax');
+                                });
+                            } else {
+                                fallbackCopy(response.data, 'Sharkintax');
+                            }
+                        } else {
+                            alert('Error: ' + response.data);
+                        }
+                    },
+                    error: function() {
+                        alert('Export failed. Please try again.');
+                    }
+                });
+            });
+            
+            $('#export-walrustax-btn').on('click', function() {
+                $.ajax({
+                    url: ajaxurl,
+                    type: 'POST',
+                    data: {
+                        action: 'grove_export_walrustax',
+                        nonce: '<?php echo wp_create_nonce('grove_export_nonce'); ?>'
+                    },
+                    success: function(response) {
+                        if (response.success) {
+                            // Copy to clipboard
+                            if (navigator.clipboard && navigator.clipboard.writeText) {
+                                navigator.clipboard.writeText(response.data).then(function() {
+                                    alert('Walrustax data copied to clipboard!');
+                                }).catch(function(err) {
+                                    console.error('Failed to copy:', err);
+                                    fallbackCopy(response.data, 'Walrustax');
+                                });
+                            } else {
+                                fallbackCopy(response.data, 'Walrustax');
+                            }
+                        } else {
+                            alert('Error: ' + response.data);
+                        }
+                    },
+                    error: function() {
+                        alert('Export failed. Please try again.');
+                    }
+                });
+            });
+            
+            $('#export-csv-btn').on('click', function() {
+                // Create form and submit for file download
+                let form = $('<form>', {
+                    action: ajaxurl,
+                    method: 'POST'
+                });
+                form.append($('<input>', {
+                    type: 'hidden',
+                    name: 'action',
+                    value: 'grove_export_csv'
+                }));
+                form.append($('<input>', {
+                    type: 'hidden',
+                    name: 'nonce',
+                    value: '<?php echo wp_create_nonce('grove_export_nonce'); ?>'
+                }));
+                form.append($('<input>', {
+                    type: 'hidden',
+                    name: 'download',
+                    value: '1'
+                }));
+                $('body').append(form);
+                form.submit();
+                form.remove();
+            });
+            
+            $('#export-xls-btn').on('click', function() {
+                // Create form and submit for file download
+                let form = $('<form>', {
+                    action: ajaxurl,
+                    method: 'POST'
+                });
+                form.append($('<input>', {
+                    type: 'hidden',
+                    name: 'action',
+                    value: 'grove_export_xls'
+                }));
+                form.append($('<input>', {
+                    type: 'hidden',
+                    name: 'nonce',
+                    value: '<?php echo wp_create_nonce('grove_export_nonce'); ?>'
+                }));
+                form.append($('<input>', {
+                    type: 'hidden',
+                    name: 'download',
+                    value: '1'
+                }));
+                $('body').append(form);
+                form.submit();
+                form.remove();
+            });
+            
+            $('#export-sql-btn').on('click', function() {
+                // Create form and submit for file download
+                let form = $('<form>', {
+                    action: ajaxurl,
+                    method: 'POST'
+                });
+                form.append($('<input>', {
+                    type: 'hidden',
+                    name: 'action',
+                    value: 'grove_export_sql'
+                }));
+                form.append($('<input>', {
+                    type: 'hidden',
+                    name: 'nonce',
+                    value: '<?php echo wp_create_nonce('grove_export_nonce'); ?>'
+                }));
+                form.append($('<input>', {
+                    type: 'hidden',
+                    name: 'download',
+                    value: '1'
+                }));
+                $('body').append(form);
+                form.submit();
+                form.remove();
+            });
+            
+            // Fallback copy function for older browsers
+            function fallbackCopy(text, type) {
+                let tempInput = $('<textarea>');
+                $('body').append(tempInput);
+                tempInput.val(text).select();
+                document.execCommand('copy');
+                tempInput.remove();
+                alert(type + ' data copied to clipboard!');
+            }
             
             // Select all checkbox
             $('#select-all').on('change', function() {
@@ -2109,11 +2266,459 @@ class Grove_Admin {
     }
     
     /**
-     * Suppress admin notices on our pages
+     * AGGRESSIVE NOTICE SUPPRESSION - Remove ALL WordPress admin notices
+     * Based on proven Snefuruplin implementation
      */
     private function suppress_all_admin_notices() {
-        // Remove all admin notices for clean interface
-        remove_all_actions('admin_notices');
-        remove_all_actions('all_admin_notices');
+        // Remove all admin notices immediately
+        add_action('admin_print_styles', function() {
+            // Remove all notice actions
+            remove_all_actions('admin_notices');
+            remove_all_actions('all_admin_notices');
+            remove_all_actions('network_admin_notices');
+            
+            // Remove user admin notices
+            global $wp_filter;
+            if (isset($wp_filter['user_admin_notices'])) {
+                unset($wp_filter['user_admin_notices']);
+            }
+        }, 0);
+        
+        // Additional cleanup for persistent notices
+        add_action('admin_head', function() {
+            // Hide any notices that slip through via CSS
+            echo '<style type="text/css">
+                .notice, .notice-warning, .notice-error, .notice-success, .notice-info,
+                .updated, .error, .update-nag, .admin-notice,
+                div.notice, div.updated, div.error, div.update-nag,
+                .wrap > .notice, .wrap > .updated, .wrap > .error,
+                #adminmenu + .notice, #adminmenu + .updated, #adminmenu + .error,
+                .update-php, .php-update-nag,
+                .plugin-update-tr, .theme-update-message,
+                .update-message, .updating-message,
+                #update-nag, #deprecation-warning {
+                    display: none !important;
+                }
+                
+                /* Hide WordPress core update notices */
+                .update-core-php, .notice-alt {
+                    display: none !important;
+                }
+                
+                /* Hide plugin activation/deactivation notices */
+                .activated, .deactivated {
+                    display: none !important;
+                }
+                
+                /* Hide file permission and other system warnings */
+                .notice-warning, .notice-error {
+                    display: none !important;
+                }
+                
+                /* Hide any remaining notices in common locations */
+                .wrap .notice:first-child,
+                .wrap > div.notice,
+                .wrap > div.updated,
+                .wrap > div.error {
+                    display: none !important;
+                }
+                
+                /* Nuclear option - hide anything that looks like a notice */
+                [class*="notice"], [class*="updated"], [class*="error"],
+                [id*="notice"], [id*="message"] {
+                    display: none !important;
+                }
+                
+                /* Restore our legitimate content */
+                .grove-content, .grove-content * {
+                    display: block !important;
+                }
+            </style>';
+        });
+        
+        // Nuclear option - JavaScript cleanup for dynamic notices
+        add_action('admin_footer', function() {
+            echo '<script type="text/javascript">
+                (function($) {
+                    $(document).ready(function() {
+                        // Remove any notices that appear after page load
+                        $(".notice, .updated, .error, .update-nag, .admin-notice").remove();
+                        
+                        // Set up mutation observer to catch dynamically added notices
+                        if (window.MutationObserver) {
+                            var observer = new MutationObserver(function(mutations) {
+                                mutations.forEach(function(mutation) {
+                                    if (mutation.addedNodes.length > 0) {
+                                        $(mutation.addedNodes).find(".notice, .updated, .error, .update-nag").remove();
+                                        $(mutation.addedNodes).filter(".notice, .updated, .error, .update-nag").remove();
+                                    }
+                                });
+                            });
+                            
+                            observer.observe(document.body, {
+                                childList: true,
+                                subtree: true
+                            });
+                        }
+                        
+                        // Periodic cleanup every 500ms
+                        setInterval(function() {
+                            $(".notice, .updated, .error, .update-nag, .admin-notice").not(".grove-content, .grove-content *").remove();
+                        }, 500);
+                    });
+                })(jQuery);
+            </script>';
+        });
+    }
+    
+    /**
+     * Export data in sharkintax format
+     */
+    public function grove_export_sharkintax() {
+        // Verify nonce
+        if (!isset($_POST['nonce']) || !wp_verify_nonce($_POST['nonce'], 'grove_export_nonce')) {
+            wp_send_json_error('Invalid nonce');
+        }
+        
+        // Check permissions
+        if (!current_user_can('manage_options')) {
+            wp_send_json_error('Unauthorized');
+        }
+        
+        global $wpdb;
+        $table_name = $wpdb->prefix . 'zen_sitespren';
+        
+        // Get the sitespren data
+        $sitespren_data = $wpdb->get_row("SELECT * FROM $table_name WHERE wppma_id = 1", ARRAY_A);
+        
+        if (!$sitespren_data) {
+            wp_send_json_error('No data found');
+        }
+        
+        // Get field order from the UI (same as displayed in table)
+        $fields = $this->get_driggs_field_order();
+        
+        // Generate sharkintax format
+        $output = Grove_Tax_Exports::generate_sharkintax($sitespren_data, array_column($fields, 'key'));
+        
+        wp_send_json_success($output);
+    }
+    
+    /**
+     * Export data in walrustax format
+     */
+    public function grove_export_walrustax() {
+        // Verify nonce
+        if (!isset($_POST['nonce']) || !wp_verify_nonce($_POST['nonce'], 'grove_export_nonce')) {
+            wp_send_json_error('Invalid nonce');
+        }
+        
+        // Check permissions
+        if (!current_user_can('manage_options')) {
+            wp_send_json_error('Unauthorized');
+        }
+        
+        global $wpdb;
+        $table_name = $wpdb->prefix . 'zen_sitespren';
+        
+        // Get the sitespren data
+        $sitespren_data = $wpdb->get_row("SELECT * FROM $table_name WHERE wppma_id = 1", ARRAY_A);
+        
+        if (!$sitespren_data) {
+            wp_send_json_error('No data found');
+        }
+        
+        // Get field order from the UI (same as displayed in table)
+        $fields = $this->get_driggs_field_order();
+        
+        // Generate walrustax format
+        $output = Grove_Tax_Exports::generate_walrustax($sitespren_data, array_column($fields, 'key'));
+        
+        wp_send_json_success($output);
+    }
+    
+    /**
+     * Export data as CSV file
+     */
+    public function grove_export_csv() {
+        // Verify nonce
+        if (!isset($_POST['nonce']) || !wp_verify_nonce($_POST['nonce'], 'grove_export_nonce')) {
+            wp_die('Invalid nonce');
+        }
+        
+        // Check permissions
+        if (!current_user_can('manage_options')) {
+            wp_die('Unauthorized');
+        }
+        
+        global $wpdb;
+        $table_name = $wpdb->prefix . 'zen_sitespren';
+        
+        // Get the sitespren data
+        $sitespren_data = $wpdb->get_row("SELECT * FROM $table_name WHERE wppma_id = 1", ARRAY_A);
+        
+        if (!$sitespren_data) {
+            wp_die('No data found');
+        }
+        
+        // Get field order from the UI (same as displayed in table)
+        $fields = $this->get_driggs_field_order();
+        
+        // Generate CSV with field name and value columns
+        $output = "Field Name,Value\n";
+        foreach ($fields as $field) {
+            $field_name = $field['key'];
+            $value = isset($sitespren_data[$field_name]) ? $sitespren_data[$field_name] : '';
+            // Escape values for CSV
+            $field_name = '"' . str_replace('"', '""', $field_name) . '"';
+            $value = '"' . str_replace('"', '""', $value) . '"';
+            $output .= $field_name . ',' . $value . "\n";
+        }
+        
+        // Generate filename with new convention
+        $filename = $this->generate_export_filename('csv');
+        
+        // Send file download headers
+        header('Content-Type: text/csv; charset=utf-8');
+        header('Content-Disposition: attachment; filename="' . $filename . '"');
+        echo $output;
+        exit;
+    }
+    
+    /**
+     * Export data as XLS file
+     */
+    public function grove_export_xls() {
+        // Verify nonce
+        if (!isset($_POST['nonce']) || !wp_verify_nonce($_POST['nonce'], 'grove_export_nonce')) {
+            wp_die('Invalid nonce');
+        }
+        
+        // Check permissions
+        if (!current_user_can('manage_options')) {
+            wp_die('Unauthorized');
+        }
+        
+        global $wpdb;
+        $table_name = $wpdb->prefix . 'zen_sitespren';
+        
+        // Get the sitespren data
+        $sitespren_data = $wpdb->get_row("SELECT * FROM $table_name WHERE wppma_id = 1", ARRAY_A);
+        
+        if (!$sitespren_data) {
+            wp_die('No data found');
+        }
+        
+        // Get field order from the UI (same as displayed in table)
+        $fields = $this->get_driggs_field_order();
+        
+        // Generate Excel XML with field name and value columns
+        $xml = '<?xml version="1.0"?>' . "\n";
+        $xml .= '<?mso-application progid="Excel.Sheet"?>' . "\n";
+        $xml .= '<Workbook xmlns="urn:schemas-microsoft-com:office:spreadsheet"' . "\n";
+        $xml .= ' xmlns:o="urn:schemas-microsoft-com:office:office"' . "\n";
+        $xml .= ' xmlns:x="urn:schemas-microsoft-com:office:excel"' . "\n";
+        $xml .= ' xmlns:ss="urn:schemas-microsoft-com:office:spreadsheet"' . "\n";
+        $xml .= ' xmlns:html="http://www.w3.org/TR/REC-html40">' . "\n";
+        
+        $xml .= '<Styles>' . "\n";
+        $xml .= '<Style ss:ID="header">' . "\n";
+        $xml .= '<Font ss:Bold="1"/>' . "\n";
+        $xml .= '</Style>' . "\n";
+        $xml .= '</Styles>' . "\n";
+        
+        $xml .= '<Worksheet ss:Name="Sitespren Data">' . "\n";
+        $xml .= '<Table>' . "\n";
+        
+        // Header row
+        $xml .= '<Row ss:StyleID="header">' . "\n";
+        $xml .= '<Cell><Data ss:Type="String">Field Name</Data></Cell>' . "\n";
+        $xml .= '<Cell><Data ss:Type="String">Value</Data></Cell>' . "\n";
+        $xml .= '</Row>' . "\n";
+        
+        // Data rows - one row per field
+        foreach ($fields as $field) {
+            $field_name = $field['key'];
+            $value = isset($sitespren_data[$field_name]) ? $sitespren_data[$field_name] : '';
+            
+            $xml .= '<Row>' . "\n";
+            $xml .= '<Cell><Data ss:Type="String">' . htmlspecialchars($field_name) . '</Data></Cell>' . "\n";
+            
+            // Determine data type for value
+            if (is_numeric($value) && !preg_match('/^0[0-9]/', $value)) {
+                $xml .= '<Cell><Data ss:Type="Number">' . $value . '</Data></Cell>' . "\n";
+            } else {
+                $xml .= '<Cell><Data ss:Type="String">' . htmlspecialchars($value) . '</Data></Cell>' . "\n";
+            }
+            $xml .= '</Row>' . "\n";
+        }
+        
+        $xml .= '</Table>' . "\n";
+        $xml .= '</Worksheet>' . "\n";
+        $xml .= '</Workbook>' . "\n";
+        
+        // Generate filename with new convention
+        $filename = $this->generate_export_filename('xls');
+        
+        // Send file download headers
+        header('Content-Type: application/vnd.ms-excel; charset=utf-8');
+        header('Content-Disposition: attachment; filename="' . $filename . '"');
+        echo $xml;
+        exit;
+    }
+    
+    /**
+     * Export data as SQL file
+     */
+    public function grove_export_sql() {
+        // Verify nonce
+        if (!isset($_POST['nonce']) || !wp_verify_nonce($_POST['nonce'], 'grove_export_nonce')) {
+            wp_die('Invalid nonce');
+        }
+        
+        // Check permissions
+        if (!current_user_can('manage_options')) {
+            wp_die('Unauthorized');
+        }
+        
+        global $wpdb;
+        $table_name = $wpdb->prefix . 'zen_sitespren';
+        
+        // Get the sitespren data
+        $sitespren_data = $wpdb->get_row("SELECT * FROM $table_name WHERE wppma_id = 1", ARRAY_A);
+        
+        if (!$sitespren_data) {
+            wp_die('No data found');
+        }
+        
+        // Generate SQL INSERT statement
+        $output = Grove_Tax_Exports::generate_sql($sitespren_data, $table_name);
+        
+        // Add some helpful comments
+        $sql = "-- Sitespren Data Export\n";
+        $sql .= "-- Generated: " . date('Y-m-d H:i:s') . "\n";
+        $sql .= "-- Site: " . get_site_url() . "\n\n";
+        $sql .= $output;
+        
+        // Generate filename with new convention
+        $filename = $this->generate_export_filename('sql');
+        
+        // Send file download headers
+        header('Content-Type: text/plain; charset=utf-8');
+        header('Content-Disposition: attachment; filename="' . $filename . '"');
+        echo $sql;
+        exit;
+    }
+    
+    /**
+     * Generate export filename with proper convention
+     * Format: grove_export_(MM-DD-YY-TIME)_(domain_with_underscores)_1.ext
+     */
+    private function generate_export_filename($extension) {
+        // Get the current site URL
+        $site_url = get_site_url();
+        
+        // Parse the URL to get the domain
+        $parsed_url = parse_url($site_url);
+        $domain = isset($parsed_url['host']) ? $parsed_url['host'] : 'unknown';
+        
+        // Remove www. prefix if present
+        $domain = preg_replace('/^www\./i', '', $domain);
+        
+        // Replace periods with underscores in the domain
+        $domain_formatted = str_replace('.', '_', $domain);
+        
+        // Generate date/time string in MM-DD-YY-TIME format
+        // Using 24-hour format for time (HHMM)
+        $datetime = date('m-d-y-Hi');
+        
+        // Construct the filename
+        $filename = 'grove_export_' . $datetime . '_' . $domain_formatted . '_1.' . $extension;
+        
+        return $filename;
+    }
+    
+    /**
+     * Get the field order as displayed in the UI
+     */
+    private function get_driggs_field_order() {
+        return array(
+            array('key' => 'wppma_id', 'label' => 'wppma_id', 'type' => 'number'),
+            array('key' => 'wppma_db_only_created_at', 'label' => 'wppma_db_only_created_at', 'type' => 'datetime'),
+            array('key' => 'wppma_db_only_updated_at', 'label' => 'wppma_db_only_updated_at', 'type' => 'datetime'),
+            array('key' => 'id', 'label' => 'id', 'type' => 'text'),
+            array('key' => 'created_at', 'label' => 'created_at', 'type' => 'datetime'),
+            array('key' => 'sitespren_base', 'label' => 'sitespren_base', 'type' => 'text'),
+            array('key' => 'driggs_industry', 'label' => 'driggs_industry', 'type' => 'text'),
+            array('key' => 'driggs_city', 'label' => 'driggs_city', 'type' => 'text'),
+            array('key' => 'driggs_brand_name', 'label' => 'driggs_brand_name', 'type' => 'text'),
+            array('key' => 'driggs_site_type_purpose', 'label' => 'driggs_site_type_purpose', 'type' => 'text'),
+            array('key' => 'driggs_email_1', 'label' => 'driggs_email_1', 'type' => 'email'),
+            array('key' => 'driggs_address_full', 'label' => 'driggs_address_full', 'type' => 'textarea'),
+            array('key' => 'driggs_phone_1', 'label' => 'driggs_phone_1', 'type' => 'text'),
+            array('key' => 'driggs_special_note_for_ai_tool', 'label' => 'driggs_special_note_for_ai_tool', 'type' => 'textarea'),
+            array('key' => 'driggs_phone1_platform_id', 'label' => 'driggs_phone1_platform_id', 'type' => 'number'),
+            array('key' => 'driggs_cgig_id', 'label' => 'driggs_cgig_id', 'type' => 'number'),
+            array('key' => 'driggs_address_species_id', 'label' => 'driggs_address_species_id', 'type' => 'number'),
+            array('key' => 'driggs_logo_url', 'label' => 'driggs_logo_url', 'type' => 'logo_url'),
+            array('key' => 'driggs_citations_done', 'label' => 'driggs_citations_done', 'type' => 'boolean'),
+            array('key' => 'driggs_revenue_goal', 'label' => 'driggs_revenue_goal', 'type' => 'number'),
+            array('key' => 'true_root_domain', 'label' => 'true_root_domain', 'type' => 'text'),
+            array('key' => 'full_subdomain', 'label' => 'full_subdomain', 'type' => 'text'),
+            array('key' => 'webproperty_type', 'label' => 'webproperty_type', 'type' => 'text'),
+            array('key' => 'fk_users_id', 'label' => 'fk_users_id', 'type' => 'text'),
+            array('key' => 'updated_at', 'label' => 'updated_at', 'type' => 'datetime'),
+            array('key' => 'wpuser1', 'label' => 'wpuser1', 'type' => 'text'),
+            array('key' => 'wppass1', 'label' => 'wppass1', 'type' => 'password'),
+            array('key' => 'wp_plugin_installed1', 'label' => 'wp_plugin_installed1', 'type' => 'boolean'),
+            array('key' => 'wp_plugin_connected2', 'label' => 'wp_plugin_connected2', 'type' => 'boolean'),
+            array('key' => 'fk_domreg_hostaccount', 'label' => 'fk_domreg_hostaccount', 'type' => 'text'),
+            array('key' => 'is_wp_site', 'label' => 'is_wp_site', 'type' => 'boolean'),
+            array('key' => 'wp_rest_app_pass', 'label' => 'wp_rest_app_pass', 'type' => 'password'),
+            array('key' => 'driggs_social_profiles_done', 'label' => 'driggs_social_profiles_done', 'type' => 'boolean'),
+            array('key' => 'driggs_hours', 'label' => 'driggs_hours', 'type' => 'text'),
+            array('key' => 'driggs_owner_name', 'label' => 'driggs_owner_name', 'type' => 'text'),
+            array('key' => 'driggs_short_descr', 'label' => 'driggs_short_descr', 'type' => 'textarea'),
+            array('key' => 'driggs_long_descr', 'label' => 'driggs_long_descr', 'type' => 'textarea'),
+            array('key' => 'driggs_year_opened', 'label' => 'driggs_year_opened', 'type' => 'number'),
+            array('key' => 'driggs_employees_qty', 'label' => 'driggs_employees_qty', 'type' => 'number'),
+            array('key' => 'driggs_keywords', 'label' => 'driggs_keywords', 'type' => 'text'),
+            array('key' => 'driggs_category', 'label' => 'driggs_category', 'type' => 'text'),
+            array('key' => 'driggs_address_species_note', 'label' => 'driggs_address_species_note', 'type' => 'text'),
+            array('key' => 'driggs_payment_methods', 'label' => 'driggs_payment_methods', 'type' => 'text'),
+            array('key' => 'driggs_social_media_links', 'label' => 'driggs_social_media_links', 'type' => 'textarea'),
+            array('key' => 'driggs_street_1', 'label' => 'driggs_street_1', 'type' => 'text'),
+            array('key' => 'driggs_street_2', 'label' => 'driggs_street_2', 'type' => 'text'),
+            array('key' => 'driggs_state_code', 'label' => 'driggs_state_code', 'type' => 'text'),
+            array('key' => 'driggs_zip', 'label' => 'driggs_zip', 'type' => 'text'),
+            array('key' => 'driggs_state_full', 'label' => 'driggs_state_full', 'type' => 'text'),
+            array('key' => 'driggs_country', 'label' => 'driggs_country', 'type' => 'text'),
+            array('key' => 'ns_full', 'label' => 'ns_full', 'type' => 'text'),
+            array('key' => 'ip_address', 'label' => 'ip_address', 'type' => 'text'),
+            array('key' => 'is_starred1', 'label' => 'is_starred1', 'type' => 'text'),
+            array('key' => 'icon_name', 'label' => 'icon_name', 'type' => 'text'),
+            array('key' => 'icon_color', 'label' => 'icon_color', 'type' => 'text'),
+            array('key' => 'is_bulldozer', 'label' => 'is_bulldozer', 'type' => 'boolean'),
+            array('key' => 'is_competitor', 'label' => 'is_competitor', 'type' => 'boolean'),
+            array('key' => 'is_external', 'label' => 'is_external', 'type' => 'boolean'),
+            array('key' => 'is_internal', 'label' => 'is_internal', 'type' => 'boolean'),
+            array('key' => 'is_ppx', 'label' => 'is_ppx', 'type' => 'boolean'),
+            array('key' => 'is_ms', 'label' => 'is_ms', 'type' => 'boolean'),
+            array('key' => 'is_wayback_rebuild', 'label' => 'is_wayback_rebuild', 'type' => 'boolean'),
+            array('key' => 'is_naked_wp_build', 'label' => 'is_naked_wp_build', 'type' => 'boolean'),
+            array('key' => 'is_rnr', 'label' => 'is_rnr', 'type' => 'boolean'),
+            array('key' => 'is_aff', 'label' => 'is_aff', 'type' => 'boolean'),
+            array('key' => 'is_other1', 'label' => 'is_other1', 'type' => 'boolean'),
+            array('key' => 'is_other2', 'label' => 'is_other2', 'type' => 'boolean'),
+            array('key' => 'snailimage', 'label' => 'snailimage', 'type' => 'text'),
+            array('key' => 'snail_image_url', 'label' => 'snail_image_url', 'type' => 'text'),
+            array('key' => 'snail_image_status', 'label' => 'snail_image_status', 'type' => 'text'),
+            array('key' => 'snail_image_error', 'label' => 'snail_image_error', 'type' => 'text'),
+            array('key' => 'screenshot_url', 'label' => 'screenshot_url', 'type' => 'text'),
+            array('key' => 'screenshot_taken_at', 'label' => 'screenshot_taken_at', 'type' => 'datetime'),
+            array('key' => 'screenshot_status', 'label' => 'screenshot_status', 'type' => 'text'),
+            array('key' => 'rel_cncglub_id', 'label' => 'rel_cncglub_id', 'type' => 'number'),
+            array('key' => 'rel_city_id', 'label' => 'rel_city_id', 'type' => 'number')
+        );
     }
 }
