@@ -7,7 +7,7 @@
  */
 class Grove_Database {
     
-    const ZEN_DB_VERSION = '1.2';
+    const ZEN_DB_VERSION = '1.3';
     
     public function __construct() {
         // Check and create tables on initialization
@@ -144,6 +144,14 @@ class Grove_Database {
             rel_cncglub_id int(11) DEFAULT NULL,
             rel_city_id int(11) DEFAULT NULL,
             driggs_logo_url text DEFAULT NULL,
+            driggs_social_profiles_done tinyint(1) DEFAULT 0,
+            driggs_hours text DEFAULT NULL,
+            driggs_owner_name varchar(255) DEFAULT NULL,
+            driggs_short_descr text DEFAULT NULL,
+            driggs_long_descr text DEFAULT NULL,
+            driggs_year_opened int(11) DEFAULT NULL,
+            driggs_employees_qty int(11) DEFAULT NULL,
+            rel_industry_id int(11) DEFAULT NULL,
             PRIMARY KEY (wppma_id),
             UNIQUE KEY unique_id (id),
             INDEX idx_sitespren_base (sitespren_base),
