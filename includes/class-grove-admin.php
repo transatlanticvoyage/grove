@@ -25,6 +25,8 @@ class Grove_Admin {
         add_action('wp_ajax_grove_export_csv', array($this, 'grove_export_csv'));
         add_action('wp_ajax_grove_export_xls', array($this, 'grove_export_xls'));
         add_action('wp_ajax_grove_export_sql', array($this, 'grove_export_sql'));
+        // WordPress native settings handlers
+        add_action('wp_ajax_grove_update_site_settings', array($this, 'grove_update_site_settings'));
     }
     
     public function add_admin_menu() {
@@ -105,13 +107,85 @@ class Grove_Admin {
             return;
         }
         
+        // Enqueue WordPress media scripts for site icon functionality
+        wp_enqueue_media();
+        
         ?>
         <div class="wrap grove-content" style="margin: 0; padding: 0;">
             <!-- Allow space for WordPress notices -->
             <div style="height: 20px;"></div>
             
             <div style="padding: 20px;">
-                <h1 style="margin-bottom: 20px;">🌳 Grove Hub - Driggs Site Manager</h1>
+                <!-- Grove Title and WordPress Settings Row -->
+                <div style="display: flex; align-items: flex-start; justify-content: space-between; margin-bottom: 20px;">
+                    <div style="flex: 1;">
+                        <h1 style="margin: 0;">🌳 Grove Hub - Driggs Site Manager</h1>
+                    </div>
+                    
+                    <!-- WordPress Native Settings -->
+                    <div style="flex: 1; max-width: 400px; margin-left: 40px;">
+                        <form id="grove-site-settings-form" style="background: #f9f9f9; padding: 15px; border-radius: 5px; border: 1px solid #ddd;">
+                            <table class="form-table" style="margin: 0;">
+                                <tr>
+                                    <th scope="row" style="padding: 8px 10px 8px 0; font-weight: 600;">
+                                        <label for="grove_blogname">Site Title</label>
+                                    </th>
+                                    <td style="padding: 8px 0;">
+                                        <input 
+                                            name="grove_blogname" 
+                                            id="grove_blogname" 
+                                            type="text" 
+                                            value="<?php echo esc_attr(get_option('blogname')); ?>" 
+                                            class="regular-text" 
+                                            style="width: 100%;"
+                                        />
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <th scope="row" style="padding: 8px 10px 8px 0; font-weight: 600;">
+                                        <label for="grove_blogdescription">Tagline</label>
+                                    </th>
+                                    <td style="padding: 8px 0;">
+                                        <input 
+                                            name="grove_blogdescription" 
+                                            id="grove_blogdescription" 
+                                            type="text" 
+                                            value="<?php echo esc_attr(get_option('blogdescription')); ?>" 
+                                            class="regular-text" 
+                                            style="width: 100%;"
+                                        />
+                                        <p class="description" style="margin: 5px 0 0 0; font-size: 12px; color: #666;">In a few words, explain what this site is about.</p>
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <th scope="row" style="padding: 8px 10px 8px 0; font-weight: 600;">Site Icon</th>
+                                    <td style="padding: 8px 0;">
+                                        <div id="grove-site-icon-preview" style="margin-bottom: 10px;">
+                                            <?php
+                                            $site_icon_id = get_option('site_icon');
+                                            if ($site_icon_id) {
+                                                $site_icon_img = wp_get_attachment_image($site_icon_id, array(32, 32), false, array('id' => 'grove-site-icon-img'));
+                                                echo $site_icon_img;
+                                            } else {
+                                                echo '<img id="grove-site-icon-img" src="" style="display: none; width: 32px; height: 32px;">';
+                                            }
+                                            ?>
+                                        </div>
+                                        <button type="button" id="grove-choose-site-icon" class="button" style="margin-right: 5px;">
+                                            <?php echo $site_icon_id ? 'Change Site Icon' : 'Select Site Icon'; ?>
+                                        </button>
+                                        <button type="button" id="grove-remove-site-icon" class="button" style="<?php echo !$site_icon_id ? 'display: none;' : ''; ?>">Remove</button>
+                                        <input type="hidden" id="grove_site_icon" name="grove_site_icon" value="<?php echo esc_attr($site_icon_id); ?>" />
+                                        <p class="description" style="margin: 5px 0 0 0; font-size: 12px; color: #666;">The Site Icon is what you see in browser tabs, bookmark bars, and within the WordPress mobile apps. It should be square and at least 512 × 512 pixels.</p>
+                                    </td>
+                                </tr>
+                            </table>
+                            <div style="margin-top: 10px;">
+                                <button type="button" id="grove-save-settings" class="button button-primary button-small">Save Changes</button>
+                            </div>
+                        </form>
+                    </div>
+                </div>
                 
                 <!-- Control Bar -->
                 <div style="background: white; border: 1px solid #ddd; padding: 15px; margin-bottom: 20px; border-radius: 5px;">
@@ -887,6 +961,115 @@ class Grove_Admin {
             $('#select-all').on('change', function() {
                 let isChecked = $(this).is(':checked');
                 $('#table-body input[type="checkbox"]').prop('checked', isChecked);
+            });
+            
+            // WordPress native settings functionality
+            var groveMediaFrame;
+            
+            // Site Icon chooser
+            $('#grove-choose-site-icon').on('click', function(e) {
+                e.preventDefault();
+                
+                // If the media frame already exists, reopen it
+                if (groveMediaFrame) {
+                    groveMediaFrame.open();
+                    return;
+                }
+                
+                // Create the media frame
+                groveMediaFrame = wp.media({
+                    title: 'Choose Site Icon',
+                    button: {
+                        text: 'Use as Site Icon'
+                    },
+                    library: {
+                        type: 'image'
+                    },
+                    multiple: false
+                });
+                
+                // When an image is selected, run a callback
+                groveMediaFrame.on('select', function() {
+                    var attachment = groveMediaFrame.state().get('selection').first().toJSON();
+                    
+                    // Set the hidden field value
+                    $('#grove_site_icon').val(attachment.id);
+                    
+                    // Update the preview image
+                    $('#grove-site-icon-img').attr('src', attachment.sizes.thumbnail ? attachment.sizes.thumbnail.url : attachment.url);
+                    $('#grove-site-icon-img').css({
+                        'width': '32px',
+                        'height': '32px',
+                        'display': 'inline-block'
+                    });
+                    
+                    // Update button text and show remove button
+                    $('#grove-choose-site-icon').text('Change Site Icon');
+                    $('#grove-remove-site-icon').show();
+                });
+                
+                // Open the modal
+                groveMediaFrame.open();
+            });
+            
+            // Remove site icon
+            $('#grove-remove-site-icon').on('click', function(e) {
+                e.preventDefault();
+                
+                // Clear the hidden field
+                $('#grove_site_icon').val('');
+                
+                // Hide the preview image
+                $('#grove-site-icon-img').hide();
+                
+                // Update button text and hide remove button
+                $('#grove-choose-site-icon').text('Select Site Icon');
+                $(this).hide();
+            });
+            
+            // Save settings
+            $('#grove-save-settings').on('click', function(e) {
+                e.preventDefault();
+                
+                var button = $(this);
+                var originalText = button.text();
+                button.text('Saving...').prop('disabled', true);
+                
+                $.ajax({
+                    url: ajaxurl,
+                    type: 'POST',
+                    data: {
+                        action: 'grove_update_site_settings',
+                        nonce: '<?php echo wp_create_nonce('grove_site_settings_nonce'); ?>',
+                        blogname: $('#grove_blogname').val(),
+                        blogdescription: $('#grove_blogdescription').val(),
+                        site_icon: $('#grove_site_icon').val()
+                    },
+                    success: function(response) {
+                        if (response.success) {
+                            button.text('Saved!').css({
+                                'background-color': '#46b450',
+                                'border-color': '#46b450',
+                                'color': '#fff'
+                            });
+                            
+                            setTimeout(function() {
+                                button.text(originalText).css({
+                                    'background-color': '',
+                                    'border-color': '',
+                                    'color': ''
+                                }).prop('disabled', false);
+                            }, 2000);
+                        } else {
+                            alert('Error saving settings: ' + response.data);
+                            button.text(originalText).prop('disabled', false);
+                        }
+                    },
+                    error: function() {
+                        alert('Error saving settings. Please try again.');
+                        button.text(originalText).prop('disabled', false);
+                    }
+                });
             });
         });
         </script>
@@ -2636,6 +2819,60 @@ class Grove_Admin {
         $filename = 'grove_export_' . $datetime . '_' . $domain_formatted . '_1.' . $extension;
         
         return $filename;
+    }
+    
+    /**
+     * AJAX handler to update WordPress native site settings
+     */
+    public function grove_update_site_settings() {
+        // Verify nonce
+        if (!isset($_POST['nonce']) || !wp_verify_nonce($_POST['nonce'], 'grove_site_settings_nonce')) {
+            wp_send_json_error('Invalid nonce');
+        }
+        
+        // Check permissions
+        if (!current_user_can('manage_options')) {
+            wp_send_json_error('Unauthorized');
+        }
+        
+        $blogname = sanitize_text_field($_POST['blogname']);
+        $blogdescription = sanitize_text_field($_POST['blogdescription']);
+        $site_icon = absint($_POST['site_icon']);
+        
+        // Update WordPress options
+        $updated = array();
+        
+        if (update_option('blogname', $blogname)) {
+            $updated[] = 'Site Title';
+        }
+        
+        if (update_option('blogdescription', $blogdescription)) {
+            $updated[] = 'Tagline';
+        }
+        
+        // Handle site icon
+        if ($site_icon) {
+            // Verify the attachment exists and is an image
+            $attachment = get_post($site_icon);
+            if ($attachment && wp_attachment_is_image($site_icon)) {
+                if (update_option('site_icon', $site_icon)) {
+                    $updated[] = 'Site Icon';
+                }
+            } else {
+                wp_send_json_error('Invalid site icon');
+            }
+        } else {
+            // Remove site icon if empty
+            if (delete_option('site_icon')) {
+                $updated[] = 'Site Icon (removed)';
+            }
+        }
+        
+        if (!empty($updated)) {
+            wp_send_json_success('Settings updated: ' . implode(', ', $updated));
+        } else {
+            wp_send_json_success('No changes made');
+        }
     }
     
     /**
