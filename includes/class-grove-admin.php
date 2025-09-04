@@ -347,33 +347,24 @@ class Grove_Admin {
                 let tbody = $('#table-body');
                 tbody.empty();
                 
-                // Field definitions in exact order requested - display actual DB field names in bold
+                // Field definitions matching /drom app order - preserve top 5 system fields
                 const fields = [
+                    // System fields (keep at top with gray background)
                     {key: 'wppma_id', label: 'wppma_id', type: 'number'},
                     {key: 'wppma_db_only_created_at', label: 'wppma_db_only_created_at', type: 'datetime'},
                     {key: 'wppma_db_only_updated_at', label: 'wppma_db_only_updated_at', type: 'datetime'},
                     {key: 'id', label: 'id', type: 'text'},
                     {key: 'created_at', label: 'created_at', type: 'datetime'},
+                    
+                    // Core site information (matching /drom order)
                     {key: 'sitespren_base', label: 'sitespren_base', type: 'text'},
-                    {key: 'driggs_industry', label: 'driggs_industry', type: 'text'},
-                    {key: 'driggs_city', label: 'driggs_city', type: 'text'},
-                    {key: 'driggs_brand_name', label: 'driggs_brand_name', type: 'text'},
-                    {key: 'driggs_site_type_purpose', label: 'driggs_site_type_purpose', type: 'text'},
-                    {key: 'driggs_email_1', label: 'driggs_email_1', type: 'email'},
-                    {key: 'driggs_address_full', label: 'driggs_address_full', type: 'textarea'},
-                    {key: 'driggs_phone_1', label: 'driggs_phone_1', type: 'text'},
-                    {key: 'driggs_special_note_for_ai_tool', label: 'driggs_special_note_for_ai_tool', type: 'textarea'},
-                    {key: 'driggs_phone1_platform_id', label: 'driggs_phone1_platform_id', type: 'number'},
-                    {key: 'driggs_cgig_id', label: 'driggs_cgig_id', type: 'number'},
-                    {key: 'driggs_address_species_id', label: 'driggs_address_species_id', type: 'number'},
-                    {key: 'driggs_logo_url', label: 'driggs_logo_url', type: 'logo_url'},
-                    {key: 'driggs_citations_done', label: 'driggs_citations_done', type: 'boolean'},
-                    {key: 'driggs_revenue_goal', label: 'driggs_revenue_goal', type: 'number'},
                     {key: 'true_root_domain', label: 'true_root_domain', type: 'text'},
                     {key: 'full_subdomain', label: 'full_subdomain', type: 'text'},
                     {key: 'webproperty_type', label: 'webproperty_type', type: 'text'},
                     {key: 'fk_users_id', label: 'fk_users_id', type: 'text'},
                     {key: 'updated_at', label: 'updated_at', type: 'datetime'},
+                    
+                    // WordPress section
                     {key: 'wpuser1', label: 'wpuser1', type: 'text'},
                     {key: 'wppass1', label: 'wppass1', type: 'password'},
                     {key: 'wp_plugin_installed1', label: 'wp_plugin_installed1', type: 'boolean'},
@@ -381,11 +372,60 @@ class Grove_Admin {
                     {key: 'fk_domreg_hostaccount', label: 'fk_domreg_hostaccount', type: 'text'},
                     {key: 'is_wp_site', label: 'is_wp_site', type: 'boolean'},
                     {key: 'wp_rest_app_pass', label: 'wp_rest_app_pass', type: 'textarea'},
+                    
+                    // Business information section
+                    {key: 'driggs_industry', label: 'driggs_industry', type: 'text'},
+                    {key: 'driggs_city', label: 'driggs_city', type: 'text'},
+                    {key: 'driggs_brand_name', label: 'driggs_brand_name', type: 'text'},
+                    {key: 'driggs_site_type_purpose', label: 'driggs_site_type_purpose', type: 'text'},
+                    {key: 'driggs_email_1', label: 'driggs_email_1', type: 'email'},
+                    
+                    // Address section separator
+                    {key: 'address_section_separator', label: '--- ADDRESS SECTION ---', type: 'separator'},
+                    {key: 'driggs_address_full', label: 'driggs_address_full', type: 'textarea'},
+                    {key: 'driggs_address_species_id', label: 'driggs_address_species_id', type: 'number'},
+                    {key: 'driggs_street_1', label: 'driggs_street_1', type: 'text'},
+                    {key: 'driggs_street_2', label: 'driggs_street_2', type: 'text'},
+                    {key: 'driggs_state_code', label: 'driggs_state_code', type: 'text'},
+                    {key: 'driggs_zip', label: 'driggs_zip', type: 'text'},
+                    {key: 'driggs_state_full', label: 'driggs_state_full', type: 'text'},
+                    {key: 'driggs_country', label: 'driggs_country', type: 'text'},
+                    {key: 'driggs_address_species_note', label: 'driggs_address_species_note', type: 'textarea'},
+                    
+                    // Phone section separator
+                    {key: 'phone_section_separator', label: '--- PHONE SECTION ---', type: 'separator'},
+                    {key: 'driggs_phone_1', label: 'driggs_phone_1', type: 'text'},
+                    {key: 'driggs_phone1_platform_id', label: 'driggs_phone1_platform_id', type: 'number'},
+                    
+                    // Business details section
+                    {key: 'driggs_hours', label: 'driggs_hours', type: 'textarea'},
+                    {key: 'driggs_owner_name', label: 'driggs_owner_name', type: 'text'},
+                    {key: 'driggs_short_descr', label: 'driggs_short_descr', type: 'textarea'},
+                    {key: 'driggs_long_descr', label: 'driggs_long_descr', type: 'textarea'},
+                    {key: 'driggs_year_opened', label: 'driggs_year_opened', type: 'number'},
+                    {key: 'driggs_employees_qty', label: 'driggs_employees_qty', type: 'number'},
+                    {key: 'driggs_keywords', label: 'driggs_keywords', type: 'textarea'},
+                    {key: 'driggs_category', label: 'driggs_category', type: 'text'},
+                    {key: 'driggs_payment_methods', label: 'driggs_payment_methods', type: 'textarea'},
+                    {key: 'driggs_social_media_links', label: 'driggs_social_media_links', type: 'textarea'},
+                    
+                    // Project management section
+                    {key: 'driggs_cgig_id', label: 'driggs_cgig_id', type: 'number'},
+                    {key: 'driggs_citations_done', label: 'driggs_citations_done', type: 'boolean'},
+                    {key: 'driggs_social_profiles_done', label: 'driggs_social_profiles_done', type: 'boolean'},
+                    {key: 'driggs_special_note_for_ai_tool', label: 'driggs_special_note_for_ai_tool', type: 'textarea'},
+                    {key: 'driggs_revenue_goal', label: 'driggs_revenue_goal', type: 'number'},
+                    {key: 'driggs_logo_url', label: 'driggs_logo_url', type: 'logo_url'},
+                    
+                    // Technical information section
                     {key: 'ns_full', label: 'ns_full', type: 'text'},
                     {key: 'ip_address', label: 'ip_address', type: 'text'},
                     {key: 'is_starred1', label: 'is_starred1', type: 'text'},
                     {key: 'icon_name', label: 'icon_name', type: 'text'},
                     {key: 'icon_color', label: 'icon_color', type: 'text'},
+                    
+                    // Classification flags section
+                    {key: 'classification_separator', label: '--- CLASSIFICATION FLAGS ---', type: 'separator'},
                     {key: 'is_bulldozer', label: 'is_bulldozer', type: 'boolean'},
                     {key: 'is_competitor', label: 'is_competitor', type: 'boolean'},
                     {key: 'is_external', label: 'is_external', type: 'boolean'},
@@ -398,10 +438,43 @@ class Grove_Admin {
                     {key: 'is_aff', label: 'is_aff', type: 'boolean'},
                     {key: 'is_other1', label: 'is_other1', type: 'boolean'},
                     {key: 'is_other2', label: 'is_other2', type: 'boolean'},
-                    {key: 'is_flylocal', label: 'is_flylocal', type: 'boolean'}
+                    {key: 'is_flylocal', label: 'is_flylocal', type: 'boolean'},
+                    
+                    // Media management section
+                    {key: 'media_separator', label: '--- MEDIA MANAGEMENT ---', type: 'separator'},
+                    {key: 'snailimage', label: 'snailimage', type: 'text'},
+                    {key: 'snail_image_url', label: 'snail_image_url', type: 'text'},
+                    {key: 'snail_image_status', label: 'snail_image_status', type: 'text'},
+                    {key: 'snail_image_error', label: 'snail_image_error', type: 'textarea'},
+                    {key: 'screenshot_url', label: 'screenshot_url', type: 'text'},
+                    {key: 'screenshot_taken_at', label: 'screenshot_taken_at', type: 'datetime'},
+                    {key: 'screenshot_status', label: 'screenshot_status', type: 'text'},
+                    
+                    // Relationships section
+                    {key: 'relationships_separator', label: '--- RELATIONSHIPS ---', type: 'separator'},
+                    {key: 'rel_cncglub_id', label: 'rel_cncglub_id', type: 'number'},
+                    {key: 'rel_city_id', label: 'rel_city_id', type: 'number'},
+                    {key: 'rel_industry_id', label: 'rel_industry_id', type: 'number'}
                 ];
                 
                 fields.forEach(function(field) {
+                    // Handle separator rows differently
+                    if (field.type === 'separator') {
+                        let separatorTr = $('<tr style="background-color: #333; color: white;"></tr>');
+                        
+                        // Empty checkbox cell
+                        let separatorCheckboxTd = $('<td style="padding: 8px; border: 1px solid #ddd; text-align: center; background-color: #333;"></td>');
+                        separatorTr.append(separatorCheckboxTd);
+                        
+                        // Separator label spanning remaining columns
+                        let separatorLabelTd = $('<td colspan="4" style="padding: 12px 8px; border: 1px solid #ddd; font-weight: bold; text-align: center; background-color: #333; color: white; font-size: 14px;"></td>');
+                        separatorLabelTd.text(field.label);
+                        separatorTr.append(separatorLabelTd);
+                        
+                        tbody.append(separatorTr);
+                        return; // Skip normal row processing for separators
+                    }
+                    
                     let tr = $('<tr style="cursor: pointer;"></tr>');
                     
                     // Apply special background color to specific rows
@@ -1163,17 +1236,48 @@ class Grove_Admin {
         $field = sanitize_text_field($_POST['field']);
         $value = $_POST['value'];
         
-        // Validate field name - all editable fields from zen_sitespren table
+        // Validate field name - all editable fields from zen_sitespren table (matching /drom order)
         $allowed_fields = [
+            // Core site fields
             'created_at', 'sitespren_base', 'true_root_domain', 'full_subdomain', 'webproperty_type',
-            'fk_users_id', 'updated_at', 'wpuser1', 'wppass1', 'wp_plugin_installed1', 'wp_plugin_connected2',
-            'fk_domreg_hostaccount', 'is_wp_site', 'wp_rest_app_pass', 'driggs_industry', 'driggs_city',
-            'driggs_brand_name', 'driggs_site_type_purpose', 'driggs_email_1', 'driggs_address_full',
-            'driggs_phone_1', 'driggs_special_note_for_ai_tool', 'driggs_logo_url', 'ns_full', 'ip_address', 'is_starred1',
-            'icon_name', 'icon_color', 'is_bulldozer', 'driggs_phone1_platform_id', 'driggs_cgig_id',
-            'driggs_revenue_goal', 'driggs_address_species_id', 'is_competitor', 'is_external', 'is_internal',
-            'is_ppx', 'is_ms', 'is_wayback_rebuild', 'is_naked_wp_build', 'is_rnr', 'is_aff',
-            'is_other1', 'is_other2', 'driggs_citations_done', 'is_flylocal'
+            'fk_users_id', 'updated_at',
+            
+            // WordPress fields
+            'wpuser1', 'wppass1', 'wp_plugin_installed1', 'wp_plugin_connected2',
+            'fk_domreg_hostaccount', 'is_wp_site', 'wp_rest_app_pass',
+            
+            // Business information
+            'driggs_industry', 'driggs_city', 'driggs_brand_name', 'driggs_site_type_purpose', 'driggs_email_1',
+            
+            // Address fields
+            'driggs_address_full', 'driggs_address_species_id', 'driggs_street_1', 'driggs_street_2',
+            'driggs_state_code', 'driggs_zip', 'driggs_state_full', 'driggs_country', 'driggs_address_species_note',
+            
+            // Contact fields
+            'driggs_phone_1', 'driggs_phone1_platform_id',
+            
+            // Business details (some may need DB columns added)
+            'driggs_hours', 'driggs_owner_name', 'driggs_short_descr', 'driggs_long_descr', 
+            'driggs_year_opened', 'driggs_employees_qty', 'driggs_keywords', 'driggs_category',
+            'driggs_payment_methods', 'driggs_social_media_links',
+            
+            // Project management
+            'driggs_cgig_id', 'driggs_citations_done', 'driggs_social_profiles_done', 'driggs_special_note_for_ai_tool',
+            'driggs_revenue_goal', 'driggs_logo_url',
+            
+            // Technical fields
+            'ns_full', 'ip_address', 'is_starred1', 'icon_name', 'icon_color',
+            
+            // Classification flags
+            'is_bulldozer', 'is_competitor', 'is_external', 'is_internal', 'is_ppx', 'is_ms',
+            'is_wayback_rebuild', 'is_naked_wp_build', 'is_rnr', 'is_aff', 'is_other1', 'is_other2', 'is_flylocal',
+            
+            // Media management (existing in DB)
+            'snailimage', 'snail_image_url', 'snail_image_status', 'snail_image_error',
+            'screenshot_url', 'screenshot_taken_at', 'screenshot_status',
+            
+            // Relationships (some may need DB columns added)
+            'rel_cncglub_id', 'rel_city_id', 'rel_industry_id'
         ];
         
         if (!in_array($field, $allowed_fields)) {
@@ -1181,11 +1285,14 @@ class Grove_Admin {
             return;
         }
         
-        // Sanitize value based on field type
-        $number_fields = ['driggs_phone1_platform_id', 'driggs_cgig_id', 'driggs_revenue_goal', 'driggs_address_species_id'];
-        $boolean_fields = ['wp_plugin_installed1', 'wp_plugin_connected2', 'is_wp_site', 'is_bulldozer', 'driggs_citations_done', 'is_competitor', 'is_external', 'is_internal', 'is_ppx', 'is_ms', 'is_wayback_rebuild', 'is_naked_wp_build', 'is_rnr', 'is_aff', 'is_other1', 'is_other2', 'is_flylocal'];
+        // Sanitize value based on field type (updated for all new fields)
+        $number_fields = ['driggs_phone1_platform_id', 'driggs_cgig_id', 'driggs_revenue_goal', 'driggs_address_species_id', 
+                         'driggs_year_opened', 'driggs_employees_qty', 'rel_cncglub_id', 'rel_city_id', 'rel_industry_id'];
+        $boolean_fields = ['wp_plugin_installed1', 'wp_plugin_connected2', 'is_wp_site', 'is_bulldozer', 'driggs_citations_done', 
+                          'driggs_social_profiles_done', 'is_competitor', 'is_external', 'is_internal', 'is_ppx', 'is_ms', 
+                          'is_wayback_rebuild', 'is_naked_wp_build', 'is_rnr', 'is_aff', 'is_other1', 'is_other2', 'is_flylocal'];
         $email_fields = ['driggs_email_1'];
-        $datetime_fields = ['created_at', 'updated_at'];
+        $datetime_fields = ['created_at', 'updated_at', 'screenshot_taken_at'];
         
         if (in_array($field, $number_fields)) {
             $value = $value === '' ? NULL : intval($value);
