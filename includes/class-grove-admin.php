@@ -767,15 +767,33 @@ class Grove_Admin {
                 cell.append(input);
                 input.focus();
                 
+                // Position cursor at end of text instead of selecting all
+                if (input[0].setSelectionRange) {
+                    let len = currentValue ? currentValue.length : 0;
+                    input[0].setSelectionRange(len, len);
+                } else if (input[0].createTextRange) {
+                    let range = input[0].createTextRange();
+                    range.collapse(true);
+                    range.moveEnd('character', currentValue ? currentValue.length : 0);
+                    range.moveStart('character', currentValue ? currentValue.length : 0);
+                    range.select();
+                }
+                
                 // Save on blur or enter
                 function saveEdit() {
                     let newValue = input.val();
                     cell.removeClass('editing');
                     
+                    // Always save the value, including empty strings (which become null)
+                    // Only skip if user didn't actually change anything
                     if (newValue !== currentValue) {
-                        updateField(fieldKey, newValue);
-                        cell.text(newValue);
-                        currentData[fieldKey] = newValue;
+                        // Convert empty string to null for database storage
+                        let valueToSave = newValue.trim() === '' ? '' : newValue;
+                        updateField(fieldKey, valueToSave);
+                        
+                        // Display empty cells as empty, not "null" text
+                        cell.text(newValue.trim() === '' ? '' : newValue);
+                        currentData[fieldKey] = newValue.trim() === '' ? null : newValue;
                         hasChanges = true;
                     } else {
                         cell.text(originalText);
