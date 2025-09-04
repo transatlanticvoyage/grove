@@ -118,7 +118,7 @@ class Grove_Zen_Shortcodes {
             return $this->render_single_service($atts);
         }
         
-        $services = $this->get_services(array(
+        $services = Grove_Database::get_services(array(
             'orderby' => $atts['orderby'],
             'order' => $atts['order'],
             'pinned_first' => $atts['pinned_first'] === 'true'
@@ -170,7 +170,7 @@ class Grove_Zen_Shortcodes {
             return '<p>Service ID is required.</p>';
         }
         
-        $service = $this->get_service($service_id);
+        $service = Grove_Database::get_service($service_id);
         
         if (!$service) {
             return '<p>Service not found.</p>';
@@ -255,7 +255,7 @@ class Grove_Zen_Shortcodes {
             return $this->render_single_location($atts);
         }
         
-        $locations = $this->get_locations(array(
+        $locations = Grove_Database::get_locations(array(
             'orderby' => $atts['orderby'],
             'order' => $atts['order'],
             'pinned_first' => $atts['pinned_first'] === 'true'
@@ -306,7 +306,7 @@ class Grove_Zen_Shortcodes {
             return '<p>Location ID is required.</p>';
         }
         
-        $location = $this->get_location($location_id);
+        $location = Grove_Database::get_location($location_id);
         
         if (!$location) {
             return '<p>Location not found.</p>';
@@ -459,11 +459,7 @@ class Grove_Zen_Shortcodes {
         }
         
         // Get the sitespren record
-        $table_name = $wpdb->prefix . 'zen_sitespren';
-        $sitespren = $wpdb->get_row($wpdb->prepare(
-            "SELECT * FROM $table_name WHERE wppma_id = %d",
-            intval($atts['wppma_id'])
-        ));
+        $sitespren = Grove_Database::get_sitespren(intval($atts['wppma_id']));
         
         if (!$sitespren) {
             return !empty($atts['default']) ? esc_html($atts['default']) : '<span class="sitespren-not-found">Sitespren record not found.</span>';

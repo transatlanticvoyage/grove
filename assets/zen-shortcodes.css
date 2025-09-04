@@ -1,206 +1,213 @@
-/* Zen Shortcodes CSS */
+/**
+ * Grove Zen Shortcodes CSS
+ * Styles for zen_services, zen_locations, and sitespren shortcodes
+ */
 
-/* Base wrapper styles */
-.zen-services-wrapper, .zen-locations-wrapper {
-    display: flex;
-    flex-direction: column;
-    gap: 20px;
+/* Services Shortcode Styles */
+.zen-services-wrapper {
     margin: 20px 0;
 }
 
-/* Grid layout */
-.zen-template-grid .zen-services-wrapper,
-.zen-template-grid .zen-locations-wrapper {
+.zen-services-wrapper.zen-template-grid {
     display: grid;
-    grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+    grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
     gap: 20px;
 }
 
-/* Cards layout */
-.zen-template-cards .zen-services-wrapper,
-.zen-template-cards .zen-locations-wrapper {
-    display: grid;
-    grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
-    gap: 25px;
-}
-
-/* Individual item styles */
-.zen-service-item, .zen-location-item {
-    position: relative;
+.zen-services-wrapper.zen-template-cards {
     display: flex;
-    gap: 15px;
-    padding: 15px;
-    background: #fff;
-    border-radius: 8px;
-    box-shadow: 0 2px 4px rgba(0,0,0,0.1);
-    transition: box-shadow 0.2s ease;
+    flex-wrap: wrap;
+    gap: 20px;
 }
 
-.zen-service-item:hover, .zen-location-item:hover {
+.zen-service-item {
+    margin-bottom: 20px;
+}
+
+.zen-service-card {
+    border: 1px solid #ddd;
+    border-radius: 8px;
+    padding: 20px;
+    background: #fff;
+    box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+    transition: box-shadow 0.3s ease;
+}
+
+.zen-service-card:hover {
     box-shadow: 0 4px 8px rgba(0,0,0,0.15);
 }
 
-/* Card styles */
-.zen-service-card, .zen-location-card {
-    display: flex;
-    flex-direction: column;
-    height: 100%;
-    background: #fff;
-    border-radius: 8px;
-    overflow: hidden;
-    box-shadow: 0 2px 4px rgba(0,0,0,0.1);
-    transition: transform 0.2s ease, box-shadow 0.2s ease;
+.zen-service-name {
+    font-size: 1.4em;
+    font-weight: bold;
+    color: #333;
+    margin-bottom: 10px;
 }
 
-.zen-service-card:hover, .zen-location-card:hover {
-    transform: translateY(-2px);
-    box-shadow: 0 6px 12px rgba(0,0,0,0.15);
+.zen-service-placard {
+    font-style: italic;
+    color: #666;
+    margin-bottom: 8px;
 }
 
-/* Image styles */
-.zen-service-image-wrapper, .zen-location-image-wrapper {
-    flex-shrink: 0;
+.zen-service-moniker {
+    font-weight: 600;
+    color: #444;
+    margin-bottom: 8px;
 }
 
-.zen-template-list .zen-service-image-wrapper,
-.zen-template-list .zen-location-image-wrapper {
-    width: 80px;
-    height: 80px;
-    border-radius: 8px;
-    overflow: hidden;
+.zen-service-description-short {
+    color: #555;
+    line-height: 1.5;
+    margin-bottom: 10px;
 }
 
-.zen-template-cards .zen-service-image-wrapper,
-.zen-template-cards .zen-location-image-wrapper,
-.zen-template-grid .zen-service-image-wrapper,
-.zen-template-grid .zen-location-image-wrapper {
-    width: 100%;
-    height: 200px;
-    overflow: hidden;
+.zen-service-description-long {
+    color: #555;
+    line-height: 1.6;
+    margin-top: 15px;
 }
 
-.zen-service-image, .zen-location-image {
-    width: 100%;
-    height: 100%;
-    object-fit: cover;
+.zen-service-image-wrapper {
+    margin-bottom: 15px;
+}
+
+.zen-service-image {
+    max-width: 100%;
+    height: auto;
     border-radius: 4px;
 }
 
-.zen-template-cards .zen-service-image,
-.zen-template-cards .zen-location-image,
-.zen-template-grid .zen-service-image,
-.zen-template-grid .zen-location-image {
-    border-radius: 0;
+/* Locations Shortcode Styles */
+.zen-locations-wrapper {
+    margin: 20px 0;
 }
 
-/* Content styles */
-.zen-service-content, .zen-location-content {
-    flex: 1;
+.zen-locations-wrapper.zen-template-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+    gap: 20px;
+}
+
+.zen-locations-wrapper.zen-template-cards {
     display: flex;
-    flex-direction: column;
-    gap: 8px;
+    flex-wrap: wrap;
+    gap: 20px;
 }
 
-.zen-template-cards .zen-service-content,
-.zen-template-cards .zen-location-content {
-    padding: 15px;
+.zen-location-item {
+    margin-bottom: 20px;
 }
 
-/* Typography */
-.zen-service-name, .zen-location-name {
-    margin: 0;
-    font-size: 1.25em;
-    font-weight: 600;
+.zen-location-card {
+    border: 1px solid #ddd;
+    border-radius: 8px;
+    padding: 20px;
+    background: #fff;
+    box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+    transition: box-shadow 0.3s ease;
+}
+
+.zen-location-card:hover {
+    box-shadow: 0 4px 8px rgba(0,0,0,0.15);
+}
+
+.zen-location-name {
+    font-size: 1.4em;
+    font-weight: bold;
     color: #333;
-    line-height: 1.3;
+    margin-bottom: 10px;
 }
 
-.zen-service-placard, .zen-location-placard {
-    font-weight: 500;
-    color: #666;
-    font-size: 0.95em;
-}
-
-.zen-service-moniker, .zen-location-moniker {
+.zen-location-placard {
     font-style: italic;
-    color: #888;
-    font-size: 0.9em;
+    color: #666;
+    margin-bottom: 8px;
 }
 
-.zen-service-description, 
-.zen-service-description-short, 
-.zen-service-description-long {
-    color: #555;
-    line-height: 1.5;
-    font-size: 0.95em;
-}
-
-.zen-service-description-long {
-    margin-top: 10px;
-    padding-top: 10px;
-    border-top: 1px solid #eee;
+.zen-location-moniker {
+    font-weight: 600;
+    color: #444;
+    margin-bottom: 8px;
 }
 
 .zen-location-address {
-    color: #666;
-    font-size: 0.9em;
-    line-height: 1.4;
+    color: #555;
+    line-height: 1.5;
+    margin-bottom: 10px;
 }
 
-/* Pinned badge */
+.zen-location-image-wrapper {
+    margin-bottom: 15px;
+}
+
+.zen-location-image {
+    max-width: 100%;
+    height: auto;
+    border-radius: 4px;
+}
+
+/* Pinned Badges */
 .zen-pinned-badge {
-    position: absolute;
-    top: 8px;
-    right: 8px;
-    background: #ff6b35;
-    color: white;
-    font-size: 0.75em;
+    display: inline-block;
+    background: #f0c14b;
+    color: #333;
     padding: 4px 8px;
-    border-radius: 12px;
-    font-weight: 500;
-    z-index: 10;
+    border-radius: 4px;
+    font-size: 0.85em;
+    font-weight: bold;
+    margin-bottom: 10px;
 }
 
-.zen-template-cards .zen-pinned-badge {
-    top: 15px;
-    right: 15px;
+/* Sitespren Shortcode Styles */
+.sitespren-error {
+    color: #d63638;
+    background: #fcf0f1;
+    padding: 4px 8px;
+    border-radius: 3px;
+    font-size: 0.9em;
 }
 
-/* Responsive design */
+.sitespren-not-found {
+    color: #996;
+    font-style: italic;
+}
+
+.sitespren-no-field {
+    color: #996;
+    font-style: italic;
+}
+
+/* Responsive Design */
 @media (max-width: 768px) {
-    .zen-template-grid .zen-services-wrapper,
-    .zen-template-grid .zen-locations-wrapper,
-    .zen-template-cards .zen-services-wrapper,
-    .zen-template-cards .zen-locations-wrapper {
+    .zen-services-wrapper.zen-template-grid,
+    .zen-locations-wrapper.zen-template-grid {
         grid-template-columns: 1fr;
     }
     
-    .zen-service-item, .zen-location-item {
+    .zen-services-wrapper.zen-template-cards,
+    .zen-locations-wrapper.zen-template-cards {
         flex-direction: column;
-        text-align: center;
     }
     
-    .zen-template-list .zen-service-image-wrapper,
-    .zen-template-list .zen-location-image-wrapper {
-        width: 100%;
-        height: 150px;
-        align-self: center;
+    .zen-service-card,
+    .zen-location-card {
+        margin: 0 0 20px 0;
     }
 }
 
-/* Special styling for specific shortcode variations */
-.zen-pinned-services, .zen-pinned-locations {
-    border-left: 4px solid #ff6b35;
-    padding-left: 15px;
+/* Content spacing improvements */
+.zen-service-content,
+.zen-location-content {
+    line-height: 1.6;
 }
 
-/* Link styling for images */
-.zen-service-image-wrapper a, .zen-location-image-wrapper a {
-    display: block;
-    width: 100%;
-    height: 100%;
+.zen-service-content > *:first-child,
+.zen-location-content > *:first-child {
+    margin-top: 0;
 }
 
-.zen-service-image-wrapper a:hover, .zen-location-image-wrapper a:hover {
-    opacity: 0.9;
+.zen-service-content > *:last-child,
+.zen-location-content > *:last-child {
+    margin-bottom: 0;
 }

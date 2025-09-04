@@ -36,14 +36,26 @@ class GrovePlugin {
     private function load_dependencies() {
         require_once GROVE_PLUGIN_PATH . 'includes/class-grove-admin.php';
         require_once GROVE_PLUGIN_PATH . 'includes/class-grove-tax-exports.php';
+        require_once GROVE_PLUGIN_PATH . 'includes/class-grove-zen-shortcodes.php';
+        require_once GROVE_PLUGIN_PATH . 'includes/class-grove-database.php';
     }
     
     private function init_hooks() {
         new Grove_Admin();
+        new Grove_Zen_Shortcodes();
+        new Grove_Database();
     }
     
     public function activate() {
-        // Plugin activation tasks
+        // Create database tables
+        require_once GROVE_PLUGIN_PATH . 'includes/class-grove-database.php';
+        $database = new Grove_Database();
+        $database->on_activation();
+        
+        // Set default shortcode mode if not already set
+        if (!get_option('grove_shortcode_mode')) {
+            add_option('grove_shortcode_mode', 'automatic');
+        }
     }
     
     public function deactivate() {
