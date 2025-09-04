@@ -116,75 +116,70 @@ class Grove_Admin {
             <div style="height: 20px;"></div>
             
             <div style="padding: 20px;">
-                <!-- Grove Title and WordPress Settings Row -->
-                <div style="display: flex; align-items: flex-start; justify-content: space-between; margin-bottom: 20px;">
-                    <div style="flex: 1;">
-                        <h1 style="margin: 0;">🌳 Grove Hub - Driggs Site Manager</h1>
-                    </div>
-                    
-                    <!-- WordPress Native Settings -->
-                    <div style="flex: 1; max-width: 400px; margin-left: 40px;">
-                        <form id="grove-site-settings-form" style="background: #f9f9f9; padding: 15px; border-radius: 5px; border: 1px solid #ddd;">
-                            <table class="form-table" style="margin: 0;">
-                                <tr>
-                                    <th scope="row" style="padding: 8px 10px 8px 0; font-weight: 600;">
-                                        <label for="grove_blogname">Site Title</label>
-                                    </th>
-                                    <td style="padding: 8px 0;">
-                                        <input 
-                                            name="grove_blogname" 
-                                            id="grove_blogname" 
-                                            type="text" 
-                                            value="<?php echo esc_attr(get_option('blogname')); ?>" 
-                                            class="regular-text" 
-                                            style="width: 100%;"
-                                        />
-                                    </td>
-                                </tr>
-                                <tr>
-                                    <th scope="row" style="padding: 8px 10px 8px 0; font-weight: 600;">
-                                        <label for="grove_blogdescription">Tagline</label>
-                                    </th>
-                                    <td style="padding: 8px 0;">
-                                        <input 
-                                            name="grove_blogdescription" 
-                                            id="grove_blogdescription" 
-                                            type="text" 
-                                            value="<?php echo esc_attr(get_option('blogdescription')); ?>" 
-                                            class="regular-text" 
-                                            style="width: 100%;"
-                                        />
-                                        <p class="description" style="margin: 5px 0 0 0; font-size: 12px; color: #666;">In a few words, explain what this site is about.</p>
-                                    </td>
-                                </tr>
-                                <tr>
-                                    <th scope="row" style="padding: 8px 10px 8px 0; font-weight: 600;">Site Icon</th>
-                                    <td style="padding: 8px 0;">
-                                        <div id="grove-site-icon-preview" style="margin-bottom: 10px;">
-                                            <?php
-                                            $site_icon_id = get_option('site_icon');
-                                            if ($site_icon_id) {
-                                                $site_icon_img = wp_get_attachment_image($site_icon_id, array(32, 32), false, array('id' => 'grove-site-icon-img'));
-                                                echo $site_icon_img;
-                                            } else {
-                                                echo '<img id="grove-site-icon-img" src="" style="display: none; width: 32px; height: 32px;">';
-                                            }
-                                            ?>
-                                        </div>
-                                        <button type="button" id="grove-choose-site-icon" class="button" style="margin-right: 5px;">
-                                            <?php echo $site_icon_id ? 'Change Site Icon' : 'Select Site Icon'; ?>
-                                        </button>
-                                        <button type="button" id="grove-remove-site-icon" class="button" style="<?php echo !$site_icon_id ? 'display: none;' : ''; ?>">Remove</button>
-                                        <input type="hidden" id="grove_site_icon" name="grove_site_icon" value="<?php echo esc_attr($site_icon_id); ?>" />
-                                        <p class="description" style="margin: 5px 0 0 0; font-size: 12px; color: #666;">The Site Icon is what you see in browser tabs, bookmark bars, and within the WordPress mobile apps. It should be square and at least 512 × 512 pixels.</p>
-                                    </td>
-                                </tr>
-                            </table>
-                            <div style="margin-top: 10px;">
-                                <button type="button" id="grove-save-settings" class="button button-primary button-small">Save Changes</button>
+                <!-- Grove Title -->
+                <div style="margin-bottom: 15px;">
+                    <h1 style="margin: 0;">🌳 Grove Hub - Driggs Site Manager</h1>
+                </div>
+                
+                <!-- WordPress Native Settings - Horizontal Bar -->
+                <div style="background: #f9f9f9; border: 1px solid #ddd; padding: 12px 20px; margin-bottom: 20px; border-radius: 5px;">
+                    <form id="grove-site-settings-form">
+                        <div style="display: flex; align-items: center; gap: 25px; flex-wrap: wrap;">
+                            
+                            <!-- Site Title Field -->
+                            <div style="display: flex; align-items: center; gap: 8px;">
+                                <label for="grove_blogname" style="font-weight: 600; white-space: nowrap; font-size: 13px;">Site Title:</label>
+                                <input 
+                                    name="grove_blogname" 
+                                    id="grove_blogname" 
+                                    type="text" 
+                                    value="<?php echo esc_attr(get_option('blogname')); ?>" 
+                                    style="width: 180px; padding: 4px 8px; border: 1px solid #ccc; border-radius: 3px; font-size: 13px;"
+                                />
                             </div>
-                        </form>
-                    </div>
+                            
+                            <!-- Tagline Field -->
+                            <div style="display: flex; align-items: center; gap: 8px;">
+                                <label for="grove_blogdescription" style="font-weight: 600; white-space: nowrap; font-size: 13px;">Tagline:</label>
+                                <input 
+                                    name="grove_blogdescription" 
+                                    id="grove_blogdescription" 
+                                    type="text" 
+                                    value="<?php echo esc_attr(get_option('blogdescription')); ?>" 
+                                    style="width: 200px; padding: 4px 8px; border: 1px solid #ccc; border-radius: 3px; font-size: 13px;"
+                                />
+                            </div>
+                            
+                            <!-- Site Icon Field -->
+                            <div style="display: flex; align-items: center; gap: 8px;">
+                                <label style="font-weight: 600; white-space: nowrap; font-size: 13px;">Site Icon:</label>
+                                <div style="display: flex; align-items: center; gap: 6px;">
+                                    <div id="grove-site-icon-preview" style="width: 24px; height: 24px; display: flex; align-items: center;">
+                                        <?php
+                                        $site_icon_id = get_option('site_icon');
+                                        if ($site_icon_id) {
+                                            $site_icon_img = wp_get_attachment_image($site_icon_id, array(24, 24), false, array('id' => 'grove-site-icon-img', 'style' => 'width: 24px; height: 24px; border-radius: 2px;'));
+                                            echo $site_icon_img;
+                                        } else {
+                                            echo '<img id="grove-site-icon-img" src="" style="display: none; width: 24px; height: 24px; border-radius: 2px;">';
+                                        }
+                                        ?>
+                                    </div>
+                                    <button type="button" id="grove-choose-site-icon" class="button button-small" style="padding: 2px 8px; font-size: 12px; height: auto;">
+                                        <?php echo $site_icon_id ? 'Change' : 'Select'; ?>
+                                    </button>
+                                    <button type="button" id="grove-remove-site-icon" class="button button-small" style="padding: 2px 6px; font-size: 12px; height: auto; <?php echo !$site_icon_id ? 'display: none;' : ''; ?>">×</button>
+                                    <input type="hidden" id="grove_site_icon" name="grove_site_icon" value="<?php echo esc_attr($site_icon_id); ?>" />
+                                </div>
+                            </div>
+                            
+                            <!-- Save Button -->
+                            <div style="margin-left: auto;">
+                                <button type="button" id="grove-save-settings" class="button button-primary button-small" style="padding: 4px 12px; font-size: 13px;">Save Changes</button>
+                            </div>
+                            
+                        </div>
+                    </form>
                 </div>
                 
                 <!-- Control Bar -->
@@ -213,15 +208,15 @@ class Grove_Admin {
                 <!-- Vertical Field Table -->
                 <div style="background: white; border: 1px solid #ddd; border-radius: 5px; overflow: hidden;">
                     <div style="overflow-x: auto;">
-                        <table id="driggs-table" style="width: 100%; border-collapse: collapse; font-size: 14px;">
+                        <table id="driggs-table" style="width: auto; border-collapse: collapse; font-size: 14px;">
                             <thead style="background: #f8f9fa;">
                                 <tr>
                                     <th style="padding: 12px 8px; border: 1px solid #ddd; font-weight: bold; text-align: left; background: #f0f0f0; width: 50px;">
                                         <input type="checkbox" id="select-all" style="width: 20px; height: 20px;">
                                     </th>
-                                    <th style="padding: 12px 8px; border: 1px solid #ddd; font-weight: bold; text-transform: lowercase; background: #f8f9fa; width: 250px;">Field Name</th>
+                                    <th style="padding: 12px 8px; border: 1px solid #ddd; font-weight: bold; text-transform: lowercase; background: #f8f9fa;">Field Name</th>
                                     <th style="padding: 12px 8px; border: 1px solid #ddd; font-weight: bold; text-transform: lowercase; background: #f8f9fa;">Value</th>
-                                    <th style="padding: 12px 8px; border: 1px solid #ddd; font-weight: bold; text-transform: lowercase; background: #f8f9fa; width: 300px;">shortcode 1</th>
+                                    <th style="padding: 12px 8px; border: 1px solid #ddd; font-weight: bold; text-transform: lowercase; background: #f8f9fa;">shortcode 1</th>
                                     <th style="padding: 0; border: 1px solid #ddd; font-weight: bold; text-transform: lowercase; background: #f8f9fa; width: 20px;">stuff3</th>
                                 </tr>
                             </thead>
@@ -308,7 +303,6 @@ class Grove_Admin {
         
         /* Read-only field styling */
         .driggs-readonly-field {
-            background-color: #f9f9f9 !important;
             color: #666 !important;
             font-style: italic !important;
             cursor: default !important;
@@ -316,10 +310,6 @@ class Grove_Admin {
             -webkit-user-select: text !important;
             -moz-user-select: text !important;
             pointer-events: auto !important;
-        }
-        
-        .driggs-readonly-field:hover {
-            background-color: #f9f9f9 !important;
         }
         </style>
         
@@ -419,11 +409,11 @@ class Grove_Admin {
                     const isSpecialBg = specialBgFields.includes(field.key);
                     
                     if (isSpecialBg) {
-                        tr.css('background-color', '#9b9b9b');
+                        tr.css('background-color', '#d5d5d5');
                         tr.hover(function() {
-                            $(this).css('background-color', '#8b8b8b');
+                            $(this).css('background-color', '#c5c5c5');
                         }, function() {
-                            $(this).css('background-color', '#9b9b9b');
+                            $(this).css('background-color', '#d5d5d5');
                         });
                     } else {
                         tr.hover(function() {
@@ -435,20 +425,20 @@ class Grove_Admin {
                     
                     // Checkbox column
                     let checkboxTd = $('<td style="padding: 8px; border: 1px solid #ddd; text-align: center;"></td>');
-                    if (isSpecialBg) checkboxTd.css('background-color', '#9b9b9b');
+                    if (isSpecialBg) checkboxTd.css('background-color', '#d5d5d5');
                     let checkbox = $('<input type="checkbox" style="width: 20px; height: 20px;" data-field="' + field.key + '">');
                     checkboxTd.append(checkbox);
                     tr.append(checkboxTd);
                     
                     // Field name column - bold DB field names
                     let fieldNameTd = $('<td style="padding: 8px; border: 1px solid #ddd; font-weight: bold; color: #23282d; font-family: monospace;"></td>');
-                    if (isSpecialBg) fieldNameTd.css('background-color', '#9b9b9b');
+                    if (isSpecialBg) fieldNameTd.css('background-color', '#d5d5d5');
                     fieldNameTd.text(field.label);
                     tr.append(fieldNameTd);
                     
                     // Value column
                     let valueTd = $('<td style="padding: 8px; border: 1px solid #ddd;"></td>');
-                    if (isSpecialBg) valueTd.css('background-color', '#9b9b9b');
+                    if (isSpecialBg) valueTd.css('background-color', '#d5d5d5');
                     let value = currentData[field.key] || '';
                     
                     if (field.type === 'boolean') {
@@ -466,6 +456,10 @@ class Grove_Admin {
                         valueTd.css('-moz-user-select', 'text');
                         valueTd.addClass('driggs-readonly-field');
                         valueTd.attr('title', 'This field is read-only (can select text but not edit)');
+                        // Ensure special background color is preserved
+                        if (isSpecialBg) {
+                            valueTd.css('background-color', '#d5d5d5');
+                        }
                     } else if (field.type === 'logo_url') {
                         // Special handling for logo URL with image preview
                         let logoContainer = $('<div style="display: flex; flex-direction: column; width: 100%; height: 100%;"></div>');
@@ -530,22 +524,22 @@ class Grove_Admin {
                     tr.append(valueTd);
                     
                     // Add new shortcode 1 column
-                    let shortcodeTd = $('<td style="padding: 8px; border: 1px solid #ddd; position: relative;"></td>');
-                    if (isSpecialBg) shortcodeTd.css('background-color', '#9b9b9b');
+                    let shortcodeTd = $('<td style="padding: 8px; border: 1px solid #ddd; position: relative; white-space: nowrap;"></td>');
+                    if (isSpecialBg) shortcodeTd.css('background-color', '#d5d5d5');
                     
-                    // Create shortcode text
-                    let shortcodeText = '[sitespren dbcol="' + field.key + '"]';
-                    let shortcodeSpan = $('<span style="font-family: monospace; font-size: 12px; color: #333; margin-right: 10px;"></span>');
-                    shortcodeSpan.text(shortcodeText);
-                    
-                    // Create copy button
-                    let copyBtn = $('<button style="padding: 4px 8px; background: #f0f0f0; border: 1px solid #ccc; border-radius: 3px; cursor: pointer; font-size: 12px; color: #333; transition: background-color 0.2s;">Copy</button>');
+                    // Create copy button (now on the left)
+                    let copyBtn = $('<button style="padding: 4px 8px; background: #f0f0f0; border: 1px solid #ccc; border-radius: 3px; cursor: pointer; font-size: 12px; color: #333; transition: background-color 0.2s; margin-right: 8px;">Copy</button>');
                     
                     // Add hover effect with yellow background
                     copyBtn.hover(
                         function() { $(this).css('background-color', '#ffeb3b'); },
                         function() { $(this).css('background-color', '#f0f0f0'); }
                     );
+                    
+                    // Create shortcode text (now on the right)
+                    let shortcodeText = '[sitespren dbcol="' + field.key + '"]';
+                    let shortcodeSpan = $('<span style="font-family: monospace; font-size: 12px; color: #333;"></span>');
+                    shortcodeSpan.text(shortcodeText);
                     
                     // Add click handler for copy functionality
                     copyBtn.on('click', function() {
@@ -587,13 +581,13 @@ class Grove_Admin {
                         }
                     });
                     
-                    shortcodeTd.append(shortcodeSpan);
                     shortcodeTd.append(copyBtn);
+                    shortcodeTd.append(shortcodeSpan);
                     tr.append(shortcodeTd);
                     
                     // Add stuff3 column with roaring_div as shortcode copy button
                     let stuff3Td = $('<td class="stuff3-cell" style="padding: 0; border: 1px solid #ddd; width: 20px;"></td>');
-                    if (isSpecialBg) stuff3Td.css('background-color', '#9b9b9b');
+                    if (isSpecialBg) stuff3Td.css('background-color', '#d5d5d5');
                     let roaring_div = $('<div class="roaring_div">R</div>');
                     
                     // Add click handler to copy shortcode
@@ -998,9 +992,10 @@ class Grove_Admin {
                     // Update the preview image
                     $('#grove-site-icon-img').attr('src', attachment.sizes.thumbnail ? attachment.sizes.thumbnail.url : attachment.url);
                     $('#grove-site-icon-img').css({
-                        'width': '32px',
-                        'height': '32px',
-                        'display': 'inline-block'
+                        'width': '24px',
+                        'height': '24px',
+                        'display': 'inline-block',
+                        'border-radius': '2px'
                     });
                     
                     // Update button text and show remove button
