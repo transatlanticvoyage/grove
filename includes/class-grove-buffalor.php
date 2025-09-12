@@ -28,6 +28,21 @@ class Grove_Buffalor {
                     <label for="antler-box-1" style="display: block; font-weight: bold; margin-bottom: 5px;">antler box 1</label>
                     <input type="text" id="antler-box-1" name="antler-box-1" style="width: 300px; padding: 8px; border: 1px solid #ccc; border-radius: 4px;">
                 </div>
+                
+                <div style="margin-top: 30px;">
+                    <label for="shortcode-registration-code" style="display: block; font-weight: bold; margin-bottom: 5px;">Shortcode Registration Code</label>
+                    <textarea id="shortcode-registration-code" readonly style="width: 100%; max-width: 800px; height: 150px; padding: 8px; border: 1px solid #ccc; border-radius: 4px; font-family: monospace; font-size: 13px; background-color: #f9f9f9;"><?php echo esc_textarea(self::get_shortcode_registration_code()); ?></textarea>
+                </div>
+                
+                <div style="margin-top: 20px;">
+                    <label for="shortcode-usage" style="display: block; font-weight: bold; margin-bottom: 5px;">Shortcode Usage</label>
+                    <input type="text" id="shortcode-usage" readonly value="[buffalo phone number]" style="width: 300px; padding: 8px; border: 1px solid #ccc; border-radius: 4px; background-color: #f9f9f9;">
+                </div>
+                
+                <div style="margin-top: 20px;">
+                    <label for="example-output" style="display: block; font-weight: bold; margin-bottom: 5px;">Example Output (using phone: 1234567890)</label>
+                    <textarea id="example-output" readonly style="width: 100%; max-width: 600px; height: 60px; padding: 8px; border: 1px solid #ccc; border-radius: 4px; font-family: monospace; font-size: 13px; background-color: #f9f9f9;"><?php echo esc_textarea(self::get_example_output()); ?></textarea>
+                </div>
             </div>
         </div>
         <?php
@@ -81,5 +96,30 @@ class Grove_Buffalor {
                 }
             }
         }, PHP_INT_MAX);
+    }
+    
+    /**
+     * Get shortcode registration code
+     */
+    private static function get_shortcode_registration_code() {
+        return 'function buffalo_phone_number_shortcode($atts) {
+    $atts = shortcode_atts(array(
+        \'phone\' => \'1234567890\',
+        \'prefix\' => \'+1\',
+        \'text\' => \'Call us: \'
+    ), $atts);
+    
+    return \'<div class="phone-number"><a href="tel:\' . $atts[\'prefix\'] . $atts[\'phone\'] . \'">\' . $atts[\'text\'] . $atts[\'phone\'] . \'</a></div>\';
+}
+add_shortcode(\'buffalo phone number\', \'buffalo_phone_number_shortcode\');';
+    }
+    
+    /**
+     * Get example output
+     */
+    private static function get_example_output() {
+        return '<div class="phone-number">
+  <a href="tel:+11234567890">Call us: 1234567890</a>
+</div>';
     }
 }
