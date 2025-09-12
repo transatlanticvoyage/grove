@@ -58,11 +58,11 @@ class Grove_Zen_Shortcodes {
         // Sitespren shortcode
         add_shortcode('sitespren', array($this, 'render_sitespren'));
         
+        // Buffalo shortcodes  
+        add_shortcode('buffalo phone number', array($this, 'render_buffalo_phone_number'));
+        
         // Factory codes shortcodes
         add_shortcode('sitespren_phone_link', array($this, 'render_sitespren_phone_link'));
-        
-        // Buffalo shortcodes
-        add_shortcode('buffalo phone number', array($this, 'render_buffalo_phone_number'));
     }
     
     /**
