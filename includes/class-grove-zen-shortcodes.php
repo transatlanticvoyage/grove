@@ -60,6 +60,9 @@ class Grove_Zen_Shortcodes {
         
         // Factory codes shortcodes
         add_shortcode('sitespren_phone_link', array($this, 'render_sitespren_phone_link'));
+        
+        // Buffalo shortcodes
+        add_shortcode('buffalo phone number', array($this, 'render_buffalo_phone_number'));
     }
     
     /**
@@ -764,5 +767,28 @@ class Grove_Zen_Shortcodes {
             esc_html($atts['text']),
             esc_html($phone)
         );
+    }
+    
+    /**
+     * Render buffalo phone number
+     * Usage: [buffalo phone number] or [buffalo phone number prefix="+1" text="Call us: "]
+     */
+    public function render_buffalo_phone_number($atts) {
+        $atts = shortcode_atts(array(
+            'wppma_id' => '1',
+            'prefix' => '+1',
+            'text' => 'Call us: '
+        ), $atts, 'buffalo phone number');
+        
+        // Get phone number from sitespren data
+        $sitespren = Grove_Database::get_sitespren(intval($atts['wppma_id']));
+        
+        if (!$sitespren || empty($sitespren->driggs_phone_1)) {
+            return '<!-- No phone number found -->';
+        }
+        
+        $phone = $sitespren->driggs_phone_1;
+        
+        return '<div class="phone-number"><a href="tel:' . esc_attr($atts['prefix']) . esc_attr($phone) . '">' . esc_html($atts['text']) . esc_html($phone) . '</a></div>';
     }
 }

@@ -103,13 +103,26 @@ class Grove_Buffalor {
      */
     private static function get_shortcode_registration_code() {
         return 'function buffalo_phone_number_shortcode($atts) {
+    global $wpdb;
+    
     $atts = shortcode_atts(array(
-        \'phone\' => \'1234567890\',
+        \'wppma_id\' => \'1\',
         \'prefix\' => \'+1\',
         \'text\' => \'Call us: \'
-    ), $atts);
+    ), $atts, \'buffalo phone number\');
     
-    return \'<div class="phone-number"><a href="tel:\' . $atts[\'prefix\'] . $atts[\'phone\'] . \'">\' . $atts[\'text\'] . $atts[\'phone\'] . \'</a></div>\';
+    // Get phone from zen_sitespren table
+    $table_name = $wpdb->prefix . \'zen_sitespren\';
+    $phone = $wpdb->get_var($wpdb->prepare(
+        "SELECT driggs_phone_1 FROM $table_name WHERE wppma_id = %d",
+        intval($atts[\'wppma_id\'])
+    ));
+    
+    if (empty($phone)) {
+        return \'<!-- No phone number found -->\';
+    }
+    
+    return \'<div class="phone-number"><a href="tel:\' . esc_attr($atts[\'prefix\']) . esc_attr($phone) . \'">\' . esc_html($atts[\'text\']) . esc_html($phone) . \'</a></div>\';
 }
 add_shortcode(\'buffalo phone number\', \'buffalo_phone_number_shortcode\');';
     }
