@@ -1270,6 +1270,11 @@ class Grove_Admin {
         $field = sanitize_text_field($_POST['field']);
         $value = $_POST['value'];
         
+        // Sanitize phone number fields - remove all non-numeric characters
+        if ($field === 'driggs_phone_1') {
+            $value = preg_replace('/[^0-9]/', '', $value);
+        }
+        
         // Validate field name - all editable fields from zen_sitespren table (matching /drom order)
         $allowed_fields = [
             // Core site fields
