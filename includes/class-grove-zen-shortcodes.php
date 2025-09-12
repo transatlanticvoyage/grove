@@ -59,7 +59,7 @@ class Grove_Zen_Shortcodes {
         add_shortcode('sitespren', array($this, 'render_sitespren'));
         
         // Buffalo shortcodes  
-        add_shortcode('buffalo phone number', array($this, 'render_buffalo_phone_number'));
+        add_shortcode('buffalo_phone_number', array($this, 'render_buffalo_phone_number'));
         
         // Factory codes shortcodes
         add_shortcode('sitespren_phone_link', array($this, 'render_sitespren_phone_link'));
@@ -771,14 +771,14 @@ class Grove_Zen_Shortcodes {
     
     /**
      * Render buffalo phone number
-     * Usage: [buffalo phone number] or [buffalo phone number prefix="+1" text="Call us: "]
+     * Usage: [buffalo_phone_number] or [buffalo_phone_number prefix="+1" text="Call us: "]
      */
     public function render_buffalo_phone_number($atts) {
         $atts = shortcode_atts(array(
             'wppma_id' => '1',
             'prefix' => '+1',
             'text' => 'Call us: '
-        ), $atts, 'buffalo phone number');
+        ), $atts, 'buffalo_phone_number');
         
         // Get phone number from sitespren data
         $sitespren = Grove_Database::get_sitespren(intval($atts['wppma_id']));
