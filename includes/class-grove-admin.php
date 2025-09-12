@@ -386,6 +386,7 @@ class Grove_Admin {
                     
                     // phone section
                     {key: 'phone_section_separator', label: 'phone section', type: 'separator'},
+                    {key: 'driggs_phone_country_code', label: 'driggs_phone_country_code', type: 'number'},
                     {key: 'driggs_phone1_platform_id', label: 'driggs_phone1_platform_id', type: 'number'},
                     {key: 'driggs_phone_1', label: 'driggs_phone_1', type: 'text'},
                     
@@ -3027,6 +3028,7 @@ class Grove_Admin {
             array('key' => 'driggs_site_type_purpose', 'label' => 'driggs_site_type_purpose', 'type' => 'text'),
             array('key' => 'driggs_email_1', 'label' => 'driggs_email_1', 'type' => 'email'),
             array('key' => 'driggs_address_full', 'label' => 'driggs_address_full', 'type' => 'textarea'),
+            array('key' => 'driggs_phone_country_code', 'label' => 'driggs_phone_country_code', 'type' => 'number'),
             array('key' => 'driggs_phone_1', 'label' => 'driggs_phone_1', 'type' => 'text'),
             array('key' => 'driggs_special_note_for_ai_tool', 'label' => 'driggs_special_note_for_ai_tool', 'type' => 'textarea'),
             array('key' => 'driggs_phone1_platform_id', 'label' => 'driggs_phone1_platform_id', 'type' => 'number'),

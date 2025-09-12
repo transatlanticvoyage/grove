@@ -96,6 +96,7 @@ class Grove_Database {
             driggs_email_1 varchar(255) DEFAULT NULL,
             driggs_address_full text DEFAULT NULL,
             driggs_address_species_id int(11) DEFAULT NULL,
+            driggs_phone_country_code int(11) DEFAULT 1,
             driggs_phone_1 varchar(255) DEFAULT NULL,
             driggs_phone1_platform_id int(11) DEFAULT NULL,
             driggs_cgig_id int(11) DEFAULT NULL,
@@ -286,10 +287,11 @@ class Grove_Database {
                     'sitespren_base' => $domain,
                     'driggs_brand_name' => get_option('blogname', 'My Site'),
                     'driggs_site_type_purpose' => 'WordPress Site',
+                    'driggs_phone_country_code' => 1,
                     'created_at' => current_time('mysql'),
                     'updated_at' => current_time('mysql')
                 ),
-                array('%s', '%s', '%s', '%s', '%s', '%s')
+                array('%s', '%s', '%s', '%s', '%d', '%s', '%s')
             );
         }
         

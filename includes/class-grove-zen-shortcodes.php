@@ -776,7 +776,7 @@ class Grove_Zen_Shortcodes {
     public function render_buffalo_phone_number($atts) {
         $atts = shortcode_atts(array(
             'wppma_id' => '1',
-            'prefix' => '+1',
+            'prefix' => '', // Will be set dynamically from database
             'text' => 'Call us: '
         ), $atts, 'buffalo_phone_number');
         
@@ -788,6 +788,14 @@ class Grove_Zen_Shortcodes {
         }
         
         $phone = $sitespren->driggs_phone_1;
+        
+        // Use dynamic country code from database, fallback to 1
+        $country_code = !empty($sitespren->driggs_phone_country_code) ? $sitespren->driggs_phone_country_code : '1';
+        
+        // Override prefix if not manually set
+        if (empty($atts['prefix'])) {
+            $atts['prefix'] = '+' . $country_code;
+        }
         
         return '<div class="phone-number"><a href="tel:' . esc_attr($atts['prefix']) . esc_attr($phone) . '">' . esc_html($atts['text']) . esc_html($phone) . '</a></div>';
     }
