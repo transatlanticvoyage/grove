@@ -57,6 +57,9 @@ class Grove_Zen_Shortcodes {
         
         // Sitespren shortcode
         add_shortcode('sitespren', array($this, 'render_sitespren'));
+        
+        // Factory codes shortcodes
+        add_shortcode('sitespren_phone_link', array($this, 'render_sitespren_phone_link'));
     }
     
     /**
@@ -727,5 +730,39 @@ class Grove_Zen_Shortcodes {
         }
         
         return $value;
+    }
+    
+    /**
+     * Render sitespren phone link
+     * Usage: [sitespren_phone_link] or [sitespren_phone_link prefix="+1" text="Call now: "]
+     */
+    public function render_sitespren_phone_link($atts) {
+        $atts = shortcode_atts(array(
+            'wppma_id' => '1',
+            'prefix' => '+1',
+            'text' => 'Call us: ',
+            'class' => 'phone-link'
+        ), $atts, 'sitespren_phone_link');
+        
+        // Get phone number from sitespren data
+        $sitespren = Grove_Database::get_sitespren(intval($atts['wppma_id']));
+        
+        if (!$sitespren || empty($sitespren->driggs_phone_1)) {
+            return '<!-- No phone number found -->';
+        }
+        
+        $phone = $sitespren->driggs_phone_1;
+        
+        // Clean phone for tel: link (remove non-digits)
+        $clean_phone = preg_replace('/[^0-9]/', '', $phone);
+        
+        return sprintf(
+            '<a href="tel:%s%s" class="%s">%s%s</a>',
+            esc_attr($atts['prefix']),
+            esc_attr($clean_phone),
+            esc_attr($atts['class']),
+            esc_html($atts['text']),
+            esc_html($phone)
+        );
     }
 }

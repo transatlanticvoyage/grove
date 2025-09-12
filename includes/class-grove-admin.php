@@ -19,6 +19,11 @@ class Grove_Admin {
         add_action('wp_ajax_grove_services_create', array($this, 'grove_services_create'));
         add_action('wp_ajax_grove_shortcode_update_mode', array($this, 'grove_shortcode_update_mode'));
         add_action('wp_ajax_grove_shortcode_test', array($this, 'grove_shortcode_test'));
+        // Factory codes handlers
+        add_action('wp_ajax_grove_factory_codes_get_data', array($this, 'grove_factory_codes_get_data'));
+        add_action('wp_ajax_grove_factory_codes_update_field', array($this, 'grove_factory_codes_update_field'));
+        add_action('wp_ajax_grove_factory_codes_delete', array($this, 'grove_factory_codes_delete'));
+        add_action('wp_ajax_grove_factory_codes_create', array($this, 'grove_factory_codes_create'));
         // Export handlers
         add_action('wp_ajax_grove_export_sharkintax', array($this, 'grove_export_sharkintax'));
         add_action('wp_ajax_grove_export_walrustax', array($this, 'grove_export_walrustax'));
@@ -87,6 +92,15 @@ class Grove_Admin {
             'manage_options',
             'shortcodecommander',
             array($this, 'shortcodecommander_page')
+        );
+        
+        add_submenu_page(
+            'grovehub',
+            'Grove Factory Codes',
+            'grove_factory_codes',
+            'manage_options',
+            'grove_factory_codes',
+            array($this, 'grove_factory_codes_page')
         );
     }
     
@@ -3069,5 +3083,495 @@ class Grove_Admin {
             array('key' => 'rel_cncglub_id', 'label' => 'rel_cncglub_id', 'type' => 'number'),
             array('key' => 'rel_city_id', 'label' => 'rel_city_id', 'type' => 'number')
         );
+    }
+    
+    /**
+     * Grove Factory Codes Manager Page
+     */
+    public function grove_factory_codes_page() {
+        global $wpdb;
+        $table_name = $wpdb->prefix . 'zen_factory_codes';
+        
+        // AGGRESSIVE NOTICE SUPPRESSION - Remove ALL WordPress admin notices
+        $this->suppress_all_admin_notices();
+        
+        ?>
+        <div class="wrap" style="margin: 0; padding: 0;">
+            <!-- Allow space for WordPress notices -->
+            <div style="height: 20px;"></div>
+            
+            <div style="padding: 20px;">
+                <h1 style="margin-bottom: 20px;">🌳🏭 Grove Factory Codes Manager</h1>
+            
+            <!-- Control Bar -->
+            <div style="background: white; border: 1px solid #ddd; padding: 15px; margin-bottom: 20px; border-radius: 5px;">
+                <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 15px;">
+                    <div style="display: flex; gap: 10px; align-items: center;">
+                        <button id="create-popup-btn" class="button button-primary">Create New Factory Code</button>
+                        <button id="delete-selected-btn" class="button" style="background: #dc3545; color: white; border-color: #dc3545;">Delete Selected</button>
+                        <button id="export-recovery-php" class="button button-secondary">Export Recovery PHP</button>
+                    </div>
+                </div>
+                
+                <!-- Search -->
+                <div style="display: flex; justify-content: flex-end; align-items: center;">
+                    <div style="position: relative;">
+                        <input type="text" id="search-box" placeholder="Search factory codes..." style="padding: 8px 40px 8px 12px; border: 1px solid #ccc; border-radius: 4px; width: 250px; font-size: 14px;">
+                        <button id="clear-search" style="position: absolute; right: 8px; top: 50%; transform: translateY(-50%); background: #ffeb3b; border: none; padding: 4px 8px; font-size: 12px; font-weight: bold; border-radius: 3px; cursor: pointer;">CL</button>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Main Table -->
+            <div style="background: white; border: 1px solid #ddd; border-radius: 5px; overflow: hidden;">
+                <div style="overflow-x: auto;">
+                    <table id="factory-codes-table" style="width: 100%; border-collapse: collapse; font-size: 14px;">
+                        <thead style="background: #f8f9fa;">
+                            <tr>
+                                <th style="padding: 12px 8px; border: 1px solid #ddd; font-weight: bold; text-align: left; background: #f0f0f0; width: 50px;">
+                                    <input type="checkbox" id="select-all" style="width: 20px; height: 20px;">
+                                </th>
+                                <th data-sort="code_id" style="padding: 12px 8px; border: 1px solid #ddd; font-weight: bold; text-transform: lowercase; cursor: pointer; background: #f8f9fa;">code_id</th>
+                                <th data-sort="code_slug" style="padding: 12px 8px; border: 1px solid #ddd; font-weight: bold; text-transform: lowercase; cursor: pointer; background: #f8f9fa;">code_slug</th>
+                                <th data-sort="code_type" style="padding: 12px 8px; border: 1px solid #ddd; font-weight: bold; text-transform: lowercase; cursor: pointer; background: #f8f9fa;">code_type</th>
+                                <th data-sort="code_title" style="padding: 12px 8px; border: 1px solid #ddd; font-weight: bold; text-transform: lowercase; cursor: pointer; background: #f8f9fa;">code_title</th>
+                                <th data-sort="code_description" style="padding: 12px 8px; border: 1px solid #ddd; font-weight: bold; text-transform: lowercase; cursor: pointer; background: #f8f9fa;">code_description</th>
+                                <th data-sort="usage_example" style="padding: 12px 8px; border: 1px solid #ddd; font-weight: bold; text-transform: lowercase; cursor: pointer; background: #f8f9fa;">usage_example</th>
+                                <th data-sort="is_active" style="padding: 12px 8px; border: 1px solid #ddd; font-weight: bold; text-transform: lowercase; cursor: pointer; background: #f8f9fa;">is_active</th>
+                                <th data-sort="is_core" style="padding: 12px 8px; border: 1px solid #ddd; font-weight: bold; text-transform: lowercase; cursor: pointer; background: #f8f9fa;">is_core</th>
+                                <th data-sort="plugin_source" style="padding: 12px 8px; border: 1px solid #ddd; font-weight: bold; text-transform: lowercase; cursor: pointer; background: #f8f9fa;">plugin_source</th>
+                                <th data-sort="created_at" style="padding: 12px 8px; border: 1px solid #ddd; font-weight: bold; text-transform: lowercase; cursor: pointer; background: #f8f9fa;">created_at</th>
+                                <th style="padding: 12px 8px; border: 1px solid #ddd; font-weight: bold; text-align: center; background: #f8f9fa;">Actions</th>
+                            </tr>
+                        </thead>
+                        <tbody id="table-body">
+                            <!-- Data will be loaded here via AJAX -->
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+            
+            <div style="margin-top: 20px; padding: 15px; background: #f9f9f9; border: 1px solid #ddd; border-radius: 5px;">
+                <p><strong>Instructions:</strong></p>
+                <ul>
+                    <li>Click on any value to edit it inline (except code_id)</li>
+                    <li>Toggle switches control boolean fields</li>
+                    <li>Changes are saved automatically when you click out of a field</li>
+                    <li>Use "Export Recovery PHP" to generate functions.php code for manual recovery</li>
+                    <li>Factory codes preserve critical shortcodes in case plugins need to be removed</li>
+                </ul>
+            </div>
+            
+        </div>
+        
+        <!-- Create/Edit Popup Modal -->
+        <div id="factory-code-popup" style="display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background-color: rgba(0,0,0,0.5); z-index: 999999;">
+            <div style="position: fixed; top: 50%; left: 50%; transform: translate(-50%, -50%); background: white; padding: 30px; border-radius: 8px; width: 80%; max-width: 800px; max-height: 90vh; overflow-y: auto;">
+                <h2 id="popup-title">Create New Factory Code</h2>
+                <form id="factory-code-form">
+                    <input type="hidden" id="code_id" name="code_id" value="">
+                    
+                    <table style="width: 100%; border-collapse: collapse;">
+                        <tr>
+                            <td style="padding: 10px; font-weight: bold; width: 150px;">code_slug:</td>
+                            <td style="padding: 10px;">
+                                <input type="text" id="code_slug" name="code_slug" required style="width: 100%; padding: 8px; border: 1px solid #ccc; border-radius: 4px;">
+                            </td>
+                        </tr>
+                        <tr>
+                            <td style="padding: 10px; font-weight: bold;">code_type:</td>
+                            <td style="padding: 10px;">
+                                <select id="code_type" name="code_type" required style="width: 100%; padding: 8px; border: 1px solid #ccc; border-radius: 4px;">
+                                    <option value="shortcode">shortcode</option>
+                                    <option value="function">function</option>
+                                    <option value="filter">filter</option>
+                                    <option value="action">action</option>
+                                    <option value="class">class</option>
+                                </select>
+                            </td>
+                        </tr>
+                        <tr>
+                            <td style="padding: 10px; font-weight: bold;">code_title:</td>
+                            <td style="padding: 10px;">
+                                <input type="text" id="code_title" name="code_title" style="width: 100%; padding: 8px; border: 1px solid #ccc; border-radius: 4px;">
+                            </td>
+                        </tr>
+                        <tr>
+                            <td style="padding: 10px; font-weight: bold;">code_description:</td>
+                            <td style="padding: 10px;">
+                                <textarea id="code_description" name="code_description" rows="3" style="width: 100%; padding: 8px; border: 1px solid #ccc; border-radius: 4px; resize: vertical;"></textarea>
+                            </td>
+                        </tr>
+                        <tr>
+                            <td style="padding: 10px; font-weight: bold;">code_snippet:</td>
+                            <td style="padding: 10px;">
+                                <textarea id="code_snippet" name="code_snippet" rows="10" required style="width: 100%; padding: 8px; border: 1px solid #ccc; border-radius: 4px; font-family: monospace; font-size: 13px; resize: vertical;"></textarea>
+                            </td>
+                        </tr>
+                        <tr>
+                            <td style="padding: 10px; font-weight: bold;">usage_example:</td>
+                            <td style="padding: 10px;">
+                                <textarea id="usage_example" name="usage_example" rows="2" style="width: 100%; padding: 8px; border: 1px solid #ccc; border-radius: 4px; resize: vertical;"></textarea>
+                            </td>
+                        </tr>
+                        <tr>
+                            <td style="padding: 10px; font-weight: bold;">plugin_source:</td>
+                            <td style="padding: 10px;">
+                                <select id="plugin_source" name="plugin_source" style="width: 100%; padding: 8px; border: 1px solid #ccc; border-radius: 4px;">
+                                    <option value="grove">grove</option>
+                                    <option value="snefuruplin">snefuruplin</option>
+                                    <option value="both">both</option>
+                                    <option value="custom">custom</option>
+                                </select>
+                            </td>
+                        </tr>
+                        <tr>
+                            <td style="padding: 10px; font-weight: bold;">is_active:</td>
+                            <td style="padding: 10px;">
+                                <input type="checkbox" id="is_active" name="is_active" checked style="transform: scale(1.5);">
+                            </td>
+                        </tr>
+                        <tr>
+                            <td style="padding: 10px; font-weight: bold;">is_core:</td>
+                            <td style="padding: 10px;">
+                                <input type="checkbox" id="is_core" name="is_core" style="transform: scale(1.5);">
+                            </td>
+                        </tr>
+                    </table>
+                    
+                    <div style="margin-top: 20px; text-align: right;">
+                        <button type="button" id="cancel-btn" class="button" style="margin-right: 10px;">Cancel</button>
+                        <button type="submit" id="save-btn" class="button button-primary">Save Factory Code</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+        
+        <style type="text/css">
+        /* Factory Codes Table Styling */
+        #factory-codes-table th {
+            position: relative;
+        }
+        
+        #factory-codes-table th[data-sort]:hover {
+            background-color: #e9ecef !important;
+        }
+        
+        #factory-codes-table th[data-sort]:after {
+            content: '↕';
+            position: absolute;
+            right: 8px;
+            color: #999;
+            font-size: 10px;
+        }
+        
+        #factory-codes-table tbody tr:hover {
+            background-color: #f8f9fa;
+        }
+        
+        .factory-code-checkbox {
+            transform: scale(1.2);
+        }
+        
+        .factory-code-active-true {
+            color: #28a745;
+            font-weight: bold;
+        }
+        
+        .factory-code-active-false {
+            color: #dc3545;
+            font-weight: bold;
+        }
+        
+        .factory-code-core-true {
+            color: #007bff;
+            font-weight: bold;
+        }
+        
+        .factory-code-snippet-preview {
+            max-width: 200px;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            font-family: monospace;
+            font-size: 12px;
+            color: #666;
+        }
+        
+        .factory-code-action-btn {
+            padding: 4px 8px;
+            font-size: 12px;
+            margin: 0 2px;
+            border-radius: 3px;
+        }
+        
+        /* Popup styling */
+        #factory-code-popup textarea {
+            font-family: 'Courier New', monospace;
+        }
+        
+        #factory-code-popup input[type="text"], 
+        #factory-code-popup textarea,
+        #factory-code-popup select {
+            font-size: 14px;
+        }
+        </style>
+        
+        <script type="text/javascript">
+        jQuery(document).ready(function($) {
+            let currentData = [];
+            let currentSort = { column: 'code_id', direction: 'asc' };
+            let searchTerm = '';
+            
+            // Load initial data
+            loadFactoryCodesData();
+            
+            function loadFactoryCodesData() {
+                $.ajax({
+                    url: ajaxurl,
+                    type: 'POST',
+                    data: {
+                        action: 'grove_factory_codes_get_data',
+                        nonce: '<?php echo wp_create_nonce('grove_factory_codes_nonce'); ?>'
+                    },
+                    success: function(response) {
+                        if (response.success) {
+                            currentData = response.data;
+                            displayData();
+                        } else {
+                            alert('Error loading factory codes data: ' + response.data);
+                        }
+                    },
+                    error: function() {
+                        alert('Error loading factory codes data');
+                    }
+                });
+            }
+            
+            function displayData() {
+                let tbody = $('#table-body');
+                tbody.empty();
+                
+                // Filter and sort data
+                let filteredData = currentData.filter(function(item) {
+                    if (!searchTerm) return true;
+                    
+                    return (
+                        (item.code_slug && item.code_slug.toLowerCase().includes(searchTerm.toLowerCase())) ||
+                        (item.code_title && item.code_title.toLowerCase().includes(searchTerm.toLowerCase())) ||
+                        (item.code_type && item.code_type.toLowerCase().includes(searchTerm.toLowerCase())) ||
+                        (item.code_description && item.code_description.toLowerCase().includes(searchTerm.toLowerCase()))
+                    );
+                });
+                
+                // Sort data
+                filteredData.sort(function(a, b) {
+                    let aVal = a[currentSort.column] || '';
+                    let bVal = b[currentSort.column] || '';
+                    
+                    // Convert to string for comparison
+                    aVal = aVal.toString().toLowerCase();
+                    bVal = bVal.toString().toLowerCase();
+                    
+                    if (currentSort.direction === 'asc') {
+                        return aVal < bVal ? -1 : (aVal > bVal ? 1 : 0);
+                    } else {
+                        return aVal > bVal ? -1 : (aVal < bVal ? 1 : 0);
+                    }
+                });
+                
+                // Display data
+                filteredData.forEach(function(item) {
+                    let row = $('<tr>');
+                    
+                    // Checkbox
+                    row.append('<td style="padding: 8px; border: 1px solid #ddd; text-align: center;"><input type="checkbox" class="row-select" data-id="' + item.code_id + '" style="width: 20px; height: 20px;"></td>');
+                    
+                    // code_id (read-only)
+                    row.append('<td style="padding: 8px; border: 1px solid #ddd; color: #666; font-style: italic;">' + (item.code_id || '') + '</td>');
+                    
+                    // code_slug (editable)
+                    row.append('<td style="padding: 8px; border: 1px solid #ddd;" data-field="code_slug" data-id="' + item.code_id + '" class="editable-field">' + (item.code_slug || '') + '</td>');
+                    
+                    // code_type (editable select)
+                    let typeClass = 'factory-code-type-' + (item.code_type || 'unknown');
+                    row.append('<td style="padding: 8px; border: 1px solid #ddd;" data-field="code_type" data-id="' + item.code_id + '" class="editable-select ' + typeClass + '">' + (item.code_type || '') + '</td>');
+                    
+                    // code_title (editable)
+                    row.append('<td style="padding: 8px; border: 1px solid #ddd;" data-field="code_title" data-id="' + item.code_id + '" class="editable-field">' + (item.code_title || '') + '</td>');
+                    
+                    // code_description (editable textarea)
+                    let description = item.code_description || '';
+                    let shortDescription = description.length > 50 ? description.substring(0, 50) + '...' : description;
+                    row.append('<td style="padding: 8px; border: 1px solid #ddd;" data-field="code_description" data-id="' + item.code_id + '" class="editable-textarea" title="' + $('<div>').text(description).html() + '">' + $('<div>').text(shortDescription).html() + '</td>');
+                    
+                    // usage_example (editable textarea)
+                    let usage = item.usage_example || '';
+                    let shortUsage = usage.length > 30 ? usage.substring(0, 30) + '...' : usage;
+                    row.append('<td style="padding: 8px; border: 1px solid #ddd;" data-field="usage_example" data-id="' + item.code_id + '" class="editable-textarea" title="' + $('<div>').text(usage).html() + '">' + $('<div>').text(shortUsage).html() + '</td>');
+                    
+                    // is_active (toggle)
+                    let activeChecked = item.is_active == 1 ? 'checked' : '';
+                    let activeClass = item.is_active == 1 ? 'factory-code-active-true' : 'factory-code-active-false';
+                    let activeText = item.is_active == 1 ? 'Yes' : 'No';
+                    row.append('<td style="padding: 8px; border: 1px solid #ddd; text-align: center;"><input type="checkbox" class="toggle-field factory-code-checkbox" data-field="is_active" data-id="' + item.code_id + '" ' + activeChecked + '> <span class="' + activeClass + '">' + activeText + '</span></td>');
+                    
+                    // is_core (toggle)
+                    let coreChecked = item.is_core == 1 ? 'checked' : '';
+                    let coreClass = item.is_core == 1 ? 'factory-code-core-true' : '';
+                    let coreText = item.is_core == 1 ? 'Yes' : 'No';
+                    row.append('<td style="padding: 8px; border: 1px solid #ddd; text-align: center;"><input type="checkbox" class="toggle-field factory-code-checkbox" data-field="is_core" data-id="' + item.code_id + '" ' + coreChecked + '> <span class="' + coreClass + '">' + coreText + '</span></td>');
+                    
+                    // plugin_source (editable select)
+                    let sourceClass = 'factory-code-source-' + (item.plugin_source || 'unknown');
+                    row.append('<td style="padding: 8px; border: 1px solid #ddd;" data-field="plugin_source" data-id="' + item.code_id + '" class="editable-select ' + sourceClass + '">' + (item.plugin_source || '') + '</td>');
+                    
+                    // created_at (read-only)
+                    row.append('<td style="padding: 8px; border: 1px solid #ddd; color: #666; font-size: 12px;">' + (item.created_at || '') + '</td>');
+                    
+                    // Actions
+                    let actions = '<button class="button button-small factory-code-action-btn edit-btn" data-id="' + item.code_id + '">Edit</button>';
+                    actions += '<button class="button button-small factory-code-action-btn view-code-btn" data-id="' + item.code_id + '" style="background: #17a2b8; color: white; border-color: #17a2b8;">View Code</button>';
+                    actions += '<button class="button button-small factory-code-action-btn copy-code-btn" data-id="' + item.code_id + '" style="background: #28a745; color: white; border-color: #28a745;">Copy</button>';
+                    row.append('<td style="padding: 8px; border: 1px solid #ddd; text-align: center;">' + actions + '</td>');
+                    
+                    tbody.append(row);
+                });
+                
+                if (filteredData.length === 0) {
+                    tbody.append('<tr><td colspan="12" style="padding: 20px; text-align: center; color: #666;">No factory codes found.</td></tr>');
+                }
+            }
+            
+            // Event handlers will go here...
+            
+        });
+        </script>
+        
+        <?php
+    }
+    
+    /**
+     * AJAX handler to get factory codes data
+     */
+    public function grove_factory_codes_get_data() {
+        // Verify nonce
+        if (!isset($_POST['nonce']) || !wp_verify_nonce($_POST['nonce'], 'grove_factory_codes_nonce')) {
+            wp_send_json_error('Invalid nonce');
+        }
+        
+        // Check permissions
+        if (!current_user_can('manage_options')) {
+            wp_send_json_error('Unauthorized');
+        }
+        
+        $factory_codes = Grove_Database::get_factory_codes();
+        wp_send_json_success($factory_codes);
+    }
+    
+    /**
+     * AJAX handler to update factory codes field
+     */
+    public function grove_factory_codes_update_field() {
+        // Verify nonce
+        if (!isset($_POST['nonce']) || !wp_verify_nonce($_POST['nonce'], 'grove_factory_codes_nonce')) {
+            wp_send_json_error('Invalid nonce');
+        }
+        
+        // Check permissions
+        if (!current_user_can('manage_options')) {
+            wp_send_json_error('Unauthorized');
+        }
+        
+        $code_id = intval($_POST['code_id']);
+        $field = sanitize_text_field($_POST['field']);
+        $value = $_POST['value']; // Don't sanitize code snippets
+        
+        // Validate field name
+        $allowed_fields = array('code_slug', 'code_type', 'code_title', 'code_description', 'code_snippet', 'dependencies', 'usage_example', 'is_active', 'is_core', 'plugin_source', 'wp_version_min');
+        if (!in_array($field, $allowed_fields)) {
+            wp_send_json_error('Invalid field');
+        }
+        
+        // Handle boolean fields
+        if (in_array($field, array('is_active', 'is_core'))) {
+            $value = $value ? 1 : 0;
+        }
+        
+        $data = array($field => $value);
+        $result = Grove_Database::update_factory_code($code_id, $data);
+        
+        if ($result !== false) {
+            wp_send_json_success('Field updated successfully');
+        } else {
+            wp_send_json_error('Failed to update field');
+        }
+    }
+    
+    /**
+     * AJAX handler to create factory code
+     */
+    public function grove_factory_codes_create() {
+        // Verify nonce
+        if (!isset($_POST['nonce']) || !wp_verify_nonce($_POST['nonce'], 'grove_factory_codes_nonce')) {
+            wp_send_json_error('Invalid nonce');
+        }
+        
+        // Check permissions
+        if (!current_user_can('manage_options')) {
+            wp_send_json_error('Unauthorized');
+        }
+        
+        $data = array(
+            'code_slug' => sanitize_text_field($_POST['code_slug']),
+            'code_type' => sanitize_text_field($_POST['code_type']),
+            'code_title' => sanitize_text_field($_POST['code_title']),
+            'code_description' => sanitize_textarea_field($_POST['code_description']),
+            'code_snippet' => $_POST['code_snippet'], // Don't sanitize code
+            'dependencies' => sanitize_textarea_field($_POST['dependencies']),
+            'usage_example' => sanitize_textarea_field($_POST['usage_example']),
+            'is_active' => isset($_POST['is_active']) ? 1 : 0,
+            'is_core' => isset($_POST['is_core']) ? 1 : 0,
+            'plugin_source' => sanitize_text_field($_POST['plugin_source']),
+            'wp_version_min' => sanitize_text_field($_POST['wp_version_min'])
+        );
+        
+        $result = Grove_Database::insert_factory_code($data);
+        
+        if ($result !== false) {
+            wp_send_json_success('Factory code created successfully');
+        } else {
+            wp_send_json_error('Failed to create factory code');
+        }
+    }
+    
+    /**
+     * AJAX handler to delete factory codes
+     */
+    public function grove_factory_codes_delete() {
+        // Verify nonce
+        if (!isset($_POST['nonce']) || !wp_verify_nonce($_POST['nonce'], 'grove_factory_codes_nonce')) {
+            wp_send_json_error('Invalid nonce');
+        }
+        
+        // Check permissions
+        if (!current_user_can('manage_options')) {
+            wp_send_json_error('Unauthorized');
+        }
+        
+        $code_ids = array_map('intval', $_POST['code_ids']);
+        $deleted_count = 0;
+        
+        foreach ($code_ids as $code_id) {
+            if (Grove_Database::delete_factory_code($code_id)) {
+                $deleted_count++;
+            }
+        }
+        
+        if ($deleted_count > 0) {
+            wp_send_json_success("Deleted $deleted_count factory codes successfully");
+        } else {
+            wp_send_json_error('Failed to delete factory codes');
+        }
     }
 }

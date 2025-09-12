@@ -57,6 +57,9 @@ class Grove_Database {
         
         // Create zen_locations table
         $this->create_locations_table($charset_collate);
+        
+        // Create zen_factory_codes table
+        $this->create_factory_codes_table($charset_collate);
     }
     
     /**
@@ -229,6 +232,39 @@ class Grove_Database {
     }
     
     /**
+     * Create zen_factory_codes table
+     */
+    private function create_factory_codes_table($charset_collate) {
+        global $wpdb;
+        
+        $table_name = $wpdb->prefix . 'zen_factory_codes';
+        
+        $sql = "CREATE TABLE IF NOT EXISTS $table_name (
+            code_id int(11) NOT NULL AUTO_INCREMENT,
+            code_slug varchar(100) NOT NULL,
+            code_type varchar(50) NOT NULL,
+            code_title varchar(255) DEFAULT NULL,
+            code_description text DEFAULT NULL,
+            code_snippet mediumtext NOT NULL,
+            dependencies text DEFAULT NULL,
+            usage_example text DEFAULT NULL,
+            is_active tinyint(1) DEFAULT 1,
+            is_core tinyint(1) DEFAULT 0,
+            plugin_source varchar(100) DEFAULT NULL,
+            wp_version_min varchar(10) DEFAULT NULL,
+            created_at timestamp DEFAULT CURRENT_TIMESTAMP,
+            updated_at timestamp DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+            PRIMARY KEY (code_id),
+            UNIQUE KEY unique_slug (code_slug),
+            INDEX idx_type (code_type),
+            INDEX idx_active (is_active),
+            INDEX idx_source (plugin_source)
+        ) $charset_collate;";
+        
+        dbDelta($sql);
+    }
+    
+    /**
      * Insert default data if tables are empty
      */
     private function maybe_insert_default_data() {
@@ -254,6 +290,69 @@ class Grove_Database {
                     'updated_at' => current_time('mysql')
                 ),
                 array('%s', '%s', '%s', '%s', '%s', '%s')
+            );
+        }
+        
+        // Insert default factory codes if table is empty
+        $factory_codes_table = $wpdb->prefix . 'zen_factory_codes';
+        $existing_codes_count = $wpdb->get_var("SELECT COUNT(*) FROM $factory_codes_table");
+        
+        if ($existing_codes_count == 0) {
+            $phone_link_code = <<<'PHP'
+// Sitespren Phone Link Shortcode Recovery Code
+// Add this to your theme's functions.php if Grove/Snefuruplin plugins are removed
+
+if (!function_exists('sitespren_phone_link_shortcode')) {
+    function sitespren_phone_link_shortcode($atts) {
+        global $wpdb;
+        
+        $atts = shortcode_atts(array(
+            'wppma_id' => '1',
+            'prefix' => '+1',
+            'text' => 'Call us: ',
+            'class' => 'phone-link'
+        ), $atts, 'sitespren_phone_link');
+        
+        // Direct database query fallback
+        $table = $wpdb->prefix . 'zen_sitespren';
+        $phone = $wpdb->get_var($wpdb->prepare(
+            "SELECT driggs_phone_1 FROM $table WHERE wppma_id = %d",
+            $atts['wppma_id']
+        ));
+        
+        if (empty($phone)) {
+            return '<!-- No phone number found -->';
+        }
+        
+        $clean_phone = preg_replace('/[^0-9]/', '', $phone);
+        
+        return sprintf(
+            '<a href="tel:%s%s" class="%s">%s%s</a>',
+            esc_attr($atts['prefix']),
+            esc_attr($clean_phone),
+            esc_attr($atts['class']),
+            esc_html($atts['text']),
+            esc_html($phone)
+        );
+    }
+    add_shortcode('sitespren_phone_link', 'sitespren_phone_link_shortcode');
+}
+PHP;
+
+            $wpdb->insert(
+                $factory_codes_table,
+                array(
+                    'code_slug' => 'sitespren_phone_link',
+                    'code_type' => 'shortcode',
+                    'code_title' => 'Sitespren Phone Link Shortcode',
+                    'code_description' => 'Creates a clickable phone link using data from zen_sitespren table. Works as standalone recovery code if plugins are removed.',
+                    'code_snippet' => $phone_link_code,
+                    'usage_example' => '[sitespren_phone_link] or [sitespren_phone_link prefix="+1" text="Call now: "]',
+                    'is_active' => 1,
+                    'is_core' => 1,
+                    'plugin_source' => 'both'
+                ),
+                array('%s', '%s', '%s', '%s', '%s', '%s', '%d', '%d', '%s')
             );
         }
     }
@@ -361,5 +460,105 @@ class Grove_Database {
             "SELECT * FROM $table_name WHERE wppma_id = %d",
             $wppma_id
         ));
+    }
+    
+    /**
+     * Get factory codes
+     */
+    public static function get_factory_codes($args = array()) {
+        global $wpdb;
+        
+        $defaults = array(
+            'orderby' => 'code_id',
+            'order' => 'ASC',
+            'type' => '',
+            'source' => '',
+            'active_only' => false,
+            'limit' => -1
+        );
+        
+        $args = wp_parse_args($args, $defaults);
+        $table_name = $wpdb->prefix . 'zen_factory_codes';
+        
+        $sql = "SELECT * FROM $table_name WHERE 1=1";
+        
+        // Add filters
+        if (!empty($args['type'])) {
+            $sql .= $wpdb->prepare(" AND code_type = %s", $args['type']);
+        }
+        
+        if (!empty($args['source'])) {
+            $sql .= $wpdb->prepare(" AND plugin_source = %s", $args['source']);
+        }
+        
+        if ($args['active_only']) {
+            $sql .= " AND is_active = 1";
+        }
+        
+        // Add ORDER BY clause
+        $sql .= " ORDER BY " . esc_sql($args['orderby']) . " " . esc_sql($args['order']);
+        
+        // Add LIMIT if specified
+        if ($args['limit'] > 0) {
+            $sql .= " LIMIT " . intval($args['limit']);
+        }
+        
+        return $wpdb->get_results($sql);
+    }
+    
+    /**
+     * Get single factory code by ID
+     */
+    public static function get_factory_code($code_id) {
+        global $wpdb;
+        
+        $table_name = $wpdb->prefix . 'zen_factory_codes';
+        return $wpdb->get_row($wpdb->prepare(
+            "SELECT * FROM $table_name WHERE code_id = %d",
+            $code_id
+        ));
+    }
+    
+    /**
+     * Get factory code by slug
+     */
+    public static function get_factory_code_by_slug($code_slug) {
+        global $wpdb;
+        
+        $table_name = $wpdb->prefix . 'zen_factory_codes';
+        return $wpdb->get_row($wpdb->prepare(
+            "SELECT * FROM $table_name WHERE code_slug = %s",
+            $code_slug
+        ));
+    }
+    
+    /**
+     * Insert factory code
+     */
+    public static function insert_factory_code($data) {
+        global $wpdb;
+        
+        $table_name = $wpdb->prefix . 'zen_factory_codes';
+        return $wpdb->insert($table_name, $data);
+    }
+    
+    /**
+     * Update factory code
+     */
+    public static function update_factory_code($code_id, $data) {
+        global $wpdb;
+        
+        $table_name = $wpdb->prefix . 'zen_factory_codes';
+        return $wpdb->update($table_name, $data, array('code_id' => $code_id));
+    }
+    
+    /**
+     * Delete factory code
+     */
+    public static function delete_factory_code($code_id) {
+        global $wpdb;
+        
+        $table_name = $wpdb->prefix . 'zen_factory_codes';
+        return $wpdb->delete($table_name, array('code_id' => $code_id));
     }
 }
