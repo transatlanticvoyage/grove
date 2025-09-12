@@ -38,6 +38,7 @@ class GrovePlugin {
         require_once GROVE_PLUGIN_PATH . 'includes/class-grove-tax-exports.php';
         require_once GROVE_PLUGIN_PATH . 'includes/class-grove-zen-shortcodes.php';
         require_once GROVE_PLUGIN_PATH . 'includes/class-grove-database.php';
+        require_once GROVE_PLUGIN_PATH . 'includes/class-grove-buffalor.php';
     }
     
     private function init_hooks() {

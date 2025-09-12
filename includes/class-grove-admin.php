@@ -102,6 +102,15 @@ class Grove_Admin {
             'grove_factory_codes',
             array($this, 'grove_factory_codes_page')
         );
+        
+        add_submenu_page(
+            'grovehub',
+            'Grove Buffalo Manager',
+            'grove_buffalor',
+            'manage_options',
+            'grove_buffalor',
+            array($this, 'grove_buffalor_page')
+        );
     }
     
     public function grove_driggs_mar_page() {
@@ -3573,5 +3582,12 @@ class Grove_Admin {
         } else {
             wp_send_json_error('Failed to delete factory codes');
         }
+    }
+    
+    /**
+     * Grove Buffalo Manager Page
+     */
+    public function grove_buffalor_page() {
+        Grove_Buffalor::render_page();
     }
 }
