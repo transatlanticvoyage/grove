@@ -36,7 +36,7 @@ class Grove_Buffalor {
                 
                 <div style="margin-top: 20px;">
                     <label for="shortcode-usage" style="display: block; font-weight: bold; margin-bottom: 5px;">Shortcode Usage</label>
-                    <input type="text" id="shortcode-usage" readonly value="[buffalo phone number]" style="width: 300px; padding: 8px; border: 1px solid #ccc; border-radius: 4px; background-color: #f9f9f9;">
+                    <input type="text" id="shortcode-usage" readonly value="[buffalo_phone_number]" style="width: 300px; padding: 8px; border: 1px solid #ccc; border-radius: 4px; background-color: #f9f9f9;">
                 </div>
                 
                 <div style="margin-top: 20px;">
@@ -109,7 +109,7 @@ class Grove_Buffalor {
         \'wppma_id\' => \'1\',
         \'prefix\' => \'+1\',
         \'text\' => \'Call us: \'
-    ), $atts, \'buffalo phone number\');
+    ), $atts, \'buffalo_phone_number\');
     
     // Get phone from zen_sitespren table
     $table_name = $wpdb->prefix . \'zen_sitespren\';
@@ -124,7 +124,7 @@ class Grove_Buffalor {
     
     return \'<div class="phone-number"><a href="tel:\' . esc_attr($atts[\'prefix\']) . esc_attr($phone) . \'">\' . esc_html($atts[\'text\']) . esc_html($phone) . \'</a></div>\';
 }
-add_shortcode(\'buffalo phone number\', \'buffalo_phone_number_shortcode\');';
+add_shortcode(\'buffalo_phone_number\', \'buffalo_phone_number_shortcode\');';
     }
     
     /**
