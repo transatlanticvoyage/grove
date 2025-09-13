@@ -28,6 +28,11 @@ class Grove_Admin {
         add_action('wp_ajax_grove_export_sharkintax', array($this, 'grove_export_sharkintax'));
         add_action('wp_ajax_grove_export_walrustax', array($this, 'grove_export_walrustax'));
         add_action('wp_ajax_grove_export_csv', array($this, 'grove_export_csv'));
+        // Hoof codes handlers
+        add_action('wp_ajax_grove_update_hoof_code', array($this, 'grove_update_hoof_code'));
+        add_action('wp_ajax_grove_hoof_create', array($this, 'grove_hoof_create'));
+        add_action('wp_ajax_grove_hoof_update', array($this, 'grove_hoof_update'));
+        add_action('wp_ajax_grove_hoof_delete', array($this, 'grove_hoof_delete'));
         add_action('wp_ajax_grove_export_xls', array($this, 'grove_export_xls'));
         add_action('wp_ajax_grove_export_sql', array($this, 'grove_export_sql'));
         // WordPress native settings handlers
@@ -110,6 +115,15 @@ class Grove_Admin {
             'manage_options',
             'grove_buffalor',
             array($this, 'grove_buffalor_page')
+        );
+        
+        add_submenu_page(
+            'grovehub',
+            'Grove Hoof Manager',
+            'grove_hoof_mar',
+            'manage_options',
+            'grove_hoof_mar',
+            array($this, 'grove_hoof_mar_page')
         );
     }
     
@@ -3596,5 +3610,200 @@ class Grove_Admin {
      */
     public function grove_buffalor_page() {
         Grove_Buffalor::render_page();
+    }
+    
+    /**
+     * AJAX handler for updating hoof code content
+     */
+    public function grove_update_hoof_code() {
+        // Verify nonce
+        if (!isset($_POST['_ajax_nonce']) || !wp_verify_nonce($_POST['_ajax_nonce'], 'grove_hoof_nonce')) {
+            wp_send_json_error('Invalid nonce');
+        }
+        
+        // Check permissions
+        if (!current_user_can('manage_options')) {
+            wp_send_json_error('Insufficient permissions');
+        }
+        
+        $hoof_id = isset($_POST['hoof_id']) ? intval($_POST['hoof_id']) : 0;
+        $content = isset($_POST['content']) ? wp_unslash($_POST['content']) : '';
+        
+        if (!$hoof_id) {
+            wp_send_json_error('Invalid hoof ID');
+        }
+        
+        // Update the hoof code
+        $result = Grove_Zen_Shortcodes::update_hoof_code($hoof_id, $content);
+        
+        if ($result !== false) {
+            // Get the shortcode slug to process the preview
+            global $wpdb;
+            $table = $wpdb->prefix . 'zen_hoof_codes';
+            $slug = $wpdb->get_var($wpdb->prepare(
+                "SELECT hoof_slug FROM $table WHERE hoof_id = %d",
+                $hoof_id
+            ));
+            
+            // Generate the preview
+            $preview = '';
+            if ($slug) {
+                $preview = do_shortcode('[' . $slug . ']');
+            }
+            
+            wp_send_json_success(array(
+                'message' => 'Hoof code updated successfully',
+                'preview' => $preview
+            ));
+        } else {
+            wp_send_json_error('Failed to update hoof code');
+        }
+    }
+    
+    /**
+     * Grove Hoof Manager Page
+     */
+    public function grove_hoof_mar_page() {
+        require_once GROVE_PLUGIN_PATH . 'includes/class-grove-hoof-mar.php';
+        Grove_Hoof_Mar::render_page();
+    }
+    
+    /**
+     * AJAX handler for creating new hoof code
+     */
+    public function grove_hoof_create() {
+        // Verify nonce
+        if (!isset($_POST['_ajax_nonce']) || !wp_verify_nonce($_POST['_ajax_nonce'], 'grove_hoof_admin_nonce')) {
+            wp_send_json_error('Invalid nonce');
+        }
+        
+        // Check permissions
+        if (!current_user_can('manage_options')) {
+            wp_send_json_error('Insufficient permissions');
+        }
+        
+        global $wpdb;
+        $table = $wpdb->prefix . 'zen_hoof_codes';
+        
+        $slug = sanitize_title($_POST['slug']);
+        $title = sanitize_text_field($_POST['title']);
+        $description = sanitize_textarea_field($_POST['description']);
+        $content = wp_unslash($_POST['content']);
+        
+        // Check if slug already exists
+        $exists = $wpdb->get_var($wpdb->prepare(
+            "SELECT COUNT(*) FROM $table WHERE hoof_slug = %s",
+            $slug
+        ));
+        
+        if ($exists) {
+            wp_send_json_error('Slug already exists');
+        }
+        
+        $result = $wpdb->insert(
+            $table,
+            array(
+                'hoof_slug' => $slug,
+                'hoof_title' => $title,
+                'hoof_description' => $description,
+                'hoof_content' => $content,
+                'is_active' => 1,
+                'is_system' => 0
+            ),
+            array('%s', '%s', '%s', '%s', '%d', '%d')
+        );
+        
+        if ($result) {
+            wp_send_json_success('Hoof code created successfully');
+        } else {
+            wp_send_json_error('Failed to create hoof code');
+        }
+    }
+    
+    /**
+     * AJAX handler for updating hoof code
+     */
+    public function grove_hoof_update() {
+        // Verify nonce
+        if (!isset($_POST['_ajax_nonce']) || !wp_verify_nonce($_POST['_ajax_nonce'], 'grove_hoof_admin_nonce')) {
+            wp_send_json_error('Invalid nonce');
+        }
+        
+        // Check permissions
+        if (!current_user_can('manage_options')) {
+            wp_send_json_error('Insufficient permissions');
+        }
+        
+        global $wpdb;
+        $table = $wpdb->prefix . 'zen_hoof_codes';
+        
+        $hoof_id = intval($_POST['hoof_id']);
+        $slug = sanitize_title($_POST['slug']);
+        $title = sanitize_text_field($_POST['title']);
+        $description = sanitize_textarea_field($_POST['description']);
+        $content = wp_unslash($_POST['content']);
+        $is_active = intval($_POST['is_active']);
+        
+        $result = $wpdb->update(
+            $table,
+            array(
+                'hoof_slug' => $slug,
+                'hoof_title' => $title,
+                'hoof_description' => $description,
+                'hoof_content' => $content,
+                'is_active' => $is_active
+            ),
+            array('hoof_id' => $hoof_id),
+            array('%s', '%s', '%s', '%s', '%d'),
+            array('%d')
+        );
+        
+        if ($result !== false) {
+            wp_send_json_success('Hoof code updated successfully');
+        } else {
+            wp_send_json_error('Failed to update hoof code');
+        }
+    }
+    
+    /**
+     * AJAX handler for deleting hoof code
+     */
+    public function grove_hoof_delete() {
+        // Verify nonce
+        if (!isset($_POST['_ajax_nonce']) || !wp_verify_nonce($_POST['_ajax_nonce'], 'grove_hoof_admin_nonce')) {
+            wp_send_json_error('Invalid nonce');
+        }
+        
+        // Check permissions
+        if (!current_user_can('manage_options')) {
+            wp_send_json_error('Insufficient permissions');
+        }
+        
+        global $wpdb;
+        $table = $wpdb->prefix . 'zen_hoof_codes';
+        
+        $hoof_id = intval($_POST['hoof_id']);
+        
+        // Check if it's a system code
+        $is_system = $wpdb->get_var($wpdb->prepare(
+            "SELECT is_system FROM $table WHERE hoof_id = %d",
+            $hoof_id
+        ));
+        
+        if ($is_system) {
+            wp_send_json_error('Cannot delete system hoof codes');
+        }
+        
+        $result = $wpdb->delete(
+            $table,
+            array('hoof_id' => $hoof_id),
+            array('%d')
+        );
+        
+        if ($result) {
+            wp_send_json_success('Hoof code deleted successfully');
+        } else {
+            wp_send_json_error('Failed to delete hoof code');
+        }
     }
 }

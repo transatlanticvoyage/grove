@@ -125,6 +125,120 @@ class Grove_Buffalor {
                         <strong>Note:</strong> [beginning_a_code_moose] outputs only the opening &lt;a&gt; tag. You must manually add the closing &lt;/a&gt; tag in your content.
                     </div>
                 </div>
+                
+                <!-- Black HR separator with 10px weight -->
+                <hr style="margin-top: 40px; margin-bottom: 30px; border: none; height: 10px; background-color: black;">
+                
+                <!-- Dynamic Hoof Shortcodes Section -->
+                <h2 style="margin-bottom: 20px;">Dynamic Hoof Shortcodes</h2>
+                
+                <?php
+                // Get all hoof codes from database
+                $hoof_codes = Grove_Zen_Shortcodes::get_hoof_codes();
+                
+                if ($hoof_codes) {
+                    foreach ($hoof_codes as $hoof) {
+                        ?>
+                        <div style="margin-top: 20px; padding: 15px; border: 1px solid #ddd; border-radius: 4px; background-color: #f9f9f9;">
+                            <div style="margin-bottom: 10px;">
+                                <label for="hoof-shortcode-<?php echo $hoof->hoof_id; ?>" style="display: block; font-weight: bold; margin-bottom: 5px;">
+                                    <?php echo esc_html($hoof->hoof_title); ?> Shortcode
+                                </label>
+                                <input type="text" 
+                                       id="hoof-shortcode-<?php echo $hoof->hoof_id; ?>" 
+                                       readonly 
+                                       value="[<?php echo esc_attr($hoof->hoof_slug); ?>]" 
+                                       style="width: 300px; padding: 8px; border: 1px solid #ccc; border-radius: 4px; background-color: #fff;">
+                            </div>
+                            
+                            <div style="margin-bottom: 10px;">
+                                <label for="hoof-content-<?php echo $hoof->hoof_id; ?>" style="display: block; font-weight: bold; margin-bottom: 5px;">
+                                    Shortcode Content (editable - can contain other shortcodes)
+                                </label>
+                                <textarea id="hoof-content-<?php echo $hoof->hoof_id; ?>" 
+                                          data-hoof-id="<?php echo $hoof->hoof_id; ?>"
+                                          class="hoof-content-editor"
+                                          style="width: 100%; max-width: 800px; height: 100px; padding: 8px; border: 1px solid #ccc; border-radius: 4px; font-family: monospace; font-size: 13px;"><?php echo esc_textarea($hoof->hoof_content); ?></textarea>
+                            </div>
+                            
+                            <div style="margin-bottom: 10px;">
+                                <button type="button" 
+                                        class="save-hoof-btn button button-primary" 
+                                        data-hoof-id="<?php echo $hoof->hoof_id; ?>"
+                                        style="margin-right: 10px;">
+                                    Save Changes
+                                </button>
+                                <span class="save-status" id="save-status-<?php echo $hoof->hoof_id; ?>" style="color: green; display: none;">✓ Saved</span>
+                            </div>
+                            
+                            <div style="margin-top: 10px;">
+                                <label style="display: block; font-weight: bold; margin-bottom: 5px;">Live Preview:</label>
+                                <div id="hoof-preview-<?php echo $hoof->hoof_id; ?>" 
+                                     style="padding: 10px; border: 1px solid #ddd; border-radius: 4px; background-color: #fff;">
+                                    <?php echo do_shortcode('[' . $hoof->hoof_slug . ']'); ?>
+                                </div>
+                            </div>
+                            
+                            <?php if (!empty($hoof->hoof_description)) : ?>
+                                <div style="margin-top: 10px; padding: 8px; background-color: #f0f8ff; border-radius: 4px;">
+                                    <small style="color: #666;"><?php echo esc_html($hoof->hoof_description); ?></small>
+                                </div>
+                            <?php endif; ?>
+                        </div>
+                        <?php
+                    }
+                } else {
+                    echo '<p>No hoof codes found. They will be created on plugin activation.</p>';
+                }
+                ?>
+                
+                <div style="margin-top: 30px; padding: 15px; background-color: #fff3cd; border: 1px solid #ffeaa7; border-radius: 4px;">
+                    <h3 style="margin-top: 0; color: #856404;">About Hoof Shortcodes</h3>
+                    <p style="color: #856404;">Hoof shortcodes are dynamic, editable shortcodes that can contain HTML and other shortcodes. They are stored in the database and can be modified here without changing code files.</p>
+                    <p style="color: #856404;">To manage all hoof codes (add, delete, reorder), visit <a href="<?php echo admin_url('admin.php?page=grove_hoof_mar'); ?>">Grove Hoof Manager</a>.</p>
+                </div>
+                
+                <script>
+                jQuery(document).ready(function($) {
+                    // Save hoof content on button click
+                    $('.save-hoof-btn').on('click', function() {
+                        var hoofId = $(this).data('hoof-id');
+                        var content = $('#hoof-content-' + hoofId).val();
+                        var statusSpan = $('#save-status-' + hoofId);
+                        var previewDiv = $('#hoof-preview-' + hoofId);
+                        var button = $(this);
+                        
+                        button.prop('disabled', true).text('Saving...');
+                        
+                        $.ajax({
+                            url: ajaxurl,
+                            type: 'POST',
+                            data: {
+                                action: 'grove_update_hoof_code',
+                                hoof_id: hoofId,
+                                content: content,
+                                _ajax_nonce: '<?php echo wp_create_nonce('grove_hoof_nonce'); ?>'
+                            },
+                            success: function(response) {
+                                if (response.success) {
+                                    statusSpan.show().delay(2000).fadeOut();
+                                    // Update preview with the processed content
+                                    if (response.data.preview) {
+                                        previewDiv.html(response.data.preview);
+                                    }
+                                } else {
+                                    alert('Error saving: ' + response.data);
+                                }
+                                button.prop('disabled', false).text('Save Changes');
+                            },
+                            error: function() {
+                                alert('Error saving changes');
+                                button.prop('disabled', false).text('Save Changes');
+                            }
+                        });
+                    });
+                });
+                </script>
             </div>
         </div>
         <?php

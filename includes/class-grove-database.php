@@ -60,6 +60,9 @@ class Grove_Database {
         
         // Create zen_factory_codes table
         $this->create_factory_codes_table($charset_collate);
+        
+        // Create zen_hoof_codes table
+        $this->create_hoof_codes_table($charset_collate);
     }
     
     /**
@@ -266,6 +269,35 @@ class Grove_Database {
     }
     
     /**
+     * Create zen_hoof_codes table for dynamic shortcodes
+     */
+    private function create_hoof_codes_table($charset_collate) {
+        global $wpdb;
+        
+        $table_name = $wpdb->prefix . 'zen_hoof_codes';
+        
+        $sql = "CREATE TABLE IF NOT EXISTS $table_name (
+            hoof_id int(11) NOT NULL AUTO_INCREMENT,
+            hoof_slug varchar(100) NOT NULL,
+            hoof_title varchar(255) DEFAULT NULL,
+            hoof_content mediumtext NOT NULL,
+            hoof_description text DEFAULT NULL,
+            is_active tinyint(1) DEFAULT 1,
+            is_system tinyint(1) DEFAULT 0,
+            position_order int(11) DEFAULT 0,
+            created_at timestamp DEFAULT CURRENT_TIMESTAMP,
+            updated_at timestamp DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+            PRIMARY KEY (hoof_id),
+            UNIQUE KEY unique_slug (hoof_slug),
+            INDEX idx_active (is_active),
+            INDEX idx_system (is_system),
+            INDEX idx_position (position_order)
+        ) $charset_collate;";
+        
+        dbDelta($sql);
+    }
+    
+    /**
      * Insert default data if tables are empty
      */
     private function maybe_insert_default_data() {
@@ -355,6 +387,42 @@ PHP;
                     'plugin_source' => 'both'
                 ),
                 array('%s', '%s', '%s', '%s', '%s', '%s', '%d', '%d', '%s')
+            );
+        }
+        
+        // Insert default hoof codes if table is empty
+        $hoof_codes_table = $wpdb->prefix . 'zen_hoof_codes';
+        $existing_hoof_count = $wpdb->get_var("SELECT COUNT(*) FROM $hoof_codes_table");
+        
+        if ($existing_hoof_count == 0) {
+            // Insert antelope_phone_piece
+            $wpdb->insert(
+                $hoof_codes_table,
+                array(
+                    'hoof_slug' => 'antelope_phone_piece',
+                    'hoof_title' => 'Antelope Phone Piece',
+                    'hoof_content' => '<div class="phone-number">[beginning_a_code_moose] Call us: [phone_local]</a></div>',
+                    'hoof_description' => 'A complete phone link with local formatting wrapped in a div',
+                    'is_active' => 1,
+                    'is_system' => 1,
+                    'position_order' => 1
+                ),
+                array('%s', '%s', '%s', '%s', '%d', '%d', '%d')
+            );
+            
+            // Insert lamb_phone_piece
+            $wpdb->insert(
+                $hoof_codes_table,
+                array(
+                    'hoof_slug' => 'lamb_phone_piece',
+                    'hoof_title' => 'Lamb Phone Piece',
+                    'hoof_content' => '<button class="phone-button">[beginning_a_code_moose]📞 [phone_international]</a></button>',
+                    'hoof_description' => 'A phone button with international formatting and emoji',
+                    'is_active' => 1,
+                    'is_system' => 1,
+                    'position_order' => 2
+                ),
+                array('%s', '%s', '%s', '%s', '%d', '%d', '%d')
             );
         }
     }
