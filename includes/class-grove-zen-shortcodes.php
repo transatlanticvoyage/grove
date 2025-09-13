@@ -61,6 +61,11 @@ class Grove_Zen_Shortcodes {
         // Buffalo shortcodes  
         add_shortcode('buffalo_phone_number', array($this, 'render_buffalo_phone_number'));
         
+        // Phone shortcodes
+        add_shortcode('phone_local', array($this, 'render_phone_local'));
+        add_shortcode('phone_international', array($this, 'render_phone_international'));
+        add_shortcode('phone_link', array($this, 'render_phone_link'));
+        
         // Factory codes shortcodes
         add_shortcode('sitespren_phone_link', array($this, 'render_sitespren_phone_link'));
     }
@@ -798,5 +803,119 @@ class Grove_Zen_Shortcodes {
         }
         
         return '<div class="phone-number"><a href="tel:' . esc_attr($atts['prefix']) . esc_attr($phone) . '">' . esc_html($atts['text']) . esc_html($phone) . '</a></div>';
+    }
+    
+    /**
+     * Phone Local Shortcode: [phone_local]
+     * Displays phone number in local format: (123) 456-7890
+     */
+    public function render_phone_local($atts) {
+        global $wpdb;
+        
+        $atts = shortcode_atts(array(
+            'wppma_id' => '1',
+            'format' => 'us'
+        ), $atts, 'phone_local');
+        
+        // Get phone from database
+        $table = $wpdb->prefix . 'zen_sitespren';
+        $phone = $wpdb->get_var($wpdb->prepare(
+            "SELECT driggs_phone_1 FROM {$table} WHERE wppma_id = %d",
+            $atts['wppma_id']
+        ));
+        
+        if (!$phone) return '';
+        
+        // Clean phone (remove all non-digits)
+        $phone_clean = preg_replace('/[^0-9]/', '', $phone);
+        
+        // Format for US: (123) 456-7890
+        if (strlen($phone_clean) == 10) {
+            return '(' . substr($phone_clean, 0, 3) . ') ' . 
+                   substr($phone_clean, 3, 3) . '-' . 
+                   substr($phone_clean, 6, 4);
+        }
+        
+        return $phone; // fallback
+    }
+    
+    /**
+     * Phone International Shortcode: [phone_international]
+     * Displays phone number in international format: +1 (123) 456-7890
+     */
+    public function render_phone_international($atts) {
+        global $wpdb;
+        
+        $atts = shortcode_atts(array(
+            'wppma_id' => '1',
+            'show_plus' => 'yes'
+        ), $atts, 'phone_international');
+        
+        // Get phone and country code from database
+        $table = $wpdb->prefix . 'zen_sitespren';
+        $result = $wpdb->get_row($wpdb->prepare(
+            "SELECT driggs_phone_1, driggs_phone_country_code FROM {$table} WHERE wppma_id = %d",
+            $atts['wppma_id']
+        ));
+        
+        if (!$result || !$result->driggs_phone_1) return '';
+        
+        $phone_clean = preg_replace('/[^0-9]/', '', $result->driggs_phone_1);
+        $country_code = $result->driggs_phone_country_code ?: '1';
+        
+        $plus = ($atts['show_plus'] === 'yes') ? '+' : '';
+        
+        // Format: +1 (123) 456-7890
+        if (strlen($phone_clean) == 10) {
+            return $plus . $country_code . ' (' . 
+                   substr($phone_clean, 0, 3) . ') ' . 
+                   substr($phone_clean, 3, 3) . '-' . 
+                   substr($phone_clean, 6, 4);
+        }
+        
+        return $plus . $country_code . ' ' . $phone_clean;
+    }
+    
+    /**
+     * Phone Link Shortcode: [phone_link]
+     * Creates clickable phone link with customizable display
+     */
+    public function render_phone_link($atts) {
+        global $wpdb;
+        
+        $atts = shortcode_atts(array(
+            'wppma_id' => '1',
+            'text' => '',
+            'format' => 'local',
+            'class' => 'phone-link'
+        ), $atts, 'phone_link');
+        
+        $table = $wpdb->prefix . 'zen_sitespren';
+        $result = $wpdb->get_row($wpdb->prepare(
+            "SELECT driggs_phone_1, driggs_phone_country_code FROM {$table} WHERE wppma_id = %d",
+            $atts['wppma_id']
+        ));
+        
+        if (!$result || !$result->driggs_phone_1) return '';
+        
+        $phone_clean = preg_replace('/[^0-9]/', '', $result->driggs_phone_1);
+        $country_code = $result->driggs_phone_country_code ?: '1';
+        
+        // tel: link (always international format)
+        $tel_link = '+' . $country_code . $phone_clean;
+        
+        // Display text
+        if ($atts['text']) {
+            $display_text = $atts['text'];
+        } else if ($atts['format'] === 'international') {
+            $display_text = '+' . $country_code . ' (' . substr($phone_clean, 0, 3) . ') ' . 
+                           substr($phone_clean, 3, 3) . '-' . substr($phone_clean, 6, 4);
+        } else {
+            $display_text = '(' . substr($phone_clean, 0, 3) . ') ' . 
+                           substr($phone_clean, 3, 3) . '-' . substr($phone_clean, 6, 4);
+        }
+        
+        return '<a href="tel:' . esc_attr($tel_link) . '" class="' . esc_attr($atts['class']) . '">' . 
+               esc_html($display_text) . '</a>';
     }
 }

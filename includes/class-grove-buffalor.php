@@ -43,6 +43,63 @@ class Grove_Buffalor {
                     <label for="example-output" style="display: block; font-weight: bold; margin-bottom: 5px;">Example Output (using phone: 1234567890, country code: 1)</label>
                     <textarea id="example-output" readonly style="width: 100%; max-width: 600px; height: 60px; padding: 8px; border: 1px solid #ccc; border-radius: 4px; font-family: monospace; font-size: 13px; background-color: #f9f9f9;"><?php echo esc_textarea(self::get_example_output()); ?></textarea>
                 </div>
+                
+                <!-- Black HR separator with 10px weight -->
+                <hr style="margin-top: 40px; margin-bottom: 30px; border: none; height: 10px; background-color: black;">
+                
+                <!-- New Phone Shortcodes Section -->
+                <h2 style="margin-bottom: 20px;">Phone Number Shortcodes</h2>
+                
+                <div style="margin-top: 20px;">
+                    <label for="phone-local-shortcode" style="display: block; font-weight: bold; margin-bottom: 5px;">Local Phone Format Shortcode</label>
+                    <input type="text" id="phone-local-shortcode" readonly value="[phone_local]" style="width: 300px; padding: 8px; border: 1px solid #ccc; border-radius: 4px; background-color: #f9f9f9;">
+                </div>
+                
+                <div style="margin-top: 15px;">
+                    <label for="phone-local-output" style="display: block; font-weight: bold; margin-bottom: 5px;">Live Output:</label>
+                    <div id="phone-local-output" style="width: 300px; padding: 8px; border: 1px solid #ddd; border-radius: 4px; background-color: #f0f8ff; font-weight: bold;"><?php echo do_shortcode('[phone_local]'); ?></div>
+                </div>
+                
+                <div style="margin-top: 20px;">
+                    <label for="phone-international-shortcode" style="display: block; font-weight: bold; margin-bottom: 5px;">International Phone Format Shortcode</label>
+                    <input type="text" id="phone-international-shortcode" readonly value="[phone_international]" style="width: 300px; padding: 8px; border: 1px solid #ccc; border-radius: 4px; background-color: #f9f9f9;">
+                </div>
+                
+                <div style="margin-top: 15px;">
+                    <label for="phone-international-output" style="display: block; font-weight: bold; margin-bottom: 5px;">Live Output:</label>
+                    <div id="phone-international-output" style="width: 300px; padding: 8px; border: 1px solid #ddd; border-radius: 4px; background-color: #f0f8ff; font-weight: bold;"><?php echo do_shortcode('[phone_international]'); ?></div>
+                </div>
+                
+                <div style="margin-top: 20px;">
+                    <label for="phone-link-shortcode" style="display: block; font-weight: bold; margin-bottom: 5px;">Clickable Phone Link Shortcode</label>
+                    <input type="text" id="phone-link-shortcode" readonly value="[phone_link]" style="width: 300px; padding: 8px; border: 1px solid #ccc; border-radius: 4px; background-color: #f9f9f9;">
+                </div>
+                
+                <div style="margin-top: 15px;">
+                    <label for="phone-link-output" style="display: block; font-weight: bold; margin-bottom: 5px;">Live Output:</label>
+                    <div id="phone-link-output" style="width: 300px; padding: 8px; border: 1px solid #ddd; border-radius: 4px; background-color: #f0f8ff; font-weight: bold;"><?php echo do_shortcode('[phone_link]'); ?></div>
+                </div>
+                
+                <div style="margin-top: 20px;">
+                    <label for="phone-link-custom-shortcode" style="display: block; font-weight: bold; margin-bottom: 5px;">Custom Text Phone Link Shortcode</label>
+                    <input type="text" id="phone-link-custom-shortcode" readonly value='[phone_link text="📞 Call Now!" format="international"]' style="width: 500px; padding: 8px; border: 1px solid #ccc; border-radius: 4px; background-color: #f9f9f9;">
+                </div>
+                
+                <div style="margin-top: 15px;">
+                    <label for="phone-link-custom-output" style="display: block; font-weight: bold; margin-bottom: 5px;">Live Output:</label>
+                    <div id="phone-link-custom-output" style="width: 300px; padding: 8px; border: 1px solid #ddd; border-radius: 4px; background-color: #f0f8ff; font-weight: bold;"><?php echo do_shortcode('[phone_link text="📞 Call Now!" format="international"]'); ?></div>
+                </div>
+                
+                <div style="margin-top: 30px; padding: 15px; background-color: #fff3cd; border: 1px solid #ffeaa7; border-radius: 4px;">
+                    <h3 style="margin-top: 0; color: #856404;">Usage Examples:</h3>
+                    <ul style="margin: 10px 0; padding-left: 20px; color: #856404;">
+                        <li><strong>[phone_local]</strong> - Displays: (123) 456-7890</li>
+                        <li><strong>[phone_international]</strong> - Displays: +1 (123) 456-7890</li>
+                        <li><strong>[phone_link]</strong> - Creates clickable link with local format</li>
+                        <li><strong>[phone_link format="international"]</strong> - Clickable link with international format</li>
+                        <li><strong>[phone_link text="Call Us!"]</strong> - Clickable link with custom text</li>
+                    </ul>
+                </div>
             </div>
         </div>
         <?php
