@@ -90,6 +90,26 @@ class Grove_Buffalor {
                     <div id="phone-link-custom-output" style="width: 300px; padding: 8px; border: 1px solid #ddd; border-radius: 4px; background-color: #f0f8ff; font-weight: bold;"><?php echo do_shortcode('[phone_link text="📞 Call Now!" format="international"]'); ?></div>
                 </div>
                 
+                <div style="margin-top: 20px;">
+                    <label for="sitespren-country-code-shortcode" style="display: block; font-weight: bold; margin-bottom: 5px;">Country Code Shortcode</label>
+                    <input type="text" id="sitespren-country-code-shortcode" readonly value='[sitespren dbcol="driggs_phone_country_code"]' style="width: 400px; padding: 8px; border: 1px solid #ccc; border-radius: 4px; background-color: #f9f9f9;">
+                </div>
+                
+                <div style="margin-top: 15px;">
+                    <label for="sitespren-country-code-output" style="display: block; font-weight: bold; margin-bottom: 5px;">Live Output:</label>
+                    <div id="sitespren-country-code-output" style="width: 300px; padding: 8px; border: 1px solid #ddd; border-radius: 4px; background-color: #f0f8ff; font-weight: bold;"><?php echo do_shortcode('[sitespren dbcol="driggs_phone_country_code"]'); ?></div>
+                </div>
+                
+                <div style="margin-top: 20px;">
+                    <label for="beginning-a-code-moose-shortcode" style="display: block; font-weight: bold; margin-bottom: 5px;">Opening Tel Link Tag Shortcode</label>
+                    <input type="text" id="beginning-a-code-moose-shortcode" readonly value="[beginning_a_code_moose]" style="width: 300px; padding: 8px; border: 1px solid #ccc; border-radius: 4px; background-color: #f9f9f9;">
+                </div>
+                
+                <div style="margin-top: 15px;">
+                    <label for="beginning-a-code-moose-output" style="display: block; font-weight: bold; margin-bottom: 5px;">Live Output:</label>
+                    <div id="beginning-a-code-moose-output" style="width: 500px; padding: 8px; border: 1px solid #ddd; border-radius: 4px; background-color: #f0f8ff; font-family: monospace; font-size: 12px;"><?php echo esc_html(do_shortcode('[beginning_a_code_moose]')); ?></div>
+                </div>
+                
                 <div style="margin-top: 30px; padding: 15px; background-color: #fff3cd; border: 1px solid #ffeaa7; border-radius: 4px;">
                     <h3 style="margin-top: 0; color: #856404;">Usage Examples:</h3>
                     <ul style="margin: 10px 0; padding-left: 20px; color: #856404;">
@@ -98,7 +118,12 @@ class Grove_Buffalor {
                         <li><strong>[phone_link]</strong> - Creates clickable link with local format</li>
                         <li><strong>[phone_link format="international"]</strong> - Clickable link with international format</li>
                         <li><strong>[phone_link text="Call Us!"]</strong> - Clickable link with custom text</li>
+                        <li><strong>[sitespren dbcol="driggs_phone_country_code"]</strong> - Displays country code: 1</li>
+                        <li><strong>[beginning_a_code_moose]</strong> - Outputs opening &lt;a href="tel:+11234567890"&gt; tag</li>
                     </ul>
+                    <div style="margin-top: 15px; padding: 10px; background-color: #e7f3ff; border-left: 4px solid #2196F3; color: #1976D2;">
+                        <strong>Note:</strong> [beginning_a_code_moose] outputs only the opening &lt;a&gt; tag. You must manually add the closing &lt;/a&gt; tag in your content.
+                    </div>
                 </div>
             </div>
         </div>
