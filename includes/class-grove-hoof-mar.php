@@ -124,6 +124,13 @@ class Grove_Hoof_Mar {
                         return;
                     }
                     
+                    console.log('Creating hoof code with data:', {
+                        slug: slug,
+                        title: title,
+                        description: description,
+                        content: content
+                    });
+                    
                     $.ajax({
                         url: ajaxurl,
                         type: 'POST',
@@ -136,11 +143,22 @@ class Grove_Hoof_Mar {
                             _ajax_nonce: '<?php echo wp_create_nonce('grove_hoof_admin_nonce'); ?>'
                         },
                         success: function(response) {
+                            console.log('AJAX response:', response);
                             if (response.success) {
+                                console.log('Success! Reloading page...');
                                 location.reload();
                             } else {
+                                console.error('Server error:', response.data);
                                 alert('Error: ' + response.data);
                             }
+                        },
+                        error: function(xhr, status, error) {
+                            console.error('AJAX error:', {
+                                status: status,
+                                error: error,
+                                response: xhr.responseText
+                            });
+                            alert('Network error: ' + error + '\nStatus: ' + status + '\nResponse: ' + xhr.responseText);
                         }
                     });
                 });
