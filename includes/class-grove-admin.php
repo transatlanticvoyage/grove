@@ -3672,39 +3672,29 @@ class Grove_Admin {
      * AJAX handler for creating new hoof code
      */
     public function grove_hoof_create() {
-        // Log incoming request for debugging
-        error_log('Grove Hoof Create - POST data: ' . print_r($_POST, true));
-        
         // Verify nonce
         if (!isset($_POST['_ajax_nonce']) || !wp_verify_nonce($_POST['_ajax_nonce'], 'grove_hoof_admin_nonce')) {
-            error_log('Grove Hoof Create - Invalid nonce');
             wp_send_json_error('Invalid nonce');
             return;
         }
         
         // Check permissions
         if (!current_user_can('manage_options')) {
-            error_log('Grove Hoof Create - Insufficient permissions for user: ' . get_current_user_id());
             wp_send_json_error('Insufficient permissions');
             return;
         }
         
         // Validate required fields
         if (empty($_POST['slug'])) {
-            error_log('Grove Hoof Create - Empty slug');
             wp_send_json_error('Slug is required');
             return;
         }
         
         global $wpdb;
         $table = $wpdb->prefix . 'zen_hoof_codes';
-        error_log('Grove Hoof Create - Using table: ' . $table);
         
         // Check if table exists
-        $table_exists = $wpdb->get_var("SHOW TABLES LIKE '$table'");
-        error_log('Grove Hoof Create - Table exists check: ' . ($table_exists == $table ? 'YES' : 'NO'));
-        if ($table_exists != $table) {
-            error_log('Grove Hoof Create - Table does not exist: ' . $table);
+        if ($wpdb->get_var("SHOW TABLES LIKE '$table'") != $table) {
             wp_send_json_error('Hoof codes table does not exist. Please reactivate the plugin.');
             return;
         }
@@ -3714,11 +3704,8 @@ class Grove_Admin {
         $description = sanitize_textarea_field($_POST['description'] ?? '');
         $content = wp_unslash($_POST['content'] ?? '');
         
-        error_log('Grove Hoof Create - Sanitized data: slug=' . $slug . ', title=' . $title);
-        
         // Validate slug
         if (empty($slug)) {
-            error_log('Grove Hoof Create - Empty slug after sanitization');
             wp_send_json_error('Invalid slug format');
             return;
         }
@@ -3729,35 +3716,24 @@ class Grove_Admin {
             $slug
         ));
         
-        error_log('Grove Hoof Create - Slug exists check: ' . $exists);
-        
         if ($exists) {
-            error_log('Grove Hoof Create - Slug already exists: ' . $slug);
             wp_send_json_error('Slug already exists: ' . $slug);
             return;
         }
         
-        $insert_data = array(
-            'hoof_slug' => $slug,
-            'hoof_title' => $title,
-            'hoof_description' => $description,
-            'hoof_content' => $content,
-            'is_active' => 1,
-            'is_system' => 0,
-            'position_order' => 999
-        );
-        
-        error_log('Grove Hoof Create - About to insert: ' . print_r($insert_data, true));
-        
         $result = $wpdb->insert(
             $table,
-            $insert_data,
+            array(
+                'hoof_slug' => $slug,
+                'hoof_title' => $title,
+                'hoof_description' => $description,
+                'hoof_content' => $content,
+                'is_active' => 1,
+                'is_system' => 0,
+                'position_order' => 999
+            ),
             array('%s', '%s', '%s', '%s', '%d', '%d', '%d')
         );
-        
-        error_log('Grove Hoof Create - Insert result: ' . ($result !== false ? 'SUCCESS' : 'FAILED'));
-        error_log('Grove Hoof Create - Last error: ' . $wpdb->last_error);
-        error_log('Grove Hoof Create - Last query: ' . $wpdb->last_query);
         
         if ($result !== false) {
             wp_send_json_success('Hoof code created successfully');
