@@ -851,18 +851,27 @@ class Grove_Zen_Shortcodes {
             'show_plus' => 'yes'
         ), $atts, 'phone_international');
         
-        // Get phone and country code from database
+        // Get phone from database first
         $table = $wpdb->prefix . 'zen_sitespren';
-        $result = $wpdb->get_row($wpdb->prepare(
-            "SELECT driggs_phone_1, driggs_phone_country_code FROM {$table} WHERE wppma_id = %d",
+        $phone = $wpdb->get_var($wpdb->prepare(
+            "SELECT driggs_phone_1 FROM {$table} WHERE wppma_id = %d",
             $atts['wppma_id']
         ));
         
-        if (!$result || !$result->driggs_phone_1) return '';
+        if (!$phone) return '';
         
-        $phone_clean = preg_replace('/[^0-9]/', '', $result->driggs_phone_1);
-        $country_code = $result->driggs_phone_country_code ?: '1';
+        // Try to get country code, fallback to 1 if column doesn't exist or is null
+        $country_code = '1'; // Default
+        $country_code_result = $wpdb->get_var($wpdb->prepare(
+            "SELECT driggs_phone_country_code FROM {$table} WHERE wppma_id = %d",
+            $atts['wppma_id']
+        ));
         
+        if ($country_code_result) {
+            $country_code = $country_code_result;
+        }
+        
+        $phone_clean = preg_replace('/[^0-9]/', '', $phone);
         $plus = ($atts['show_plus'] === 'yes') ? '+' : '';
         
         // Format: +1 (123) 456-7890
@@ -890,16 +899,27 @@ class Grove_Zen_Shortcodes {
             'class' => 'phone-link'
         ), $atts, 'phone_link');
         
+        // Get phone from database first
         $table = $wpdb->prefix . 'zen_sitespren';
-        $result = $wpdb->get_row($wpdb->prepare(
-            "SELECT driggs_phone_1, driggs_phone_country_code FROM {$table} WHERE wppma_id = %d",
+        $phone = $wpdb->get_var($wpdb->prepare(
+            "SELECT driggs_phone_1 FROM {$table} WHERE wppma_id = %d",
             $atts['wppma_id']
         ));
         
-        if (!$result || !$result->driggs_phone_1) return '';
+        if (!$phone) return '';
         
-        $phone_clean = preg_replace('/[^0-9]/', '', $result->driggs_phone_1);
-        $country_code = $result->driggs_phone_country_code ?: '1';
+        // Try to get country code, fallback to 1 if column doesn't exist or is null
+        $country_code = '1'; // Default
+        $country_code_result = $wpdb->get_var($wpdb->prepare(
+            "SELECT driggs_phone_country_code FROM {$table} WHERE wppma_id = %d",
+            $atts['wppma_id']
+        ));
+        
+        if ($country_code_result) {
+            $country_code = $country_code_result;
+        }
+        
+        $phone_clean = preg_replace('/[^0-9]/', '', $phone);
         
         // tel: link (always international format)
         $tel_link = '+' . $country_code . $phone_clean;
