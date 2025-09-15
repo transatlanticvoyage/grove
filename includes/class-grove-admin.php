@@ -1372,14 +1372,22 @@ class Grove_Admin {
         global $wpdb;
         $table_name = $wpdb->prefix . 'zen_sitespren';
         
+        // Determine the correct format for the field value
+        $data_format = '%s'; // Default to string
+        if (in_array($field, $number_fields)) {
+            $data_format = '%d';
+        } elseif (in_array($field, $boolean_fields)) {
+            $data_format = '%d';
+        }
+        
         try {
             // Update the single record (should only be one record per site)
             $result = $wpdb->update(
                 $table_name,
                 array($field => $value),
                 array('wppma_id' => 1), // Update the first/only record
-                null,
-                array('%d')
+                array($data_format), // Correct format for the data
+                array('%d') // Format for the WHERE clause
             );
             
             if ($result === false) {
