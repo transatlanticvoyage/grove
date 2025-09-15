@@ -621,7 +621,15 @@ class Grove_Admin {
                         valueTd.css('padding', '6px');
                     } else {
                         // Editable text fields
-                        valueTd.text(value);
+                        if (field.type === 'textarea') {
+                            // For textarea fields, preserve linebreaks by using a div with pre-wrap
+                            let contentDiv = $('<div style="white-space: pre-wrap; word-wrap: break-word; max-width: 300px;"></div>');
+                            contentDiv.text(value); // Use .text() to safely escape HTML but preserve linebreaks with CSS
+                            valueTd.append(contentDiv);
+                        } else {
+                            // For other fields, use normal text display
+                            valueTd.text(value);
+                        }
                         valueTd.attr('data-field', field.key);
                         valueTd.attr('data-type', field.type);
                         valueTd.css('cursor', 'text');
@@ -861,7 +869,23 @@ class Grove_Admin {
                         updateField(fieldKey, valueToSave);
                         
                         // Display empty cells as empty, not "null" text
-                        cell.text(newValue.trim() === '' ? '' : newValue);
+                        let displayValue = newValue.trim() === '' ? '' : newValue;
+                        if (fieldType === 'textarea') {
+                            // For textarea fields, update the content div to preserve linebreaks
+                            let contentDiv = cell.find('div');
+                            if (contentDiv.length > 0) {
+                                contentDiv.text(displayValue);
+                            } else {
+                                // Fallback: create new content div if not found
+                                cell.empty();
+                                let newContentDiv = $('<div style="white-space: pre-wrap; word-wrap: break-word; max-width: 300px;"></div>');
+                                newContentDiv.text(displayValue);
+                                cell.append(newContentDiv);
+                            }
+                        } else {
+                            // For other fields, use normal text display
+                            cell.text(displayValue);
+                        }
                         currentData[fieldKey] = newValue.trim() === '' ? null : newValue;
                         hasChanges = true;
                         
@@ -877,7 +901,22 @@ class Grove_Admin {
                             });
                         }
                     } else {
-                        cell.text(originalText);
+                        // No changes, restore original content
+                        if (fieldType === 'textarea') {
+                            // For textarea fields, restore the content div
+                            let contentDiv = cell.find('div');
+                            if (contentDiv.length > 0) {
+                                contentDiv.text(currentValue || '');
+                            } else {
+                                // Fallback: create new content div
+                                cell.empty();
+                                let newContentDiv = $('<div style="white-space: pre-wrap; word-wrap: break-word; max-width: 300px;"></div>');
+                                newContentDiv.text(currentValue || '');
+                                cell.append(newContentDiv);
+                            }
+                        } else {
+                            cell.text(originalText);
+                        }
                         
                         // Debug logging when no save occurs
                         if (fieldType === 'number') {
@@ -895,7 +934,17 @@ class Grove_Admin {
                 // Cancel on escape
                 function cancelEdit() {
                     cell.removeClass('editing');
-                    cell.text(originalText);
+                    
+                    // Restore original content based on field type
+                    if (fieldType === 'textarea') {
+                        // For textarea fields, restore the content div
+                        cell.empty();
+                        let contentDiv = $('<div style="white-space: pre-wrap; word-wrap: break-word; max-width: 300px;"></div>');
+                        contentDiv.text(currentValue || '');
+                        cell.append(contentDiv);
+                    } else {
+                        cell.text(originalText);
+                    }
                 }
                 
                 input.on('blur', saveEdit);
