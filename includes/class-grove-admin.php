@@ -628,6 +628,14 @@ class Grove_Admin {
                         // Use closure to capture current value properly
                         valueTd.click(function(capturedValue, capturedKey, capturedType) {
                             return function() {
+                                // Debug logging for number fields
+                                if (capturedType === 'number') {
+                                    console.log('Number field clicked:', {
+                                        fieldKey: capturedKey,
+                                        capturedValue: capturedValue,
+                                        actualCurrentDataValue: currentData[capturedKey]
+                                    });
+                                }
                                 startInlineEdit($(this), capturedValue, capturedKey, capturedType);
                             };
                         }(value, field.key, field.type));
@@ -790,6 +798,16 @@ class Grove_Admin {
             }
             
             function startInlineEdit(cell, currentValue, fieldKey, fieldType) {
+                // Debug logging for number fields
+                if (fieldType === 'number') {
+                    console.log('startInlineEdit called for number field:', {
+                        fieldKey: fieldKey,
+                        currentValue: currentValue,
+                        fieldType: fieldType,
+                        cellText: cell.text()
+                    });
+                }
+                
                 // Skip if already editing
                 if (cell.hasClass('editing')) return;
                 
@@ -831,9 +849,13 @@ class Grove_Admin {
                     let newValue = input.val();
                     cell.removeClass('editing');
                     
+                    // Normalize values for comparison (handle null/empty cases)
+                    let normalizedCurrentValue = currentValue === null || currentValue === undefined || currentValue === '' ? '' : String(currentValue);
+                    let normalizedNewValue = newValue === null || newValue === undefined ? '' : String(newValue);
+                    
                     // Always save the value, including empty strings (which become null)
                     // Only skip if user didn't actually change anything
-                    if (newValue !== currentValue) {
+                    if (normalizedNewValue !== normalizedCurrentValue) {
                         // Convert empty string to null for database storage
                         let valueToSave = newValue.trim() === '' ? '' : newValue;
                         updateField(fieldKey, valueToSave);
@@ -842,8 +864,31 @@ class Grove_Admin {
                         cell.text(newValue.trim() === '' ? '' : newValue);
                         currentData[fieldKey] = newValue.trim() === '' ? null : newValue;
                         hasChanges = true;
+                        
+                        // Debug logging for number fields
+                        if (fieldType === 'number') {
+                            console.log('Number field saved:', {
+                                fieldKey: fieldKey,
+                                currentValue: currentValue,
+                                newValue: newValue,
+                                normalizedCurrentValue: normalizedCurrentValue,
+                                normalizedNewValue: normalizedNewValue,
+                                valueToSave: valueToSave
+                            });
+                        }
                     } else {
                         cell.text(originalText);
+                        
+                        // Debug logging when no save occurs
+                        if (fieldType === 'number') {
+                            console.log('Number field NOT saved (no change):', {
+                                fieldKey: fieldKey,
+                                currentValue: currentValue,
+                                newValue: newValue,
+                                normalizedCurrentValue: normalizedCurrentValue,
+                                normalizedNewValue: normalizedNewValue
+                            });
+                        }
                     }
                 }
                 
