@@ -841,15 +841,23 @@ class Grove_Admin {
                 input.focus();
                 
                 // Position cursor at end of text instead of selecting all
-                if (input[0].setSelectionRange) {
-                    let len = currentValue ? currentValue.length : 0;
-                    input[0].setSelectionRange(len, len);
-                } else if (input[0].createTextRange) {
-                    let range = input[0].createTextRange();
-                    range.collapse(true);
-                    range.moveEnd('character', currentValue ? currentValue.length : 0);
-                    range.moveStart('character', currentValue ? currentValue.length : 0);
-                    range.select();
+                // Note: Number inputs don't support text selection APIs
+                if (fieldType !== 'number') {
+                    try {
+                        if (input[0].setSelectionRange) {
+                            let len = currentValue ? currentValue.length : 0;
+                            input[0].setSelectionRange(len, len);
+                        } else if (input[0].createTextRange) {
+                            let range = input[0].createTextRange();
+                            range.collapse(true);
+                            range.moveEnd('character', currentValue ? currentValue.length : 0);
+                            range.moveStart('character', currentValue ? currentValue.length : 0);
+                            range.select();
+                        }
+                    } catch (e) {
+                        // Ignore selection errors for input types that don't support it
+                        console.log('Selection not supported for this input type:', fieldType);
+                    }
                 }
                 
                 // Save on blur or enter
