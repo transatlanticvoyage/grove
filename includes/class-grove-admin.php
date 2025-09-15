@@ -542,7 +542,13 @@ class Grove_Admin {
                     // Value column
                     let valueTd = $('<td style="padding: 8px; border: 1px solid #ddd;"></td>');
                     if (isSpecialBg) valueTd.css('background-color', '#d5d5d5');
-                    let value = currentData[field.key] || '';
+                    // Handle null values properly for different field types
+                    let value = currentData[field.key];
+                    if (value === null || value === undefined) {
+                        // For number fields, use empty string (will display as blank but work correctly)
+                        // For other fields, use empty string as well
+                        value = '';
+                    }
                     
                     if (field.type === 'boolean') {
                         // Toggle switch for boolean fields
@@ -619,9 +625,12 @@ class Grove_Admin {
                         valueTd.attr('data-field', field.key);
                         valueTd.attr('data-type', field.type);
                         valueTd.css('cursor', 'text');
-                        valueTd.click(function() {
-                            startInlineEdit($(this), value, field.key, field.type);
-                        });
+                        // Use closure to capture current value properly
+                        valueTd.click(function(capturedValue, capturedKey, capturedType) {
+                            return function() {
+                                startInlineEdit($(this), capturedValue, capturedKey, capturedType);
+                            };
+                        }(value, field.key, field.type));
                     }
                     
                     tr.append(valueTd);
@@ -3068,16 +3077,16 @@ class Grove_Admin {
             array('key' => 'is_wp_site', 'label' => 'is_wp_site', 'type' => 'boolean'),
             array('key' => 'wp_rest_app_pass', 'label' => 'wp_rest_app_pass', 'type' => 'password'),
             array('key' => 'driggs_social_profiles_done', 'label' => 'driggs_social_profiles_done', 'type' => 'boolean'),
-            array('key' => 'driggs_hours', 'label' => 'driggs_hours', 'type' => 'text'),
+            array('key' => 'driggs_hours', 'label' => 'driggs_hours', 'type' => 'textarea'),
             array('key' => 'driggs_owner_name', 'label' => 'driggs_owner_name', 'type' => 'text'),
             array('key' => 'driggs_short_descr', 'label' => 'driggs_short_descr', 'type' => 'textarea'),
             array('key' => 'driggs_long_descr', 'label' => 'driggs_long_descr', 'type' => 'textarea'),
             array('key' => 'driggs_year_opened', 'label' => 'driggs_year_opened', 'type' => 'number'),
             array('key' => 'driggs_employees_qty', 'label' => 'driggs_employees_qty', 'type' => 'number'),
-            array('key' => 'driggs_keywords', 'label' => 'driggs_keywords', 'type' => 'text'),
+            array('key' => 'driggs_keywords', 'label' => 'driggs_keywords', 'type' => 'textarea'),
             array('key' => 'driggs_category', 'label' => 'driggs_category', 'type' => 'text'),
             array('key' => 'driggs_address_species_note', 'label' => 'driggs_address_species_note', 'type' => 'text'),
-            array('key' => 'driggs_payment_methods', 'label' => 'driggs_payment_methods', 'type' => 'text'),
+            array('key' => 'driggs_payment_methods', 'label' => 'driggs_payment_methods', 'type' => 'textarea'),
             array('key' => 'driggs_social_media_links', 'label' => 'driggs_social_media_links', 'type' => 'textarea'),
             array('key' => 'driggs_logo_url', 'label' => 'driggs_logo_url', 'type' => 'logo_url'),
             array('key' => 'driggs_street_1', 'label' => 'driggs_street_1', 'type' => 'text'),
