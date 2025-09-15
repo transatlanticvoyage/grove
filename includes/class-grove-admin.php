@@ -1307,7 +1307,7 @@ class Grove_Admin {
             'driggs_state_code', 'driggs_zip', 'driggs_state_full', 'driggs_country', 'driggs_address_species_note',
             
             // Contact fields
-            'driggs_phone_1', 'driggs_phone1_platform_id',
+            'driggs_phone_country_code', 'driggs_phone_1', 'driggs_phone1_platform_id',
             
             // Business details (some may need DB columns added)
             'driggs_hours', 'driggs_owner_name', 'driggs_short_descr', 'driggs_long_descr', 
@@ -1339,7 +1339,7 @@ class Grove_Admin {
         }
         
         // Sanitize value based on field type (updated for all new fields)
-        $number_fields = ['driggs_phone1_platform_id', 'driggs_cgig_id', 'driggs_revenue_goal', 'driggs_address_species_id', 
+        $number_fields = ['driggs_phone_country_code', 'driggs_phone1_platform_id', 'driggs_cgig_id', 'driggs_revenue_goal', 'driggs_address_species_id', 
                          'driggs_year_opened', 'driggs_employees_qty', 'rel_cncglub_id', 'rel_city_id', 'rel_industry_id'];
         $boolean_fields = ['wp_plugin_installed1', 'wp_plugin_connected2', 'is_wp_site', 'is_bulldozer', 'driggs_citations_done', 
                           'driggs_social_profiles_done', 'is_competitor', 'is_external', 'is_internal', 'is_ppx', 'is_ms', 
