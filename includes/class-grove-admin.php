@@ -439,6 +439,7 @@ class Grove_Admin {
                     {key: 'driggs_payment_methods', label: 'driggs_payment_methods', type: 'textarea'},
                     {key: 'driggs_special_note_for_ai_tool', label: 'driggs_special_note_for_ai_tool', type: 'textarea'},
                     {key: 'driggs_social_media_links', label: 'driggs_social_media_links', type: 'textarea'},
+                    {key: 'driggs_logo_url', label: 'driggs_logo_url', type: 'logo_url'},
                     
                     // misc section
                     {key: 'misc_section_separator', label: 'misc section', type: 'separator'},
@@ -474,7 +475,6 @@ class Grove_Admin {
                     {key: 'is_flylocal', label: 'is_flylocal', type: 'boolean'},
                     
                     // Additional Grove-specific fields not in /drom
-                    {key: 'driggs_logo_url', label: 'driggs_logo_url', type: 'logo_url'},
                     {key: 'snailimage', label: 'snailimage', type: 'text'},
                     {key: 'snail_image_url', label: 'snail_image_url', type: 'text'},
                     {key: 'snail_image_status', label: 'snail_image_status', type: 'text'},
@@ -3053,7 +3053,6 @@ class Grove_Admin {
             array('key' => 'driggs_phone1_platform_id', 'label' => 'driggs_phone1_platform_id', 'type' => 'number'),
             array('key' => 'driggs_cgig_id', 'label' => 'driggs_cgig_id', 'type' => 'number'),
             array('key' => 'driggs_address_species_id', 'label' => 'driggs_address_species_id', 'type' => 'number'),
-            array('key' => 'driggs_logo_url', 'label' => 'driggs_logo_url', 'type' => 'logo_url'),
             array('key' => 'driggs_citations_done', 'label' => 'driggs_citations_done', 'type' => 'boolean'),
             array('key' => 'driggs_revenue_goal', 'label' => 'driggs_revenue_goal', 'type' => 'number'),
             array('key' => 'true_root_domain', 'label' => 'true_root_domain', 'type' => 'text'),
@@ -3080,6 +3079,7 @@ class Grove_Admin {
             array('key' => 'driggs_address_species_note', 'label' => 'driggs_address_species_note', 'type' => 'text'),
             array('key' => 'driggs_payment_methods', 'label' => 'driggs_payment_methods', 'type' => 'text'),
             array('key' => 'driggs_social_media_links', 'label' => 'driggs_social_media_links', 'type' => 'textarea'),
+            array('key' => 'driggs_logo_url', 'label' => 'driggs_logo_url', 'type' => 'logo_url'),
             array('key' => 'driggs_street_1', 'label' => 'driggs_street_1', 'type' => 'text'),
             array('key' => 'driggs_street_2', 'label' => 'driggs_street_2', 'type' => 'text'),
             array('key' => 'driggs_state_code', 'label' => 'driggs_state_code', 'type' => 'text'),
