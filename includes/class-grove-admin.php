@@ -31,6 +31,7 @@ class Grove_Admin {
         add_action('wp_ajax_grove_export_nova_beluga_both', array($this, 'grove_export_nova_beluga_both'));
         add_action('wp_ajax_grove_export_nova_beluga_friendly', array($this, 'grove_export_nova_beluga_friendly'));
         add_action('wp_ajax_grove_get_friendly_name', array($this, 'grove_get_friendly_name'));
+        add_action('wp_ajax_grove_get_all_friendly_names', array($this, 'grove_get_all_friendly_names'));
         // Hoof codes handlers
         add_action('wp_ajax_grove_update_hoof_code', array($this, 'grove_update_hoof_code'));
         add_action('wp_ajax_grove_hoof_create', array($this, 'grove_hoof_create'));
@@ -807,33 +808,59 @@ class Grove_Admin {
                     let friendlyNameTd = $('<td style="padding: 8px; border: 1px solid #ddd; text-align: left;"></td>');
                     if (isSpecialBg) friendlyNameTd.css('background-color', '#d5d5d5');
                     
-                    // Get friendly name from lighthouse table via synchronous AJAX
-                    let friendly_name = '';
-                    $.ajax({
-                        url: ajaxurl,
-                        type: 'POST',
-                        async: false, // Synchronous to get value before continuing
-                        data: {
-                            action: 'grove_get_friendly_name',
-                            nonce: '<?php echo wp_create_nonce('grove_export_nonce'); ?>',
-                            table_name: 'sitespren',
-                            field_name: fieldKey
-                        },
-                        success: function(response) {
-                            if (response.success) {
-                                friendly_name = response.data || '';
-                            }
-                        },
-                        error: function() {
-                            friendly_name = '';
-                        }
-                    });
-                    
-                    friendlyNameTd.text(friendly_name);
+                    // Placeholder for friendly name - will be populated later
+                    friendlyNameTd.text('');
                     tr.append(friendlyNameTd);
                     
                     tbody.append(tr);
                 });
+                
+                // After table is built, populate friendly names
+                populateFriendlyNames();
+            }
+            
+            function populateFriendlyNames() {
+                // Get all field keys from the table
+                let fieldKeys = [];
+                $('#table-body tr').each(function() {
+                    let row = $(this);
+                    if (!row.find('td[colspan]').length) { // Skip separator rows
+                        let fieldNameCell = row.find('td:nth-child(2)'); // Field name is 2nd column
+                        if (fieldNameCell.length) {
+                            let fieldName = fieldNameCell.text().trim();
+                            if (fieldName && !fieldName.includes('section')) {
+                                fieldKeys.push({
+                                    element: row.find('td:last-child'), // Last column is friendly name
+                                    fieldName: fieldName
+                                });
+                            }
+                        }
+                    }
+                });
+                
+                // Make single AJAX call to get all friendly names
+                if (fieldKeys.length > 0) {
+                    $.ajax({
+                        url: ajaxurl,
+                        type: 'POST',
+                        data: {
+                            action: 'grove_get_all_friendly_names',
+                            nonce: '<?php echo wp_create_nonce('grove_export_nonce'); ?>',
+                            field_names: fieldKeys.map(fk => fk.fieldName)
+                        },
+                        success: function(response) {
+                            if (response.success && response.data) {
+                                fieldKeys.forEach(function(fieldKey, index) {
+                                    let friendlyName = response.data[fieldKey.fieldName] || '';
+                                    fieldKey.element.text(friendlyName);
+                                });
+                            }
+                        },
+                        error: function() {
+                            console.log('Failed to load friendly names');
+                        }
+                    });
+                }
             }
             
             function createToggleSwitch(fieldKey, isChecked) {
@@ -3161,6 +3188,38 @@ class Grove_Admin {
         $friendly_name = Grove_Database::get_friendly_name($table_name, $field_name);
         
         wp_send_json_success($friendly_name);
+    }
+    
+    /**
+     * Get all friendly names from lighthouse table
+     */
+    public function grove_get_all_friendly_names() {
+        // Verify nonce
+        if (!isset($_POST['nonce']) || !wp_verify_nonce($_POST['nonce'], 'grove_export_nonce')) {
+            wp_send_json_error('Invalid nonce');
+        }
+        
+        // Check permissions
+        if (!current_user_can('manage_options')) {
+            wp_send_json_error('Unauthorized');
+        }
+        
+        $field_names = $_POST['field_names'] ?? array();
+        
+        if (!is_array($field_names) || empty($field_names)) {
+            wp_send_json_error('Missing field names');
+        }
+        
+        $friendly_names = array();
+        $table_name = 'sitespren';
+        
+        foreach ($field_names as $field_name) {
+            $field_name = sanitize_text_field($field_name);
+            $friendly_name = Grove_Database::get_friendly_name($table_name, $field_name);
+            $friendly_names[$field_name] = $friendly_name;
+        }
+        
+        wp_send_json_success($friendly_names);
     }
     
     /**
