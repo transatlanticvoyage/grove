@@ -236,8 +236,16 @@ class Grove_Admin {
                                 <button id="export-csv-btn" class="button button-secondary" style="padding: 5px 12px; font-size: 13px;">csv</button>
                                 <button id="export-sql-btn" class="button button-secondary" style="padding: 5px 12px; font-size: 13px;">sql</button>
                                 <div style="border-left: 1px solid #ccc; height: 25px; margin: 0 10px;"></div>
-                                <div style="position: relative;">
+                                <div style="position: relative; display: flex; align-items: center; gap: 10px;">
                                     <button id="nova-beluga-btn" class="button button-secondary" style="padding: 5px 12px; font-size: 13px;">nova beluga</button>
+                                    <label style="font-size: 11px; display: flex; align-items: center; gap: 3px;">
+                                        <input type="checkbox" id="omit-no-friendly" checked style="margin: 0;"> 
+                                        omit items w/o lighthouse friendly name 1
+                                    </label>
+                                    <label style="font-size: 11px; display: flex; align-items: center; gap: 3px;">
+                                        <input type="checkbox" id="use-custom-position" checked style="margin: 0;"> 
+                                        use custom_position_a to order
+                                    </label>
                                     <div id="nova-beluga-dropdown" style="
                                         position: absolute;
                                         top: 100%;
@@ -1235,7 +1243,9 @@ class Grove_Admin {
                         type: 'POST',
                         data: {
                             action: 'grove_export_nova_beluga_both',
-                            nonce: '<?php echo wp_create_nonce('grove_export_nonce'); ?>'
+                            nonce: '<?php echo wp_create_nonce('grove_export_nonce'); ?>',
+                            omit_no_friendly: $('#omit-no-friendly').is(':checked'),
+                            use_custom_position: $('#use-custom-position').is(':checked')
                         },
                         success: function(response) {
                             if (response.success) {
@@ -1265,7 +1275,9 @@ class Grove_Admin {
                         type: 'POST',
                         data: {
                             action: 'grove_export_nova_beluga_friendly',
-                            nonce: '<?php echo wp_create_nonce('grove_export_nonce'); ?>'
+                            nonce: '<?php echo wp_create_nonce('grove_export_nonce'); ?>',
+                            omit_no_friendly: $('#omit-no-friendly').is(':checked'),
+                            use_custom_position: $('#use-custom-position').is(':checked')
                         },
                         success: function(response) {
                             if (response.success) {
@@ -3043,11 +3055,15 @@ class Grove_Admin {
             wp_send_json_error('No data found');
         }
         
+        // Get checkbox options
+        $omit_no_friendly = isset($_POST['omit_no_friendly']) && $_POST['omit_no_friendly'] === 'true';
+        $use_custom_position = isset($_POST['use_custom_position']) && $_POST['use_custom_position'] === 'true';
+        
         // Get field order from the UI (same as displayed in table)
         $fields = $this->get_driggs_field_order();
         
         // Generate nova beluga format with both field sets
-        $output = Grove_Tax_Exports::generate_nova_beluga_both($sitespren_data, array_column($fields, 'key'));
+        $output = Grove_Tax_Exports::generate_nova_beluga_both($sitespren_data, array_column($fields, 'key'), $omit_no_friendly, $use_custom_position);
         
         wp_send_json_success($output);
     }
@@ -3076,11 +3092,15 @@ class Grove_Admin {
             wp_send_json_error('No data found');
         }
         
+        // Get checkbox options
+        $omit_no_friendly = isset($_POST['omit_no_friendly']) && $_POST['omit_no_friendly'] === 'true';
+        $use_custom_position = isset($_POST['use_custom_position']) && $_POST['use_custom_position'] === 'true';
+        
         // Get field order from the UI (same as displayed in table)
         $fields = $this->get_driggs_field_order();
         
         // Generate nova beluga format with friendly names only
-        $output = Grove_Tax_Exports::generate_nova_beluga_friendly($sitespren_data, array_column($fields, 'key'));
+        $output = Grove_Tax_Exports::generate_nova_beluga_friendly($sitespren_data, array_column($fields, 'key'), $omit_no_friendly, $use_custom_position);
         
         wp_send_json_success($output);
     }
