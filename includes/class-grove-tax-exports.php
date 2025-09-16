@@ -313,4 +313,117 @@ class Grove_Tax_Exports {
             'webproperty_type'
         );
     }
+    
+    /**
+     * Generate Nova Beluga format output with both field name sets
+     * Format: Friendly name - Field name with separators, followed by value
+     * 
+     * @param array $data The sitespren data array
+     * @param array $fields Optional array of specific fields to include
+     * @return string Formatted nova beluga output with both names
+     */
+    public static function generate_nova_beluga_both($data, $fields = null) {
+        if (!$data) {
+            return '';
+        }
+        
+        // If no fields specified, use all driggs_ and sitespren_ fields
+        if (!$fields) {
+            $fields = array();
+            foreach ($data as $key => $value) {
+                if (strpos($key, 'driggs_') === 0 || strpos($key, 'sitespren_') === 0) {
+                    $fields[] = $key;
+                }
+            }
+        }
+        
+        global $wpdb;
+        $output = '';
+        
+        foreach ($fields as $field) {
+            // Check if this is a section header (doesn't start with 'driggs_' or 'sitespren_')
+            $isSection = strpos($field, 'driggs_') !== 0 && 
+                         strpos($field, 'sitespren_') !== 0 && 
+                         strpos($field, 'section') !== false;
+            
+            if ($isSection) {
+                $output .= "===================================\n";
+                $output .= $field . "\n";
+                $output .= "-----------------------------------\n";
+                $output .= "\n"; // Empty line for sections
+            } else {
+                // Get friendly name from lighthouse table
+                $table_name = str_replace('zen_', '', 'sitespren'); // Remove zen_ prefix if present
+                $friendly_name = Grove_Database::get_friendly_name($table_name, $field);
+                
+                // Format: Friendly name - Original field name
+                $display_name = $friendly_name . ' - ' . $field;
+                
+                $output .= "===================================\n";
+                $output .= $display_name . "\n";
+                $output .= "-----------------------------------\n";
+                
+                // Get the actual value from data
+                $value = isset($data[$field]) ? $data[$field] : '';
+                $output .= $value . "\n";
+            }
+        }
+        
+        return $output;
+    }
+    
+    /**
+     * Generate Nova Beluga format output with friendly names only
+     * Format: Friendly name with separators, followed by value
+     * 
+     * @param array $data The sitespren data array
+     * @param array $fields Optional array of specific fields to include
+     * @return string Formatted nova beluga output with friendly names only
+     */
+    public static function generate_nova_beluga_friendly($data, $fields = null) {
+        if (!$data) {
+            return '';
+        }
+        
+        // If no fields specified, use all driggs_ and sitespren_ fields
+        if (!$fields) {
+            $fields = array();
+            foreach ($data as $key => $value) {
+                if (strpos($key, 'driggs_') === 0 || strpos($key, 'sitespren_') === 0) {
+                    $fields[] = $key;
+                }
+            }
+        }
+        
+        global $wpdb;
+        $output = '';
+        
+        foreach ($fields as $field) {
+            // Check if this is a section header (doesn't start with 'driggs_' or 'sitespren_')
+            $isSection = strpos($field, 'driggs_') !== 0 && 
+                         strpos($field, 'sitespren_') !== 0 && 
+                         strpos($field, 'section') !== false;
+            
+            if ($isSection) {
+                $output .= "===================================\n";
+                $output .= $field . "\n";
+                $output .= "-----------------------------------\n";
+                $output .= "\n"; // Empty line for sections
+            } else {
+                // Get friendly name from lighthouse table
+                $table_name = str_replace('zen_', '', 'sitespren'); // Remove zen_ prefix if present
+                $friendly_name = Grove_Database::get_friendly_name($table_name, $field);
+                
+                $output .= "===================================\n";
+                $output .= $friendly_name . "\n";
+                $output .= "-----------------------------------\n";
+                
+                // Get the actual value from data
+                $value = isset($data[$field]) ? $data[$field] : '';
+                $output .= $value . "\n";
+            }
+        }
+        
+        return $output;
+    }
 }

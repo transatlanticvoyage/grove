@@ -28,6 +28,8 @@ class Grove_Admin {
         add_action('wp_ajax_grove_export_sharkintax', array($this, 'grove_export_sharkintax'));
         add_action('wp_ajax_grove_export_walrustax', array($this, 'grove_export_walrustax'));
         add_action('wp_ajax_grove_export_csv', array($this, 'grove_export_csv'));
+        add_action('wp_ajax_grove_export_nova_beluga_both', array($this, 'grove_export_nova_beluga_both'));
+        add_action('wp_ajax_grove_export_nova_beluga_friendly', array($this, 'grove_export_nova_beluga_friendly'));
         // Hoof codes handlers
         add_action('wp_ajax_grove_update_hoof_code', array($this, 'grove_update_hoof_code'));
         add_action('wp_ajax_grove_hoof_create', array($this, 'grove_hoof_create'));
@@ -233,6 +235,38 @@ class Grove_Admin {
                                 <button id="export-xls-btn" class="button button-secondary" style="padding: 5px 12px; font-size: 13px;">xls</button>
                                 <button id="export-csv-btn" class="button button-secondary" style="padding: 5px 12px; font-size: 13px;">csv</button>
                                 <button id="export-sql-btn" class="button button-secondary" style="padding: 5px 12px; font-size: 13px;">sql</button>
+                                <div style="border-left: 1px solid #ccc; height: 25px; margin: 0 10px;"></div>
+                                <div style="position: relative;">
+                                    <button id="nova-beluga-btn" class="button button-secondary" style="padding: 5px 12px; font-size: 13px;">nova beluga</button>
+                                    <div id="nova-beluga-dropdown" style="
+                                        position: absolute;
+                                        top: 100%;
+                                        left: 0;
+                                        background: white;
+                                        border: 1px solid #ddd;
+                                        border-radius: 4px;
+                                        box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+                                        z-index: 1000;
+                                        min-width: 320px;
+                                        display: none;
+                                        margin-top: 2px;
+                                    ">
+                                        <table style="width: 100%; border-collapse: collapse;">
+                                            <tr style="cursor: pointer;" class="nova-option" data-action="both">
+                                                <td style="padding: 8px 12px; border: 1px solid #eee; width: 40%;">copy with both field name sets</td>
+                                                <td style="padding: 8px 12px; border: 1px solid #eee; text-align: center; width: 20%;">sharkintax</td>
+                                                <td style="padding: 8px 12px; border: 1px solid #eee; text-align: center; width: 20%;">-</td>
+                                                <td style="padding: 8px 12px; border: 1px solid #eee; text-align: center; width: 20%;">-</td>
+                                            </tr>
+                                            <tr style="cursor: pointer;" class="nova-option" data-action="friendly">
+                                                <td style="padding: 8px 12px; border: 1px solid #eee;">copy with friendly_name_1_datum only</td>
+                                                <td style="padding: 8px 12px; border: 1px solid #eee; text-align: center;">sharkintax</td>
+                                                <td style="padding: 8px 12px; border: 1px solid #eee; text-align: center;">-</td>
+                                                <td style="padding: 8px 12px; border: 1px solid #eee; text-align: center;">-</td>
+                                            </tr>
+                                        </table>
+                                    </div>
+                                </div>
                             </div>
                         </div>
                         <div>
@@ -1171,6 +1205,97 @@ class Grove_Admin {
                 $('body').append(form);
                 form.submit();
                 form.remove();
+            });
+            
+            // Nova Beluga dropdown handlers
+            $('#nova-beluga-btn').on('click', function(e) {
+                e.stopPropagation();
+                $('#nova-beluga-dropdown').toggle();
+            });
+            
+            // Close dropdown when clicking outside
+            $(document).on('click', function() {
+                $('#nova-beluga-dropdown').hide();
+            });
+            
+            // Prevent dropdown from closing when clicking inside it
+            $('#nova-beluga-dropdown').on('click', function(e) {
+                e.stopPropagation();
+            });
+            
+            // Handle option selection
+            $('.nova-option').on('click', function() {
+                const action = $(this).data('action');
+                $('#nova-beluga-dropdown').hide();
+                
+                if (action === 'both') {
+                    // Copy with both field name sets
+                    $.ajax({
+                        url: ajaxurl,
+                        type: 'POST',
+                        data: {
+                            action: 'grove_export_nova_beluga_both',
+                            nonce: '<?php echo wp_create_nonce('grove_export_nonce'); ?>'
+                        },
+                        success: function(response) {
+                            if (response.success) {
+                                // Copy to clipboard
+                                if (navigator.clipboard && navigator.clipboard.writeText) {
+                                    navigator.clipboard.writeText(response.data).then(function() {
+                                        alert('Nova Beluga data (both field sets) copied to clipboard!');
+                                    }).catch(function(err) {
+                                        console.error('Failed to copy:', err);
+                                        fallbackCopy(response.data, 'Nova Beluga Both');
+                                    });
+                                } else {
+                                    fallbackCopy(response.data, 'Nova Beluga Both');
+                                }
+                            } else {
+                                alert('Error: ' + response.data);
+                            }
+                        },
+                        error: function() {
+                            alert('AJAX error occurred');
+                        }
+                    });
+                } else if (action === 'friendly') {
+                    // Copy with friendly_name_1_datum only
+                    $.ajax({
+                        url: ajaxurl,
+                        type: 'POST',
+                        data: {
+                            action: 'grove_export_nova_beluga_friendly',
+                            nonce: '<?php echo wp_create_nonce('grove_export_nonce'); ?>'
+                        },
+                        success: function(response) {
+                            if (response.success) {
+                                // Copy to clipboard
+                                if (navigator.clipboard && navigator.clipboard.writeText) {
+                                    navigator.clipboard.writeText(response.data).then(function() {
+                                        alert('Nova Beluga data (friendly names only) copied to clipboard!');
+                                    }).catch(function(err) {
+                                        console.error('Failed to copy:', err);
+                                        fallbackCopy(response.data, 'Nova Beluga Friendly');
+                                    });
+                                } else {
+                                    fallbackCopy(response.data, 'Nova Beluga Friendly');
+                                }
+                            } else {
+                                alert('Error: ' + response.data);
+                            }
+                        },
+                        error: function() {
+                            alert('AJAX error occurred');
+                        }
+                    });
+                }
+            });
+            
+            // Add hover effects to dropdown options
+            $('.nova-option').on('mouseenter', function() {
+                $(this).css('background-color', '#f0f0f0');
+            }).on('mouseleave', function() {
+                $(this).css('background-color', '');
             });
             
             // Fallback copy function for older browsers
@@ -2890,6 +3015,72 @@ class Grove_Admin {
         
         // Generate walrustax format
         $output = Grove_Tax_Exports::generate_walrustax($sitespren_data, array_column($fields, 'key'));
+        
+        wp_send_json_success($output);
+    }
+    
+    /**
+     * Export data with Nova Beluga format (both field name sets)
+     */
+    public function grove_export_nova_beluga_both() {
+        // Verify nonce
+        if (!isset($_POST['nonce']) || !wp_verify_nonce($_POST['nonce'], 'grove_export_nonce')) {
+            wp_send_json_error('Invalid nonce');
+        }
+        
+        // Check permissions
+        if (!current_user_can('manage_options')) {
+            wp_send_json_error('Unauthorized');
+        }
+        
+        global $wpdb;
+        $table_name = $wpdb->prefix . 'zen_sitespren';
+        
+        // Get the sitespren data
+        $sitespren_data = $wpdb->get_row("SELECT * FROM $table_name WHERE wppma_id = 1", ARRAY_A);
+        
+        if (!$sitespren_data) {
+            wp_send_json_error('No data found');
+        }
+        
+        // Get field order from the UI (same as displayed in table)
+        $fields = $this->get_driggs_field_order();
+        
+        // Generate nova beluga format with both field sets
+        $output = Grove_Tax_Exports::generate_nova_beluga_both($sitespren_data, array_column($fields, 'key'));
+        
+        wp_send_json_success($output);
+    }
+    
+    /**
+     * Export data with Nova Beluga format (friendly names only)
+     */
+    public function grove_export_nova_beluga_friendly() {
+        // Verify nonce
+        if (!isset($_POST['nonce']) || !wp_verify_nonce($_POST['nonce'], 'grove_export_nonce')) {
+            wp_send_json_error('Invalid nonce');
+        }
+        
+        // Check permissions
+        if (!current_user_can('manage_options')) {
+            wp_send_json_error('Unauthorized');
+        }
+        
+        global $wpdb;
+        $table_name = $wpdb->prefix . 'zen_sitespren';
+        
+        // Get the sitespren data
+        $sitespren_data = $wpdb->get_row("SELECT * FROM $table_name WHERE wppma_id = 1", ARRAY_A);
+        
+        if (!$sitespren_data) {
+            wp_send_json_error('No data found');
+        }
+        
+        // Get field order from the UI (same as displayed in table)
+        $fields = $this->get_driggs_field_order();
+        
+        // Generate nova beluga format with friendly names only
+        $output = Grove_Tax_Exports::generate_nova_beluga_friendly($sitespren_data, array_column($fields, 'key'));
         
         wp_send_json_success($output);
     }
