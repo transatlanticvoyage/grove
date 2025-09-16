@@ -30,6 +30,7 @@ class Grove_Admin {
         add_action('wp_ajax_grove_export_csv', array($this, 'grove_export_csv'));
         add_action('wp_ajax_grove_export_nova_beluga_both', array($this, 'grove_export_nova_beluga_both'));
         add_action('wp_ajax_grove_export_nova_beluga_friendly', array($this, 'grove_export_nova_beluga_friendly'));
+        add_action('wp_ajax_grove_get_friendly_name', array($this, 'grove_get_friendly_name'));
         // Hoof codes handlers
         add_action('wp_ajax_grove_update_hoof_code', array($this, 'grove_update_hoof_code'));
         add_action('wp_ajax_grove_hoof_create', array($this, 'grove_hoof_create'));
@@ -806,8 +807,28 @@ class Grove_Admin {
                     let friendlyNameTd = $('<td style="padding: 8px; border: 1px solid #ddd; text-align: left;"></td>');
                     if (isSpecialBg) friendlyNameTd.css('background-color', '#d5d5d5');
                     
-                    // Get friendly name from the data that should be passed from server
-                    let friendly_name = field.friendly_name || '';
+                    // Get friendly name from lighthouse table via synchronous AJAX
+                    let friendly_name = '';
+                    $.ajax({
+                        url: ajaxurl,
+                        type: 'POST',
+                        async: false, // Synchronous to get value before continuing
+                        data: {
+                            action: 'grove_get_friendly_name',
+                            nonce: '<?php echo wp_create_nonce('grove_export_nonce'); ?>',
+                            table_name: 'sitespren',
+                            field_name: fieldKey
+                        },
+                        success: function(response) {
+                            if (response.success) {
+                                friendly_name = response.data || '';
+                            }
+                        },
+                        error: function() {
+                            friendly_name = '';
+                        }
+                    });
+                    
                     friendlyNameTd.text(friendly_name);
                     tr.append(friendlyNameTd);
                     
@@ -3113,6 +3134,33 @@ class Grove_Admin {
         $output = Grove_Tax_Exports::generate_nova_beluga_friendly($sitespren_data, array_column($fields, 'key'), $omit_no_friendly, $use_custom_position);
         
         wp_send_json_success($output);
+    }
+    
+    /**
+     * Get friendly name from lighthouse table
+     */
+    public function grove_get_friendly_name() {
+        // Verify nonce
+        if (!isset($_POST['nonce']) || !wp_verify_nonce($_POST['nonce'], 'grove_export_nonce')) {
+            wp_send_json_error('Invalid nonce');
+        }
+        
+        // Check permissions
+        if (!current_user_can('manage_options')) {
+            wp_send_json_error('Unauthorized');
+        }
+        
+        $table_name = sanitize_text_field($_POST['table_name'] ?? '');
+        $field_name = sanitize_text_field($_POST['field_name'] ?? '');
+        
+        if (empty($table_name) || empty($field_name)) {
+            wp_send_json_error('Missing parameters');
+        }
+        
+        // Get friendly name from database
+        $friendly_name = Grove_Database::get_friendly_name($table_name, $field_name);
+        
+        wp_send_json_success($friendly_name);
     }
     
     /**
