@@ -297,7 +297,7 @@ class Grove_Admin {
                                     <th style="padding: 12px 8px; border: 1px solid #ddd; font-weight: bold; text-transform: lowercase; background: #f8f9fa;">Value</th>
                                     <th style="padding: 12px 8px; border: 1px solid #ddd; font-weight: bold; text-transform: lowercase; background: #f8f9fa;">shortcode 1</th>
                                     <th style="padding: 0; border: 1px solid #ddd; font-weight: bold; text-transform: lowercase; background: #f8f9fa; width: 20px;">stuff3</th>
-                                    <th style="padding: 12px 8px; border: 1px solid #ddd; font-weight: bold; text-transform: lowercase; background: #f8f9fa;">_zen_lighthouse_friendly_names.friendly_name_1_datum</th>
+                                    <th class="dogsdogs" style="padding: 12px 8px; border: 1px solid #ddd; font-weight: bold; text-transform: lowercase; background: #f8f9fa;">_zen_lighthouse_friendly_names.friendly_name_1_datum</th>
                                 </tr>
                             </thead>
                             <tbody id="table-body">
