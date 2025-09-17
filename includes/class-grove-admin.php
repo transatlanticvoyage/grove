@@ -1938,53 +1938,6 @@ class Grove_Admin {
                         }
                     });
                 });
-                
-                // Image button handlers
-                $(document).on('click', '.upload-image-btn, .edit-image-btn', function(e) {
-                    e.preventDefault();
-                    e.stopPropagation();
-                    
-                    console.log('Image button clicked'); // Debug
-                    
-                    let btn = $(this);
-                    let id = btn.data('id');
-                    
-                    console.log('Service ID:', id); // Debug
-                    
-                    // Check if wp.media is available
-                    if (typeof wp === 'undefined' || typeof wp.media === 'undefined') {
-                        alert('WordPress media library is not loaded. Please refresh the page.');
-                        return;
-                    }
-                    
-                    let mediaUploader = wp.media({
-                        title: 'Select Service Image',
-                        button: {
-                            text: 'Use this image'
-                        },
-                        multiple: false
-                    });
-                    
-                    mediaUploader.on('select', function() {
-                        let attachment = mediaUploader.state().get('selection').first().toJSON();
-                        console.log('Selected attachment:', attachment); // Debug
-                        updateImageField(id, attachment.id);
-                    });
-                    
-                    mediaUploader.open();
-                });
-                
-                $(document).on('click', '.delete-image-btn', function(e) {
-                    e.preventDefault();
-                    e.stopPropagation();
-                    
-                    let btn = $(this);
-                    let id = btn.data('id');
-                    
-                    if (confirm('Are you sure you want to remove this image?')) {
-                        updateImageField(id, null);
-                    }
-                });
             }
             
             function updateField(id, field, value, cell) {
@@ -2227,6 +2180,53 @@ class Grove_Admin {
             
             // Load initial data
             loadServicesData();
+            
+            // Image button handlers (outside displayData to ensure they're always attached)
+            $(document).on('click', '.upload-image-btn, .edit-image-btn', function(e) {
+                e.preventDefault();
+                e.stopPropagation();
+                
+                console.log('Image button clicked'); // Debug
+                
+                let btn = $(this);
+                let id = btn.data('id');
+                
+                console.log('Service ID:', id); // Debug
+                
+                // Check if wp.media is available
+                if (typeof wp === 'undefined' || typeof wp.media === 'undefined') {
+                    alert('WordPress media library is not loaded. Please refresh the page.');
+                    return;
+                }
+                
+                let mediaUploader = wp.media({
+                    title: 'Select Service Image',
+                    button: {
+                        text: 'Use this image'
+                    },
+                    multiple: false
+                });
+                
+                mediaUploader.on('select', function() {
+                    let attachment = mediaUploader.state().get('selection').first().toJSON();
+                    console.log('Selected attachment:', attachment); // Debug
+                    updateImageField(id, attachment.id);
+                });
+                
+                mediaUploader.open();
+            });
+            
+            $(document).on('click', '.delete-image-btn', function(e) {
+                e.preventDefault();
+                e.stopPropagation();
+                
+                let btn = $(this);
+                let id = btn.data('id');
+                
+                if (confirm('Are you sure you want to remove this image?')) {
+                    updateImageField(id, null);
+                }
+            });
             
             function loadServicesData() {
                 $.ajax({
