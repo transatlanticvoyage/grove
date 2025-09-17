@@ -4384,6 +4384,7 @@ class Grove_Admin {
                             <th style="width: 120px;"><b>shortcode_type</b></th>
                             <th style="width: 100px;"><b>shortcode_category</b></th>
                             <th style="width: 80px;"><b>is_active</b></th>
+                            <th style="width: 100px;"><b>is_adminpublic</b></th>
                             <th style="width: 120px;">Actions</th>
                         </tr>
                     </thead>
@@ -4404,7 +4405,7 @@ class Grove_Admin {
         <!-- Inline Edit Row Template -->
         <script type="text/template" id="inline-edit-template">
             <tr class="inline-edit-row">
-                <td colspan="8">
+                <td colspan="9">
                     <div style="padding: 15px; background: #f9f9f9;">
                         <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 15px;">
                             <div>
@@ -4446,6 +4447,9 @@ class Grove_Admin {
                             </label>
                             <label style="display: flex; align-items: center; gap: 5px;">
                                 <input type="checkbox" name="is_global"> Global
+                            </label>
+                            <label style="display: flex; align-items: center; gap: 5px;">
+                                <input type="checkbox" name="is_adminpublic"> Admin Public
                             </label>
                             <div style="margin-left: auto;">
                                 <button class="save-inline button button-primary">Save</button>
@@ -4548,7 +4552,8 @@ class Grove_Admin {
                     shortcode_type: row.find('select[name="shortcode_type"]').val(),
                     shortcode_usage_example: row.find('input[name="shortcode_usage_example"]').val(),
                     is_active: row.find('input[name="is_active"]').is(':checked') ? 1 : 0,
-                    is_global: row.find('input[name="is_global"]').is(':checked') ? 1 : 0
+                    is_global: row.find('input[name="is_global"]').is(':checked') ? 1 : 0,
+                    is_adminpublic: row.find('input[name="is_adminpublic"]').is(':checked') ? 1 : 0
                 };
                 
                 if (!isCreate) {
@@ -4592,6 +4597,7 @@ class Grove_Admin {
                 editRow.find('input[name="shortcode_usage_example"]').val(row.find('.shortcode-usage').text());
                 editRow.find('input[name="is_active"]').prop('checked', row.find('.shortcode-active').text() === 'Yes');
                 editRow.find('input[name="is_global"]').prop('checked', row.find('.shortcode-global').data('global') === '1');
+                editRow.find('input[name="is_adminpublic"]').prop('checked', row.find('.shortcode-adminpublic').data('adminpublic') === '1');
                 
                 editRow.data('shortcode-id', shortcodeId);
                 row.after(editRow);
@@ -4646,6 +4652,10 @@ class Grove_Admin {
                         ? shortcode.shortcode_content.substring(0, 50) + '...'
                         : shortcode.shortcode_content;
                         
+                    const adminPublicBadge = shortcode.is_adminpublic == '1' 
+                        ? '<span style="background: #28a745; color: white; padding: 2px 6px; border-radius: 3px; font-size: 11px; font-weight: bold;">yes adminpublic</span>'
+                        : '';
+                        
                     html += `
                         <tr>
                             <td>${shortcode.shortcode_id}</td>
@@ -4655,6 +4665,7 @@ class Grove_Admin {
                             <td class="shortcode-type">${shortcode.shortcode_type}</td>
                             <td class="shortcode-category">${shortcode.shortcode_category || ''}</td>
                             <td class="shortcode-active">${shortcode.is_active == '1' ? 'Yes' : 'No'}</td>
+                            <td class="shortcode-adminpublic" data-adminpublic="${shortcode.is_adminpublic}">${adminPublicBadge}</td>
                             <td>
                                 <button class="edit-shortcode button button-small" data-shortcode-id="${shortcode.shortcode_id}">Edit</button>
                                 <button class="delete-shortcode button button-small" data-shortcode-id="${shortcode.shortcode_id}">Delete</button>
@@ -4785,6 +4796,7 @@ class Grove_Admin {
             'shortcode_usage_example' => sanitize_text_field($_POST['shortcode_usage_example']),
             'is_active' => intval($_POST['is_active']),
             'is_global' => intval($_POST['is_global']),
+            'is_adminpublic' => intval($_POST['is_adminpublic']),
             'author_user_id' => get_current_user_id()
         );
         
@@ -4815,14 +4827,15 @@ class Grove_Admin {
             'shortcode_type' => sanitize_text_field($_POST['shortcode_type']),
             'shortcode_usage_example' => sanitize_text_field($_POST['shortcode_usage_example']),
             'is_active' => intval($_POST['is_active']),
-            'is_global' => intval($_POST['is_global'])
+            'is_global' => intval($_POST['is_global']),
+            'is_adminpublic' => intval($_POST['is_adminpublic'])
         );
         
         $result = $wpdb->update(
             $table_name,
             $data,
             array('shortcode_id' => $shortcode_id),
-            array('%s', '%s', '%s', '%s', '%s', '%s', '%s', '%d', '%d'),
+            array('%s', '%s', '%s', '%s', '%s', '%s', '%s', '%d', '%d', '%d'),
             array('%d')
         );
         
