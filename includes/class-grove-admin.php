@@ -4814,6 +4814,10 @@ class Grove_Admin {
         $result = $wpdb->insert($table_name, $data);
         
         if ($result) {
+            // If the shortcode is active, register it immediately
+            if ($data['is_active'] == 1) {
+                Grove_Zen_Shortcodes::register_single_shortcode($data['shortcode_slug'], $data['shortcode_content']);
+            }
             wp_send_json_success('Shortcode created successfully');
         } else {
             wp_send_json_error('Failed to create shortcode');
@@ -4828,6 +4832,12 @@ class Grove_Admin {
         
         $table_name = $wpdb->prefix . 'zen_general_shortcodes';
         $shortcode_id = intval($_POST['shortcode_id']);
+        
+        // Get the old shortcode data first
+        $old_shortcode = $wpdb->get_row($wpdb->prepare(
+            "SELECT shortcode_slug, is_active FROM $table_name WHERE shortcode_id = %d",
+            $shortcode_id
+        ));
         
         $data = array(
             'shortcode_name' => sanitize_text_field($_POST['shortcode_name']),
@@ -4851,6 +4861,19 @@ class Grove_Admin {
         );
         
         if ($result !== false) {
+            // Handle shortcode re-registration
+            if ($old_shortcode) {
+                // If the old shortcode was active, unregister it first
+                if ($old_shortcode->is_active == 1) {
+                    Grove_Zen_Shortcodes::unregister_single_shortcode($old_shortcode->shortcode_slug);
+                }
+                
+                // If the new shortcode is active, register it
+                if ($data['is_active'] == 1) {
+                    Grove_Zen_Shortcodes::register_single_shortcode($data['shortcode_slug'], $data['shortcode_content']);
+                }
+            }
+            
             wp_send_json_success('Shortcode updated successfully');
         } else {
             wp_send_json_error('Failed to update shortcode');
@@ -4866,6 +4889,12 @@ class Grove_Admin {
         $table_name = $wpdb->prefix . 'zen_general_shortcodes';
         $shortcode_id = intval($_POST['shortcode_id']);
         
+        // Get the shortcode slug before deleting
+        $shortcode = $wpdb->get_row($wpdb->prepare(
+            "SELECT shortcode_slug, is_active FROM $table_name WHERE shortcode_id = %d",
+            $shortcode_id
+        ));
+        
         $result = $wpdb->delete(
             $table_name,
             array('shortcode_id' => $shortcode_id),
@@ -4873,6 +4902,11 @@ class Grove_Admin {
         );
         
         if ($result) {
+            // If the shortcode was active, unregister it
+            if ($shortcode && $shortcode->is_active == 1) {
+                Grove_Zen_Shortcodes::unregister_single_shortcode($shortcode->shortcode_slug);
+            }
+            
             wp_send_json_success('Shortcode deleted successfully');
         } else {
             wp_send_json_error('Failed to delete shortcode');

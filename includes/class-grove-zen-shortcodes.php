@@ -1109,4 +1109,61 @@ class Grove_Zen_Shortcodes {
         
         return $content;
     }
+    
+    /**
+     * Register a single shortcode immediately (for real-time admin updates)
+     */
+    public static function register_single_shortcode($shortcode_slug, $shortcode_content) {
+        // Create a closure to handle the shortcode
+        add_shortcode($shortcode_slug, function($atts) use ($shortcode_content) {
+            // Parse attributes
+            $atts = shortcode_atts(array(
+                'id' => '1'
+            ), $atts);
+            
+            // Replace {id} placeholder with actual ID
+            $content = str_replace('{id}', $atts['id'], $shortcode_content);
+            
+            // Process any nested shortcodes (like [zen_service])
+            $content = do_shortcode($content);
+            
+            return $content;
+        });
+    }
+    
+    /**
+     * Unregister a shortcode immediately (for real-time admin updates)
+     */
+    public static function unregister_single_shortcode($shortcode_slug) {
+        global $shortcode_tags;
+        if (isset($shortcode_tags[$shortcode_slug])) {
+            unset($shortcode_tags[$shortcode_slug]);
+        }
+    }
+    
+    /**
+     * Refresh all dynamic shortcode registrations (useful for debugging)
+     */
+    public function refresh_dynamic_shortcodes() {
+        global $wpdb, $shortcode_tags;
+        
+        $table_name = $wpdb->prefix . 'zen_general_shortcodes';
+        
+        // Get all existing dynamic shortcodes from the database
+        $existing_shortcodes = $wpdb->get_results(
+            "SELECT shortcode_slug FROM $table_name"
+        );
+        
+        // Unregister all existing dynamic shortcodes
+        if ($existing_shortcodes) {
+            foreach ($existing_shortcodes as $shortcode) {
+                if (isset($shortcode_tags[$shortcode->shortcode_slug])) {
+                    unset($shortcode_tags[$shortcode->shortcode_slug]);
+                }
+            }
+        }
+        
+        // Re-register all active dynamic shortcodes
+        $this->register_dynamic_shortcodes();
+    }
 }
