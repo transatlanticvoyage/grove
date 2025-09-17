@@ -137,6 +137,7 @@ class Grove_Zen_Shortcodes {
         
         // Dynamic shortcodes from the zen_general_shortcodes table should ALWAYS work
         // regardless of whether Grove or Snefuruplin is handling other shortcodes
+        // This now uses direct registration like driggs_mar shortcodes
         $this->register_dynamic_shortcodes();
         self::$dynamic_shortcodes_registered = true;
     }
@@ -1118,8 +1119,23 @@ class Grove_Zen_Shortcodes {
     
     /**
      * Register dynamic shortcodes from the zen_general_shortcodes table
+     * This now uses direct registration like driggs_mar shortcodes
      */
     public function register_dynamic_shortcodes() {
+        // Register a universal handler for ALL general shortcodes
+        // This works like sitespren - one handler that looks up content from DB
+        add_shortcode('dogsyen', array($this, 'render_general_shortcode'));
+        add_shortcode('main_code_from_claude2', array($this, 'render_general_shortcode'));
+        
+        // Also register any other shortcodes from the database
+        $this->register_all_general_shortcodes();
+    }
+    
+    /**
+     * Register all shortcodes from the general shortcodes table
+     * Similar to how driggs_mar shortcodes are registered
+     */
+    private function register_all_general_shortcodes() {
         global $wpdb;
         
         $table_name = $wpdb->prefix . 'zen_general_shortcodes';
@@ -1129,21 +1145,72 @@ class Grove_Zen_Shortcodes {
             return;
         }
         
-        // Get all active shortcodes
-        $shortcodes = $wpdb->get_results(
-            "SELECT shortcode_slug, shortcode_content FROM $table_name WHERE is_active = 1"
+        // Get all active shortcode slugs
+        $shortcodes = $wpdb->get_col(
+            "SELECT shortcode_slug FROM $table_name WHERE is_active = 1"
         );
         
         if (!$shortcodes) {
             return;
         }
         
-        foreach ($shortcodes as $shortcode) {
-            // Register each shortcode dynamically
-            add_shortcode($shortcode->shortcode_slug, function($atts) use ($shortcode) {
-                return $this->render_dynamic_shortcode($shortcode->shortcode_content, $atts);
-            });
+        // Register each shortcode to use our universal handler
+        foreach ($shortcodes as $slug) {
+            add_shortcode($slug, array($this, 'render_general_shortcode'));
         }
+    }
+    
+    /**
+     * Universal handler for general shortcodes - works like render_sitespren
+     * Looks up content from database and processes it
+     */
+    public function render_general_shortcode($atts, $content = '', $tag = '') {
+        global $wpdb;
+        
+        // The $tag parameter contains the actual shortcode used
+        $shortcode_slug = $tag;
+        
+        // Get the shortcode content from database
+        $table_name = $wpdb->prefix . 'zen_general_shortcodes';
+        $shortcode_data = $wpdb->get_row($wpdb->prepare(
+            "SELECT shortcode_content, shortcode_type FROM $table_name WHERE shortcode_slug = %s AND is_active = 1",
+            $shortcode_slug
+        ));
+        
+        if (!$shortcode_data || empty($shortcode_data->shortcode_content)) {
+            return '<!-- Shortcode not found or inactive: ' . esc_html($shortcode_slug) . ' -->';
+        }
+        
+        // Process the content with placeholders
+        return $this->process_shortcode_template($shortcode_data->shortcode_content, $atts);
+    }
+    
+    /**
+     * Process shortcode template with dynamic placeholders
+     */
+    private function process_shortcode_template($template, $atts) {
+        // Parse attributes with common defaults
+        $atts = shortcode_atts(array(
+            'id' => '1',
+            'service_id' => '',
+            'location_id' => '1',
+            'wppma_id' => '1',
+            'category' => '',
+            'type' => 'default',
+            'class' => '',
+            'limit' => '5'
+        ), $atts);
+        
+        // Replace all placeholders with their values
+        $content = $template;
+        foreach ($atts as $key => $value) {
+            $content = str_replace('{' . $key . '}', $value, $content);
+        }
+        
+        // Process any nested shortcodes (like [zen_service], [zen_location], etc.)
+        $content = do_shortcode($content);
+        
+        return $content;
     }
     
     /**
@@ -1166,23 +1233,14 @@ class Grove_Zen_Shortcodes {
     
     /**
      * Register a single shortcode immediately (for real-time admin updates)
+     * Now uses the same approach as driggs_mar shortcodes
      */
     public static function register_single_shortcode($shortcode_slug, $shortcode_content) {
-        // Create a closure to handle the shortcode
-        add_shortcode($shortcode_slug, function($atts) use ($shortcode_content) {
-            // Parse attributes
-            $atts = shortcode_atts(array(
-                'id' => '1'
-            ), $atts);
-            
-            // Replace {id} placeholder with actual ID
-            $content = str_replace('{id}', $atts['id'], $shortcode_content);
-            
-            // Process any nested shortcodes (like [zen_service])
-            $content = do_shortcode($content);
-            
-            return $content;
-        });
+        // Get instance to access non-static methods
+        $instance = new self();
+        
+        // Register using the same handler as all general shortcodes
+        add_shortcode($shortcode_slug, array($instance, 'render_general_shortcode'));
     }
     
     /**
