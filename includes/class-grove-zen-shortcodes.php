@@ -10,6 +10,7 @@ class Grove_Zen_Shortcodes {
         // Don't auto-register shortcodes - let the commander control it
         add_action('wp_enqueue_scripts', array($this, 'enqueue_styles'));
         add_action('init', array($this, 'maybe_register_shortcodes'), 15); // Later priority
+        add_action('wp_loaded', array($this, 'ensure_shortcodes_registered'), 20); // Ensure registration before content processing
     }
     
     /**
@@ -17,6 +18,11 @@ class Grove_Zen_Shortcodes {
      */
     public function maybe_register_shortcodes() {
         $mode = get_option('grove_shortcode_mode', 'automatic');
+        
+        // Include plugin.php to ensure is_plugin_active is available
+        if (!function_exists('is_plugin_active')) {
+            include_once(ABSPATH . 'wp-admin/includes/plugin.php');
+        }
         
         switch ($mode) {
             case 'automatic':
@@ -83,6 +89,11 @@ class Grove_Zen_Shortcodes {
     public function is_grove_controlling_shortcodes() {
         $mode = get_option('grove_shortcode_mode', 'automatic');
         
+        // Include plugin.php to ensure is_plugin_active is available
+        if (!function_exists('is_plugin_active')) {
+            include_once(ABSPATH . 'wp-admin/includes/plugin.php');
+        }
+        
         if ($mode === 'force_active') {
             return true;
         } elseif ($mode === 'automatic') {
@@ -90,6 +101,24 @@ class Grove_Zen_Shortcodes {
         }
         
         return false;
+    }
+    
+    /**
+     * Force register all shortcodes (for testing/debugging)
+     */
+    public static function force_register_all() {
+        $instance = new self();
+        $instance->register_shortcodes();
+    }
+    
+    /**
+     * Ensure shortcodes are registered on wp_loaded (backup registration)
+     */
+    public function ensure_shortcodes_registered() {
+        // Double-check that dynamic shortcodes are registered
+        if ($this->is_grove_controlling_shortcodes()) {
+            $this->register_dynamic_shortcodes();
+        }
     }
     
     /**
@@ -1075,6 +1104,11 @@ class Grove_Zen_Shortcodes {
         
         $table_name = $wpdb->prefix . 'zen_general_shortcodes';
         
+        // Check if table exists first
+        if ($wpdb->get_var("SHOW TABLES LIKE '$table_name'") != $table_name) {
+            return;
+        }
+        
         // Get all active shortcodes
         $shortcodes = $wpdb->get_results(
             "SELECT shortcode_slug, shortcode_content FROM $table_name WHERE is_active = 1"
@@ -1165,5 +1199,22 @@ class Grove_Zen_Shortcodes {
         
         // Re-register all active dynamic shortcodes
         $this->register_dynamic_shortcodes();
+    }
+    
+    /**
+     * Debug method to check if shortcodes are registered
+     */
+    public static function debug_registered_shortcodes() {
+        global $shortcode_tags;
+        error_log('Grove Debug: Registered shortcodes: ' . print_r(array_keys($shortcode_tags), true));
+        
+        global $wpdb;
+        $table_name = $wpdb->prefix . 'zen_general_shortcodes';
+        if ($wpdb->get_var("SHOW TABLES LIKE '$table_name'") == $table_name) {
+            $shortcodes = $wpdb->get_results(
+                "SELECT shortcode_slug, is_active FROM $table_name"
+            );
+            error_log('Grove Debug: Database shortcodes: ' . print_r($shortcodes, true));
+        }
     }
 }

@@ -4385,6 +4385,7 @@ class Grove_Admin {
                             <th style="width: 100px;"><b>shortcode_category</b></th>
                             <th style="width: 80px;"><b>is_active</b></th>
                             <th style="width: 100px;"><b>is_adminpublic</b></th>
+                            <th style="width: 180px;"><b>copy shortcode</b></th>
                             <th style="width: 120px;">Actions</th>
                         </tr>
                     </thead>
@@ -4405,7 +4406,7 @@ class Grove_Admin {
         <!-- Inline Edit Row Template -->
         <script type="text/template" id="inline-edit-template">
             <tr class="inline-edit-row">
-                <td colspan="9">
+                <td colspan="10">
                     <div style="padding: 15px; background: #f9f9f9;">
                         <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 15px;">
                             <div>
@@ -4576,6 +4577,46 @@ class Grove_Admin {
                 editingRow = null;
             });
             
+            // Copy shortcode button
+            $(document).on('click', '.copy-shortcode-btn', function() {
+                const shortcode = $(this).data('shortcode');
+                
+                // Try modern clipboard API first
+                if (navigator.clipboard && navigator.clipboard.writeText) {
+                    navigator.clipboard.writeText(shortcode).then(function() {
+                        // Visual feedback
+                        const btn = $(this);
+                        const originalText = btn.text();
+                        btn.text('✓ Copied!').css('background', '#28a745');
+                        setTimeout(function() {
+                            btn.text(originalText).css('background', '#0073aa');
+                        }, 2000);
+                    }.bind(this)).catch(function(err) {
+                        console.error('Failed to copy:', err);
+                        fallbackCopy(shortcode);
+                    });
+                } else {
+                    fallbackCopy(shortcode);
+                }
+                
+                function fallbackCopy(text) {
+                    // Fallback for older browsers
+                    const tempInput = $('<textarea>');
+                    $('body').append(tempInput);
+                    tempInput.val(text).select();
+                    document.execCommand('copy');
+                    tempInput.remove();
+                    
+                    // Visual feedback
+                    const btn = $(this);
+                    const originalText = btn.text();
+                    btn.text('✓ Copied!').css('background', '#28a745');
+                    setTimeout(function() {
+                        btn.text(originalText).css('background', '#0073aa');
+                    }, 2000);
+                }
+            });
+            
             // Edit button
             $(document).on('click', '.edit-shortcode', function() {
                 if (editingRow) {
@@ -4640,7 +4681,7 @@ class Grove_Admin {
                         renderTable(data.shortcodes);
                         updatePagination(data.total_pages, data.total_items);
                     } else {
-                        $('#shortcodes-tbody').html('<tr><td colspan="9">Error loading shortcodes: ' + response.data + '</td></tr>');
+                        $('#shortcodes-tbody').html('<tr><td colspan="10">Error loading shortcodes: ' + response.data + '</td></tr>');
                     }
                 });
             }
@@ -4677,6 +4718,20 @@ class Grove_Admin {
                             <td class="shortcode-category">${shortcode.shortcode_category || ''}</td>
                             <td class="shortcode-active">${shortcode.is_active == '1' ? 'Yes' : 'No'}</td>
                             <td class="shortcode-adminpublic" data-adminpublic="${shortcode.is_adminpublic}">${adminPublicBadge}</td>
+                            <td style="padding: 8px;">
+                                <div style="display: flex; align-items: center; gap: 5px;">
+                                    <button class="copy-shortcode-btn button button-small" 
+                                            data-shortcode="[${shortcode.shortcode_slug}]" 
+                                            style="background: #0073aa; color: white; border: none; padding: 4px 8px; border-radius: 3px; cursor: pointer; font-size: 11px;"
+                                            title="Copy shortcode to clipboard">
+                                        📋 Copy
+                                    </button>
+                                    <input type="text" 
+                                           value="[${shortcode.shortcode_slug}]" 
+                                           readonly 
+                                           style="flex: 1; padding: 4px 6px; border: 1px solid #ddd; border-radius: 3px; background: #f9f9f9; font-size: 11px; font-family: monospace;">
+                                </div>
+                            </td>
                             <td>
                                 <button class="edit-shortcode button button-small" data-shortcode-id="${shortcode.shortcode_id}">Edit</button>
                                 <button class="delete-shortcode button button-small" data-shortcode-id="${shortcode.shortcode_id}">Delete</button>
@@ -4816,6 +4871,10 @@ class Grove_Admin {
         if ($result) {
             // If the shortcode is active, register it immediately
             if ($data['is_active'] == 1) {
+                // Include plugin.php to ensure is_plugin_active is available
+                if (!function_exists('is_plugin_active')) {
+                    include_once(ABSPATH . 'wp-admin/includes/plugin.php');
+                }
                 Grove_Zen_Shortcodes::register_single_shortcode($data['shortcode_slug'], $data['shortcode_content']);
             }
             wp_send_json_success('Shortcode created successfully');
@@ -4863,6 +4922,11 @@ class Grove_Admin {
         if ($result !== false) {
             // Handle shortcode re-registration
             if ($old_shortcode) {
+                // Include plugin.php to ensure is_plugin_active is available
+                if (!function_exists('is_plugin_active')) {
+                    include_once(ABSPATH . 'wp-admin/includes/plugin.php');
+                }
+                
                 // If the old shortcode was active, unregister it first
                 if ($old_shortcode->is_active == 1) {
                     Grove_Zen_Shortcodes::unregister_single_shortcode($old_shortcode->shortcode_slug);
@@ -4904,6 +4968,10 @@ class Grove_Admin {
         if ($result) {
             // If the shortcode was active, unregister it
             if ($shortcode && $shortcode->is_active == 1) {
+                // Include plugin.php to ensure is_plugin_active is available
+                if (!function_exists('is_plugin_active')) {
+                    include_once(ABSPATH . 'wp-admin/includes/plugin.php');
+                }
                 Grove_Zen_Shortcodes::unregister_single_shortcode($shortcode->shortcode_slug);
             }
             
