@@ -4386,6 +4386,7 @@ class Grove_Admin {
                             <th style="width: 80px;"><b>is_active</b></th>
                             <th style="width: 100px;"><b>is_adminpublic</b></th>
                             <th style="width: 180px;"><b>copy shortcode</b></th>
+                            <th style="width: 250px;"><b>full usage example</b></th>
                             <th style="width: 120px;">Actions</th>
                         </tr>
                     </thead>
@@ -4406,7 +4407,7 @@ class Grove_Admin {
         <!-- Inline Edit Row Template -->
         <script type="text/template" id="inline-edit-template">
             <tr class="inline-edit-row">
-                <td colspan="10">
+                <td colspan="11">
                     <div style="padding: 15px; background: #f9f9f9;">
                         <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 15px;">
                             <div>
@@ -4617,6 +4618,45 @@ class Grove_Admin {
                 }
             });
             
+            // Copy usage example button
+            $(document).on('click', '.copy-example-btn', function() {
+                const example = $(this).data('example');
+                const btn = $(this);
+                
+                // Try modern clipboard API first
+                if (navigator.clipboard && navigator.clipboard.writeText) {
+                    navigator.clipboard.writeText(example).then(function() {
+                        // Visual feedback
+                        const originalText = btn.text();
+                        btn.text('✓ Copied!').css('background', '#228B22');
+                        setTimeout(function() {
+                            btn.text(originalText).css('background', '#8B4513');
+                        }, 2000);
+                    }).catch(function(err) {
+                        console.error('Failed to copy:', err);
+                        fallbackExampleCopy(example, btn);
+                    });
+                } else {
+                    fallbackExampleCopy(example, btn);
+                }
+                
+                function fallbackExampleCopy(text, button) {
+                    // Fallback for older browsers
+                    const tempInput = $('<textarea>');
+                    $('body').append(tempInput);
+                    tempInput.val(text).select();
+                    document.execCommand('copy');
+                    tempInput.remove();
+                    
+                    // Visual feedback
+                    const originalText = button.text();
+                    button.text('✓ Copied!').css('background', '#228B22');
+                    setTimeout(function() {
+                        button.text(originalText).css('background', '#8B4513');
+                    }, 2000);
+                }
+            });
+            
             // Edit button
             $(document).on('click', '.edit-shortcode', function() {
                 if (editingRow) {
@@ -4681,7 +4721,7 @@ class Grove_Admin {
                         renderTable(data.shortcodes);
                         updatePagination(data.total_pages, data.total_items);
                     } else {
-                        $('#shortcodes-tbody').html('<tr><td colspan="10">Error loading shortcodes: ' + response.data + '</td></tr>');
+                        $('#shortcodes-tbody').html('<tr><td colspan="11">Error loading shortcodes: ' + response.data + '</td></tr>');
                     }
                 });
             }
@@ -4730,6 +4770,20 @@ class Grove_Admin {
                                            value="[${shortcode.shortcode_slug}]" 
                                            readonly 
                                            style="flex: 1; padding: 4px 6px; border: 1px solid #ddd; border-radius: 3px; background: #f9f9f9; font-size: 11px; font-family: monospace;">
+                                </div>
+                            </td>
+                            <td style="padding: 8px;">
+                                <div style="display: flex; align-items: center; gap: 5px;">
+                                    <button class="copy-example-btn button button-small" 
+                                            data-example="${shortcode.shortcode_usage_example || '[' + shortcode.shortcode_slug + ']'}" 
+                                            style="background: #8B4513; color: white; border: none; padding: 4px 8px; border-radius: 3px; cursor: pointer; font-size: 11px;"
+                                            title="Copy full usage example">
+                                        📝 Copy
+                                    </button>
+                                    <input type="text" 
+                                           value="${shortcode.shortcode_usage_example || '[' + shortcode.shortcode_slug + ']'}" 
+                                           readonly 
+                                           style="flex: 1; padding: 4px 6px; border: 1px solid #ddd; border-radius: 3px; background: #fffbf0; font-size: 11px; font-family: monospace;">
                                 </div>
                             </td>
                             <td>
