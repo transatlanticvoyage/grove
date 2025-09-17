@@ -7,7 +7,7 @@
  */
 class Grove_Database {
     
-    const ZEN_DB_VERSION = '1.5';
+    const ZEN_DB_VERSION = '1.6';
     
     public function __construct() {
         // Check and create tables on initialization
