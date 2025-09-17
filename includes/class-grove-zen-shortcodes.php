@@ -130,8 +130,11 @@ class Grove_Zen_Shortcodes {
      * These should work regardless of which plugin is handling other shortcodes
      */
     public function always_register_dynamic_shortcodes() {
+        error_log('Grove Debug: always_register_dynamic_shortcodes() called');
+        
         // Prevent duplicate registration
         if (self::$dynamic_shortcodes_registered) {
+            error_log('Grove Debug: Shortcodes already registered, skipping');
             return;
         }
         
@@ -140,6 +143,10 @@ class Grove_Zen_Shortcodes {
         // This now uses direct registration like driggs_mar shortcodes
         $this->register_dynamic_shortcodes();
         self::$dynamic_shortcodes_registered = true;
+        
+        // Debug: List all registered shortcodes
+        global $shortcode_tags;
+        error_log('Grove Debug: All registered shortcodes: ' . implode(', ', array_keys($shortcode_tags)));
     }
     
     /**
@@ -1122,10 +1129,19 @@ class Grove_Zen_Shortcodes {
      * This now uses direct registration like driggs_mar shortcodes
      */
     public function register_dynamic_shortcodes() {
+        // Debug: Log that this method is being called
+        error_log('Grove Debug: register_dynamic_shortcodes() called');
+        
         // Register a universal handler for ALL general shortcodes
         // This works like sitespren - one handler that looks up content from DB
         add_shortcode('dogsyen', array($this, 'render_general_shortcode'));
         add_shortcode('main_code_from_claude2', array($this, 'render_general_shortcode'));
+        add_shortcode('rainyen', array($this, 'render_general_shortcode'));
+        
+        // Debug: Check if shortcodes were registered
+        global $shortcode_tags;
+        error_log('Grove Debug: dogsyen registered? ' . (isset($shortcode_tags['dogsyen']) ? 'YES' : 'NO'));
+        error_log('Grove Debug: main_code_from_claude2 registered? ' . (isset($shortcode_tags['main_code_from_claude2']) ? 'YES' : 'NO'));
         
         // Also register any other shortcodes from the database
         $this->register_all_general_shortcodes();
@@ -1167,19 +1183,34 @@ class Grove_Zen_Shortcodes {
     public function render_general_shortcode($atts, $content = '', $tag = '') {
         global $wpdb;
         
+        // Debug: Log that handler was called
+        error_log('Grove Debug: render_general_shortcode() called for: ' . $tag);
+        
         // The $tag parameter contains the actual shortcode used
         $shortcode_slug = $tag;
         
         // Get the shortcode content from database
         $table_name = $wpdb->prefix . 'zen_general_shortcodes';
+        
+        // Debug: Check table existence
+        $table_exists = $wpdb->get_var("SHOW TABLES LIKE '$table_name'");
+        error_log('Grove Debug: Table exists? ' . ($table_exists ? 'YES' : 'NO'));
+        
         $shortcode_data = $wpdb->get_row($wpdb->prepare(
             "SELECT shortcode_content, shortcode_type FROM $table_name WHERE shortcode_slug = %s AND is_active = 1",
             $shortcode_slug
         ));
         
+        // Debug: Log query result
+        error_log('Grove Debug: Query result for ' . $shortcode_slug . ': ' . print_r($shortcode_data, true));
+        
         if (!$shortcode_data || empty($shortcode_data->shortcode_content)) {
+            error_log('Grove Debug: No data found for shortcode: ' . $shortcode_slug);
             return '<!-- Shortcode not found or inactive: ' . esc_html($shortcode_slug) . ' -->';
         }
+        
+        // Debug: Log content before processing
+        error_log('Grove Debug: Content to process: ' . $shortcode_data->shortcode_content);
         
         // Process the content with placeholders
         return $this->process_shortcode_template($shortcode_data->shortcode_content, $atts);
