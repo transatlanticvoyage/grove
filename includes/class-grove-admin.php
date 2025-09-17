@@ -4925,10 +4925,6 @@ class Grove_Admin {
         if ($result) {
             // If the shortcode is active, register it immediately
             if ($data['is_active'] == 1) {
-                // Include plugin.php to ensure is_plugin_active is available
-                if (!function_exists('is_plugin_active')) {
-                    include_once(ABSPATH . 'wp-admin/includes/plugin.php');
-                }
                 Grove_Zen_Shortcodes::register_single_shortcode($data['shortcode_slug'], $data['shortcode_content']);
             }
             wp_send_json_success('Shortcode created successfully');
@@ -4976,11 +4972,6 @@ class Grove_Admin {
         if ($result !== false) {
             // Handle shortcode re-registration
             if ($old_shortcode) {
-                // Include plugin.php to ensure is_plugin_active is available
-                if (!function_exists('is_plugin_active')) {
-                    include_once(ABSPATH . 'wp-admin/includes/plugin.php');
-                }
-                
                 // If the old shortcode was active, unregister it first
                 if ($old_shortcode->is_active == 1) {
                     Grove_Zen_Shortcodes::unregister_single_shortcode($old_shortcode->shortcode_slug);
@@ -5022,10 +5013,6 @@ class Grove_Admin {
         if ($result) {
             // If the shortcode was active, unregister it
             if ($shortcode && $shortcode->is_active == 1) {
-                // Include plugin.php to ensure is_plugin_active is available
-                if (!function_exists('is_plugin_active')) {
-                    include_once(ABSPATH . 'wp-admin/includes/plugin.php');
-                }
                 Grove_Zen_Shortcodes::unregister_single_shortcode($shortcode->shortcode_slug);
             }
             

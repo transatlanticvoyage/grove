@@ -6,15 +6,10 @@
  */
 class Grove_Zen_Shortcodes {
     
-    private static $dynamic_shortcodes_registered = false;
-    
     public function __construct() {
         // Don't auto-register shortcodes - let the commander control it
         add_action('wp_enqueue_scripts', array($this, 'enqueue_styles'));
         add_action('init', array($this, 'maybe_register_shortcodes'), 15); // Later priority
-        add_action('init', array($this, 'always_register_dynamic_shortcodes'), 20); // ALWAYS register dynamic shortcodes
-        add_action('wp_loaded', array($this, 'always_register_dynamic_shortcodes'), 20); // Double-check dynamic shortcodes
-        add_action('wp', array($this, 'always_register_dynamic_shortcodes'), 25); // Triple-check before content rendering
     }
     
     /**
@@ -23,14 +18,12 @@ class Grove_Zen_Shortcodes {
     public function maybe_register_shortcodes() {
         $mode = get_option('grove_shortcode_mode', 'automatic');
         
-        // Include plugin.php to ensure is_plugin_active is available
-        if (!function_exists('is_plugin_active')) {
-            include_once(ABSPATH . 'wp-admin/includes/plugin.php');
-        }
-        
         switch ($mode) {
             case 'automatic':
                 // Default: Only if Snefuruplin not active
+                if (!function_exists('is_plugin_active')) {
+                    include_once(ABSPATH . 'wp-admin/includes/plugin.php');
+                }
                 if (!is_plugin_active('snefuruplin/snefuruplin.php')) {
                     $this->register_shortcodes();
                 }
@@ -93,14 +86,12 @@ class Grove_Zen_Shortcodes {
     public function is_grove_controlling_shortcodes() {
         $mode = get_option('grove_shortcode_mode', 'automatic');
         
-        // Include plugin.php to ensure is_plugin_active is available
-        if (!function_exists('is_plugin_active')) {
-            include_once(ABSPATH . 'wp-admin/includes/plugin.php');
-        }
-        
         if ($mode === 'force_active') {
             return true;
         } elseif ($mode === 'automatic') {
+            if (!function_exists('is_plugin_active')) {
+                include_once(ABSPATH . 'wp-admin/includes/plugin.php');
+            }
             return !is_plugin_active('snefuruplin/snefuruplin.php');
         }
         
@@ -115,39 +106,6 @@ class Grove_Zen_Shortcodes {
         $instance->register_shortcodes();
     }
     
-    /**
-     * Ensure shortcodes are registered on wp_loaded (backup registration)
-     */
-    public function ensure_shortcodes_registered() {
-        // Double-check that dynamic shortcodes are registered
-        if ($this->is_grove_controlling_shortcodes()) {
-            $this->register_dynamic_shortcodes();
-        }
-    }
-    
-    /**
-     * ALWAYS register dynamic shortcodes from the general shortcodes table
-     * These should work regardless of which plugin is handling other shortcodes
-     */
-    public function always_register_dynamic_shortcodes() {
-        error_log('Grove Debug: always_register_dynamic_shortcodes() called');
-        
-        // Prevent duplicate registration
-        if (self::$dynamic_shortcodes_registered) {
-            error_log('Grove Debug: Shortcodes already registered, skipping');
-            return;
-        }
-        
-        // Dynamic shortcodes from the zen_general_shortcodes table should ALWAYS work
-        // regardless of whether Grove or Snefuruplin is handling other shortcodes
-        // This now uses direct registration like driggs_mar shortcodes
-        $this->register_dynamic_shortcodes();
-        self::$dynamic_shortcodes_registered = true;
-        
-        // Debug: List all registered shortcodes
-        global $shortcode_tags;
-        error_log('Grove Debug: All registered shortcodes: ' . implode(', ', array_keys($shortcode_tags)));
-    }
     
     /**
      * Enqueue shortcodes CSS only when Grove is controlling
@@ -1126,24 +1084,9 @@ class Grove_Zen_Shortcodes {
     
     /**
      * Register dynamic shortcodes from the zen_general_shortcodes table
-     * This now uses direct registration like driggs_mar shortcodes
      */
     public function register_dynamic_shortcodes() {
-        // Debug: Log that this method is being called
-        error_log('Grove Debug: register_dynamic_shortcodes() called');
-        
-        // Register a universal handler for ALL general shortcodes
-        // This works like sitespren - one handler that looks up content from DB
-        add_shortcode('dogsyen', array($this, 'render_general_shortcode'));
-        add_shortcode('main_code_from_claude2', array($this, 'render_general_shortcode'));
-        add_shortcode('rainyen', array($this, 'render_general_shortcode'));
-        
-        // Debug: Check if shortcodes were registered
-        global $shortcode_tags;
-        error_log('Grove Debug: dogsyen registered? ' . (isset($shortcode_tags['dogsyen']) ? 'YES' : 'NO'));
-        error_log('Grove Debug: main_code_from_claude2 registered? ' . (isset($shortcode_tags['main_code_from_claude2']) ? 'YES' : 'NO'));
-        
-        // Also register any other shortcodes from the database
+        // Register all shortcodes from the database
         $this->register_all_general_shortcodes();
     }
     
@@ -1183,34 +1126,25 @@ class Grove_Zen_Shortcodes {
     public function render_general_shortcode($atts, $content = '', $tag = '') {
         global $wpdb;
         
-        // Debug: Log that handler was called
-        error_log('Grove Debug: render_general_shortcode() called for: ' . $tag);
-        
         // The $tag parameter contains the actual shortcode used
         $shortcode_slug = $tag;
         
         // Get the shortcode content from database
         $table_name = $wpdb->prefix . 'zen_general_shortcodes';
         
-        // Debug: Check table existence
-        $table_exists = $wpdb->get_var("SHOW TABLES LIKE '$table_name'");
-        error_log('Grove Debug: Table exists? ' . ($table_exists ? 'YES' : 'NO'));
+        // Check if table exists first
+        if ($wpdb->get_var("SHOW TABLES LIKE '$table_name'") != $table_name) {
+            return '<!-- General shortcodes table not found -->';
+        }
         
         $shortcode_data = $wpdb->get_row($wpdb->prepare(
             "SELECT shortcode_content, shortcode_type FROM $table_name WHERE shortcode_slug = %s AND is_active = 1",
             $shortcode_slug
         ));
         
-        // Debug: Log query result
-        error_log('Grove Debug: Query result for ' . $shortcode_slug . ': ' . print_r($shortcode_data, true));
-        
         if (!$shortcode_data || empty($shortcode_data->shortcode_content)) {
-            error_log('Grove Debug: No data found for shortcode: ' . $shortcode_slug);
             return '<!-- Shortcode not found or inactive: ' . esc_html($shortcode_slug) . ' -->';
         }
-        
-        // Debug: Log content before processing
-        error_log('Grove Debug: Content to process: ' . $shortcode_data->shortcode_content);
         
         // Process the content with placeholders
         return $this->process_shortcode_template($shortcode_data->shortcode_content, $atts);
@@ -1239,24 +1173,6 @@ class Grove_Zen_Shortcodes {
         }
         
         // Process any nested shortcodes (like [zen_service], [zen_location], etc.)
-        $content = do_shortcode($content);
-        
-        return $content;
-    }
-    
-    /**
-     * Render dynamic shortcode content with attribute processing
-     */
-    public function render_dynamic_shortcode($content, $atts) {
-        // Parse attributes
-        $atts = shortcode_atts(array(
-            'id' => '1'
-        ), $atts);
-        
-        // Replace {id} placeholder with actual ID
-        $content = str_replace('{id}', $atts['id'], $content);
-        
-        // Process any nested shortcodes (like [zen_service])
         $content = do_shortcode($content);
         
         return $content;
@@ -1310,20 +1226,4 @@ class Grove_Zen_Shortcodes {
         $this->register_dynamic_shortcodes();
     }
     
-    /**
-     * Debug method to check if shortcodes are registered
-     */
-    public static function debug_registered_shortcodes() {
-        global $shortcode_tags;
-        error_log('Grove Debug: Registered shortcodes: ' . print_r(array_keys($shortcode_tags), true));
-        
-        global $wpdb;
-        $table_name = $wpdb->prefix . 'zen_general_shortcodes';
-        if ($wpdb->get_var("SHOW TABLES LIKE '$table_name'") == $table_name) {
-            $shortcodes = $wpdb->get_results(
-                "SELECT shortcode_slug, is_active FROM $table_name"
-            );
-            error_log('Grove Debug: Database shortcodes: ' . print_r($shortcodes, true));
-        }
-    }
 }
