@@ -46,6 +46,9 @@ class Grove_Zen_Shortcodes {
         add_shortcode('zen_service', array($this, 'render_single_service'));
         add_shortcode('zen_service_image', array($this, 'render_service_image'));
         
+        // Dynamic shortcodes from database
+        $this->register_dynamic_shortcodes();
+        
         // Locations shortcodes
         add_shortcode('zen_locations', array($this, 'render_locations'));
         add_shortcode('zen_location', array($this, 'render_single_location'));
@@ -1062,5 +1065,48 @@ class Grove_Zen_Shortcodes {
             array('%s'),
             array('%d')
         );
+    }
+    
+    /**
+     * Register dynamic shortcodes from the zen_general_shortcodes table
+     */
+    public function register_dynamic_shortcodes() {
+        global $wpdb;
+        
+        $table_name = $wpdb->prefix . 'zen_general_shortcodes';
+        
+        // Get all active shortcodes
+        $shortcodes = $wpdb->get_results(
+            "SELECT shortcode_slug, shortcode_content FROM $table_name WHERE is_active = 1"
+        );
+        
+        if (!$shortcodes) {
+            return;
+        }
+        
+        foreach ($shortcodes as $shortcode) {
+            // Register each shortcode dynamically
+            add_shortcode($shortcode->shortcode_slug, function($atts) use ($shortcode) {
+                return $this->render_dynamic_shortcode($shortcode->shortcode_content, $atts);
+            });
+        }
+    }
+    
+    /**
+     * Render dynamic shortcode content with attribute processing
+     */
+    public function render_dynamic_shortcode($content, $atts) {
+        // Parse attributes
+        $atts = shortcode_atts(array(
+            'id' => '1'
+        ), $atts);
+        
+        // Replace {id} placeholder with actual ID
+        $content = str_replace('{id}', $atts['id'], $content);
+        
+        // Process any nested shortcodes (like [zen_service])
+        $content = do_shortcode($content);
+        
+        return $content;
     }
 }
