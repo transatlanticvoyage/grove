@@ -1175,25 +1175,33 @@ class Grove_Zen_Shortcodes {
         // Fix escaped quotes in shortcodes - stripslashes to clean them
         $content = stripslashes($content);
         
-        // Debug: Check what shortcodes are registered
-        global $shortcode_tags;
-        error_log('Grove Debug: zen_service registered? ' . (isset($shortcode_tags['zen_service']) ? 'YES' : 'NO'));
-        if (isset($shortcode_tags['zen_service'])) {
-            error_log('Grove Debug: zen_service handler: ' . print_r($shortcode_tags['zen_service'], true));
-        }
-        
-        // Debug: Log content before do_shortcode
-        error_log('Grove Debug: Content before do_shortcode: ' . $content);
+        // Check for CSS at the end and wrap it in <style> tags
+        $content = $this->wrap_css_in_style_tags($content);
         
         // Process any nested shortcodes (like [zen_service], [zen_location], etc.)
         $content = do_shortcode($content);
         
-        // Debug: Log content after do_shortcode
-        error_log('Grove Debug: Content after do_shortcode: ' . substr($content, 0, 200) . '...');
-        
         return $content;
     }
     
+    /**
+     * Wrap any CSS found in content with proper <style> tags
+     */
+    private function wrap_css_in_style_tags($content) {
+        // Look for CSS patterns - selectors followed by curly braces
+        if (preg_match('/([.#][\w-]+[\s\S]*?\{[\s\S]*?\}[\s\S]*?)$/m', $content, $matches)) {
+            $css_part = trim($matches[1]);
+            
+            // Remove the CSS from the main content
+            $content = preg_replace('/([.#][\w-]+[\s\S]*?\{[\s\S]*?\}[\s\S]*?)$/m', '', $content);
+            
+            // Wrap CSS in style tags and append
+            $content .= "\n<style>\n" . $css_part . "\n</style>";
+        }
+        
+        return $content;
+    }
+
     /**
      * Register a single shortcode immediately (for real-time admin updates)
      * Now uses the same approach as driggs_mar shortcodes
