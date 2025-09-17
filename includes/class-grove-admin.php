@@ -4640,7 +4640,7 @@ class Grove_Admin {
                         renderTable(data.shortcodes);
                         updatePagination(data.total_pages, data.total_items);
                     } else {
-                        $('#shortcodes-tbody').html('<tr><td colspan="8">Error loading shortcodes: ' + response.data + '</td></tr>');
+                        $('#shortcodes-tbody').html('<tr><td colspan="9">Error loading shortcodes: ' + response.data + '</td></tr>');
                     }
                 });
             }
