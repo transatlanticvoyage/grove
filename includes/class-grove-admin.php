@@ -39,6 +39,11 @@ class Grove_Admin {
         add_action('wp_ajax_grove_hoof_delete', array($this, 'grove_hoof_delete'));
         add_action('wp_ajax_grove_export_xls', array($this, 'grove_export_xls'));
         add_action('wp_ajax_grove_export_sql', array($this, 'grove_export_sql'));
+        // General shortcodes handlers
+        add_action('wp_ajax_grove_generalshortcodes_load', array($this, 'grove_generalshortcodes_load'));
+        add_action('wp_ajax_grove_generalshortcodes_create', array($this, 'grove_generalshortcodes_create'));
+        add_action('wp_ajax_grove_generalshortcodes_update', array($this, 'grove_generalshortcodes_update'));
+        add_action('wp_ajax_grove_generalshortcodes_delete', array($this, 'grove_generalshortcodes_delete'));
         // WordPress native settings handlers
         add_action('wp_ajax_grove_update_site_settings', array($this, 'grove_update_site_settings'));
     }
@@ -128,6 +133,15 @@ class Grove_Admin {
             'manage_options',
             'grove_hoof_mar',
             array($this, 'grove_hoof_mar_page')
+        );
+        
+        add_submenu_page(
+            'grovehub',
+            'General Shortcodes Manager',
+            'grove_generalshortcodes_mar',
+            'manage_options',
+            'grove_generalshortcodes_mar',
+            array($this, 'grove_generalshortcodes_mar_page')
         );
     }
     
@@ -4284,6 +4298,560 @@ class Grove_Admin {
             wp_send_json_success('Hoof code deleted successfully');
         } else {
             wp_send_json_error('Failed to delete hoof code');
+        }
+    }
+    
+    /**
+     * General Shortcodes Manager Page - Matches snefuruplin services page styling
+     */
+    public function grove_generalshortcodes_mar_page() {
+        global $wpdb;
+        $table_name = $wpdb->prefix . 'zen_general_shortcodes';
+        
+        // AGGRESSIVE NOTICE SUPPRESSION - Remove ALL WordPress admin notices
+        $this->suppress_all_admin_notices();
+        
+        // Handle AJAX requests
+        if (isset($_POST['action'])) {
+            $this->handle_generalshortcodes_ajax();
+            return;
+        }
+        
+        // Enqueue WordPress media scripts
+        wp_enqueue_media();
+        
+        // Suppress all admin notices except those directly related to this page
+        add_action('admin_print_scripts', function() {
+            remove_all_actions('admin_notices');
+            remove_all_actions('all_admin_notices');
+        });
+        
+        ?>
+        <div class="wrap" style="margin: 0; padding: 0;">
+            <!-- Allow space for WordPress notices -->
+            <div style="height: 20px;"></div>
+            
+            <div style="padding: 20px;">
+                <h1 style="margin-bottom: 20px;">🔧 General Shortcodes Manager</h1>
+            
+            <!-- Control Bar -->
+            <div style="background: white; border: 1px solid #ddd; padding: 15px; margin-bottom: 20px; border-radius: 5px;">
+                <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 15px;">
+                    <div style="display: flex; gap: 10px; align-items: center;">
+                        <button id="create-inline-btn" class="button button-primary">Create New (Inline)</button>
+                        <button id="create-popup-btn" class="button button-secondary">Create New (Popup)</button>
+                    </div>
+                </div>
+                
+                <!-- Nubra Tableface Kite -->
+                <div id="nubra-tableface-kite" style="margin-bottom: 15px;"></div>
+                
+                <!-- Pagination and Search Controls -->
+                <div style="display: flex; justify-content: space-between; align-items: center;">
+                    <div style="display: flex; gap: 15px; align-items: center;">
+                        <!-- Items per page -->
+                        <div style="display: flex; gap: 0; border: 1px solid #ccc;">
+                            <button class="per-page-btn" data-value="10" style="border: none; padding: 10px 15px; background: #f9f9f9; cursor: pointer; font-size: 14px;">10</button>
+                            <button class="per-page-btn" data-value="20" style="border: none; padding: 10px 15px; background: #f9f9f9; cursor: pointer; font-size: 14px; border-left: 1px solid #ccc;">20</button>
+                            <button class="per-page-btn" data-value="50" style="border: none; padding: 10px 15px; background: #f9f9f9; cursor: pointer; font-size: 14px; border-left: 1px solid #ccc;">50</button>
+                            <button class="per-page-btn active" data-value="100" style="border: none; padding: 10px 15px; background: #0073aa; color: white; cursor: pointer; font-size: 14px; border-left: 1px solid #ccc;">100</button>
+                        </div>
+                        
+                        <!-- Search box -->
+                        <input type="text" id="search-box" placeholder="Search shortcodes..." style="padding: 8px; border: 1px solid #ccc; border-radius: 3px; width: 200px;">
+                        <button id="search-btn" class="button">Search</button>
+                        <button id="clear-search-btn" class="button">Clear</button>
+                    </div>
+                    
+                    <!-- Pagination -->
+                    <div id="pagination-controls" style="display: flex; align-items: center; gap: 10px;">
+                        <button id="prev-page" class="button" disabled>« Previous</button>
+                        <span id="page-info">Page 1 of 1</span>
+                        <button id="next-page" class="button" disabled>Next »</button>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Table Container -->
+            <div id="table-container" style="background: white; border: 1px solid #ddd; border-radius: 5px; overflow: hidden;">
+                <table id="shortcodes-table" class="wp-list-table widefat fixed striped">
+                    <thead>
+                        <tr>
+                            <th style="width: 60px;">ID</th>
+                            <th style="width: 200px;">Name</th>
+                            <th style="width: 150px;">Slug</th>
+                            <th>Content</th>
+                            <th style="width: 120px;">Type</th>
+                            <th style="width: 100px;">Category</th>
+                            <th style="width: 80px;">Active</th>
+                            <th style="width: 120px;">Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody id="shortcodes-tbody">
+                        <!-- Table content will be loaded here -->
+                    </tbody>
+                </table>
+            </div>
+            
+            <!-- Loading indicator -->
+            <div id="loading-indicator" style="text-align: center; padding: 20px; display: none;">
+                <div style="font-size: 16px;">Loading...</div>
+            </div>
+            
+        </div>
+        </div>
+        
+        <!-- Inline Edit Row Template -->
+        <script type="text/template" id="inline-edit-template">
+            <tr class="inline-edit-row">
+                <td colspan="8">
+                    <div style="padding: 15px; background: #f9f9f9;">
+                        <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 15px;">
+                            <div>
+                                <label>Name:</label>
+                                <input type="text" name="shortcode_name" style="width: 100%; margin-top: 5px;">
+                            </div>
+                            <div>
+                                <label>Slug:</label>
+                                <input type="text" name="shortcode_slug" style="width: 100%; margin-top: 5px;">
+                            </div>
+                            <div style="grid-column: 1 / -1;">
+                                <label>Content:</label>
+                                <textarea name="shortcode_content" style="width: 100%; height: 100px; margin-top: 5px;"></textarea>
+                            </div>
+                            <div>
+                                <label>Description:</label>
+                                <textarea name="shortcode_description" style="width: 100%; height: 60px; margin-top: 5px;"></textarea>
+                            </div>
+                            <div>
+                                <label>Category:</label>
+                                <input type="text" name="shortcode_category" style="width: 100%; margin-top: 5px;">
+                            </div>
+                            <div>
+                                <label>Type:</label>
+                                <select name="shortcode_type" style="width: 100%; margin-top: 5px;">
+                                    <option value="custom">Custom</option>
+                                    <option value="system">System</option>
+                                    <option value="template">Template</option>
+                                </select>
+                            </div>
+                            <div>
+                                <label>Usage Example:</label>
+                                <input type="text" name="shortcode_usage_example" style="width: 100%; margin-top: 5px;">
+                            </div>
+                        </div>
+                        <div style="margin-top: 15px; display: flex; gap: 10px; align-items: center;">
+                            <label style="display: flex; align-items: center; gap: 5px;">
+                                <input type="checkbox" name="is_active"> Active
+                            </label>
+                            <label style="display: flex; align-items: center; gap: 5px;">
+                                <input type="checkbox" name="is_global"> Global
+                            </label>
+                            <div style="margin-left: auto;">
+                                <button class="save-inline button button-primary">Save</button>
+                                <button class="cancel-inline button">Cancel</button>
+                            </div>
+                        </div>
+                    </div>
+                </td>
+            </tr>
+        </script>
+        
+        <script>
+        jQuery(document).ready(function($) {
+            let currentPage = 1;
+            let itemsPerPage = 100;
+            let searchQuery = '';
+            let editingRow = null;
+            
+            // Load initial data
+            loadShortcodes();
+            
+            // Items per page buttons
+            $('.per-page-btn').on('click', function() {
+                $('.per-page-btn').removeClass('active').css({
+                    'background': '#f9f9f9',
+                    'color': '#333'
+                });
+                $(this).addClass('active').css({
+                    'background': '#0073aa',
+                    'color': 'white'
+                });
+                itemsPerPage = parseInt($(this).data('value'));
+                currentPage = 1;
+                loadShortcodes();
+            });
+            
+            // Search functionality
+            $('#search-btn').on('click', function() {
+                searchQuery = $('#search-box').val();
+                currentPage = 1;
+                loadShortcodes();
+            });
+            
+            $('#clear-search-btn').on('click', function() {
+                searchQuery = '';
+                $('#search-box').val('');
+                currentPage = 1;
+                loadShortcodes();
+            });
+            
+            // Enter key in search box
+            $('#search-box').on('keypress', function(e) {
+                if (e.which === 13) {
+                    $('#search-btn').click();
+                }
+            });
+            
+            // Pagination
+            $('#prev-page').on('click', function() {
+                if (currentPage > 1) {
+                    currentPage--;
+                    loadShortcodes();
+                }
+            });
+            
+            $('#next-page').on('click', function() {
+                currentPage++;
+                loadShortcodes();
+            });
+            
+            // Create new inline
+            $('#create-inline-btn').on('click', function() {
+                if (editingRow) {
+                    editingRow.remove();
+                }
+                
+                const template = $('#inline-edit-template').html();
+                const newRow = $(template);
+                newRow.find('.save-inline').text('Create');
+                $('#shortcodes-tbody').prepend(newRow);
+                editingRow = newRow;
+                
+                // Focus on first input
+                newRow.find('input[name="shortcode_name"]').focus();
+            });
+            
+            // Save inline (create or update)
+            $(document).on('click', '.save-inline', function() {
+                const row = $(this).closest('.inline-edit-row');
+                const isCreate = $(this).text() === 'Create';
+                const shortcodeId = isCreate ? null : row.data('shortcode-id');
+                
+                const data = {
+                    action: isCreate ? 'grove_generalshortcodes_create' : 'grove_generalshortcodes_update',
+                    shortcode_name: row.find('input[name="shortcode_name"]').val(),
+                    shortcode_slug: row.find('input[name="shortcode_slug"]').val(),
+                    shortcode_content: row.find('textarea[name="shortcode_content"]').val(),
+                    shortcode_description: row.find('textarea[name="shortcode_description"]').val(),
+                    shortcode_category: row.find('input[name="shortcode_category"]').val(),
+                    shortcode_type: row.find('select[name="shortcode_type"]').val(),
+                    shortcode_usage_example: row.find('input[name="shortcode_usage_example"]').val(),
+                    is_active: row.find('input[name="is_active"]').is(':checked') ? 1 : 0,
+                    is_global: row.find('input[name="is_global"]').is(':checked') ? 1 : 0
+                };
+                
+                if (!isCreate) {
+                    data.shortcode_id = shortcodeId;
+                }
+                
+                $.post(ajaxurl, data, function(response) {
+                    if (response.success) {
+                        editingRow = null;
+                        loadShortcodes();
+                    } else {
+                        alert('Error: ' + response.data);
+                    }
+                });
+            });
+            
+            // Cancel inline
+            $(document).on('click', '.cancel-inline', function() {
+                $(this).closest('.inline-edit-row').remove();
+                editingRow = null;
+            });
+            
+            // Edit button
+            $(document).on('click', '.edit-shortcode', function() {
+                if (editingRow) {
+                    editingRow.remove();
+                }
+                
+                const shortcodeId = $(this).data('shortcode-id');
+                const row = $(this).closest('tr');
+                const template = $('#inline-edit-template').html();
+                const editRow = $(template);
+                
+                // Populate fields
+                editRow.find('input[name="shortcode_name"]').val(row.find('.shortcode-name').text());
+                editRow.find('input[name="shortcode_slug"]').val(row.find('.shortcode-slug').text());
+                editRow.find('textarea[name="shortcode_content"]').val(row.find('.shortcode-content').data('full-content'));
+                editRow.find('textarea[name="shortcode_description"]').val(row.find('.shortcode-description').text());
+                editRow.find('input[name="shortcode_category"]').val(row.find('.shortcode-category').text());
+                editRow.find('select[name="shortcode_type"]').val(row.find('.shortcode-type').text());
+                editRow.find('input[name="shortcode_usage_example"]').val(row.find('.shortcode-usage').text());
+                editRow.find('input[name="is_active"]').prop('checked', row.find('.shortcode-active').text() === 'Yes');
+                editRow.find('input[name="is_global"]').prop('checked', row.find('.shortcode-global').data('global') === '1');
+                
+                editRow.data('shortcode-id', shortcodeId);
+                row.after(editRow);
+                editingRow = editRow;
+            });
+            
+            // Delete button
+            $(document).on('click', '.delete-shortcode', function() {
+                if (confirm('Are you sure you want to delete this shortcode?')) {
+                    const shortcodeId = $(this).data('shortcode-id');
+                    
+                    $.post(ajaxurl, {
+                        action: 'grove_generalshortcodes_delete',
+                        shortcode_id: shortcodeId
+                    }, function(response) {
+                        if (response.success) {
+                            loadShortcodes();
+                        } else {
+                            alert('Error: ' + response.data);
+                        }
+                    });
+                }
+            });
+            
+            function loadShortcodes() {
+                $('#loading-indicator').show();
+                $('#table-container').hide();
+                
+                $.post(ajaxurl, {
+                    action: 'grove_generalshortcodes_load',
+                    page: currentPage,
+                    per_page: itemsPerPage,
+                    search: searchQuery
+                }, function(response) {
+                    $('#loading-indicator').hide();
+                    $('#table-container').show();
+                    
+                    if (response.success) {
+                        const data = response.data;
+                        renderTable(data.shortcodes);
+                        updatePagination(data.total_pages, data.total_items);
+                    } else {
+                        $('#shortcodes-tbody').html('<tr><td colspan="8">Error loading shortcodes: ' + response.data + '</td></tr>');
+                    }
+                });
+            }
+            
+            function renderTable(shortcodes) {
+                let html = '';
+                shortcodes.forEach(function(shortcode) {
+                    const truncatedContent = shortcode.shortcode_content.length > 50 
+                        ? shortcode.shortcode_content.substring(0, 50) + '...'
+                        : shortcode.shortcode_content;
+                        
+                    html += `
+                        <tr>
+                            <td>${shortcode.shortcode_id}</td>
+                            <td class="shortcode-name">${shortcode.shortcode_name}</td>
+                            <td class="shortcode-slug">${shortcode.shortcode_slug}</td>
+                            <td class="shortcode-content" data-full-content="${shortcode.shortcode_content.replace(/"/g, '&quot;')}">${truncatedContent}</td>
+                            <td class="shortcode-type">${shortcode.shortcode_type}</td>
+                            <td class="shortcode-category">${shortcode.shortcode_category || ''}</td>
+                            <td class="shortcode-active">${shortcode.is_active == '1' ? 'Yes' : 'No'}</td>
+                            <td>
+                                <button class="edit-shortcode button button-small" data-shortcode-id="${shortcode.shortcode_id}">Edit</button>
+                                <button class="delete-shortcode button button-small" data-shortcode-id="${shortcode.shortcode_id}">Delete</button>
+                            </td>
+                        </tr>
+                    `;
+                });
+                $('#shortcodes-tbody').html(html);
+            }
+            
+            function updatePagination(totalPages, totalItems) {
+                $('#page-info').text(`Page ${currentPage} of ${totalPages} (${totalItems} items)`);
+                $('#prev-page').prop('disabled', currentPage <= 1);
+                $('#next-page').prop('disabled', currentPage >= totalPages);
+            }
+        });
+        </script>
+        
+        <style>
+        .inline-edit-row {
+            background: #f9f9f9 !important;
+        }
+        .inline-edit-row td {
+            border-top: 2px solid #0073aa !important;
+            border-bottom: 2px solid #0073aa !important;
+        }
+        .per-page-btn.active {
+            background: #0073aa !important;
+            color: white !important;
+        }
+        #shortcodes-table th {
+            background: #f1f1f1;
+            font-weight: bold;
+        }
+        #shortcodes-table td {
+            vertical-align: middle;
+        }
+        .button-small {
+            padding: 2px 8px !important;
+            font-size: 11px !important;
+            line-height: 1.4 !important;
+            height: auto !important;
+        }
+        </style>
+        
+        <?php
+    }
+    
+    /**
+     * Handle General Shortcodes AJAX requests
+     */
+    private function handle_generalshortcodes_ajax() {
+        $action = $_POST['action'];
+        
+        switch ($action) {
+            case 'grove_generalshortcodes_load':
+                $this->grove_generalshortcodes_load();
+                break;
+            case 'grove_generalshortcodes_create':
+                $this->grove_generalshortcodes_create();
+                break;
+            case 'grove_generalshortcodes_update':
+                $this->grove_generalshortcodes_update();
+                break;
+            case 'grove_generalshortcodes_delete':
+                $this->grove_generalshortcodes_delete();
+                break;
+        }
+    }
+    
+    /**
+     * Load general shortcodes for table display
+     */
+    public function grove_generalshortcodes_load() {
+        global $wpdb;
+        
+        $page = intval($_POST['page'] ?? 1);
+        $per_page = intval($_POST['per_page'] ?? 100);
+        $search = sanitize_text_field($_POST['search'] ?? '');
+        $offset = ($page - 1) * $per_page;
+        
+        $table_name = $wpdb->prefix . 'zen_general_shortcodes';
+        
+        // Build search condition
+        $search_condition = '';
+        if (!empty($search)) {
+            $search_condition = $wpdb->prepare(
+                " AND (shortcode_name LIKE %s OR shortcode_slug LIKE %s OR shortcode_content LIKE %s OR shortcode_category LIKE %s)",
+                '%' . $search . '%',
+                '%' . $search . '%',
+                '%' . $search . '%',
+                '%' . $search . '%'
+            );
+        }
+        
+        // Get total count
+        $total_query = "SELECT COUNT(*) FROM $table_name WHERE 1=1 $search_condition";
+        $total_items = $wpdb->get_var($total_query);
+        $total_pages = ceil($total_items / $per_page);
+        
+        // Get shortcodes
+        $query = "SELECT * FROM $table_name WHERE 1=1 $search_condition ORDER BY position_order ASC, shortcode_id DESC LIMIT $per_page OFFSET $offset";
+        $shortcodes = $wpdb->get_results($query);
+        
+        wp_send_json_success(array(
+            'shortcodes' => $shortcodes,
+            'total_pages' => $total_pages,
+            'total_items' => $total_items,
+            'current_page' => $page
+        ));
+    }
+    
+    /**
+     * Create new general shortcode
+     */
+    public function grove_generalshortcodes_create() {
+        global $wpdb;
+        
+        $table_name = $wpdb->prefix . 'zen_general_shortcodes';
+        
+        $data = array(
+            'shortcode_name' => sanitize_text_field($_POST['shortcode_name']),
+            'shortcode_slug' => sanitize_text_field($_POST['shortcode_slug']),
+            'shortcode_content' => wp_kses_post($_POST['shortcode_content']),
+            'shortcode_description' => sanitize_textarea_field($_POST['shortcode_description']),
+            'shortcode_category' => sanitize_text_field($_POST['shortcode_category']),
+            'shortcode_type' => sanitize_text_field($_POST['shortcode_type']),
+            'shortcode_usage_example' => sanitize_text_field($_POST['shortcode_usage_example']),
+            'is_active' => intval($_POST['is_active']),
+            'is_global' => intval($_POST['is_global']),
+            'author_user_id' => get_current_user_id()
+        );
+        
+        $result = $wpdb->insert($table_name, $data);
+        
+        if ($result) {
+            wp_send_json_success('Shortcode created successfully');
+        } else {
+            wp_send_json_error('Failed to create shortcode');
+        }
+    }
+    
+    /**
+     * Update existing general shortcode
+     */
+    public function grove_generalshortcodes_update() {
+        global $wpdb;
+        
+        $table_name = $wpdb->prefix . 'zen_general_shortcodes';
+        $shortcode_id = intval($_POST['shortcode_id']);
+        
+        $data = array(
+            'shortcode_name' => sanitize_text_field($_POST['shortcode_name']),
+            'shortcode_slug' => sanitize_text_field($_POST['shortcode_slug']),
+            'shortcode_content' => wp_kses_post($_POST['shortcode_content']),
+            'shortcode_description' => sanitize_textarea_field($_POST['shortcode_description']),
+            'shortcode_category' => sanitize_text_field($_POST['shortcode_category']),
+            'shortcode_type' => sanitize_text_field($_POST['shortcode_type']),
+            'shortcode_usage_example' => sanitize_text_field($_POST['shortcode_usage_example']),
+            'is_active' => intval($_POST['is_active']),
+            'is_global' => intval($_POST['is_global'])
+        );
+        
+        $result = $wpdb->update(
+            $table_name,
+            $data,
+            array('shortcode_id' => $shortcode_id),
+            array('%s', '%s', '%s', '%s', '%s', '%s', '%s', '%d', '%d'),
+            array('%d')
+        );
+        
+        if ($result !== false) {
+            wp_send_json_success('Shortcode updated successfully');
+        } else {
+            wp_send_json_error('Failed to update shortcode');
+        }
+    }
+    
+    /**
+     * Delete general shortcode
+     */
+    public function grove_generalshortcodes_delete() {
+        global $wpdb;
+        
+        $table_name = $wpdb->prefix . 'zen_general_shortcodes';
+        $shortcode_id = intval($_POST['shortcode_id']);
+        
+        $result = $wpdb->delete(
+            $table_name,
+            array('shortcode_id' => $shortcode_id),
+            array('%d')
+        );
+        
+        if ($result) {
+            wp_send_json_success('Shortcode deleted successfully');
+        } else {
+            wp_send_json_error('Failed to delete shortcode');
         }
     }
 }
