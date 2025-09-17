@@ -6,11 +6,15 @@
  */
 class Grove_Zen_Shortcodes {
     
+    private static $dynamic_shortcodes_registered = false;
+    
     public function __construct() {
         // Don't auto-register shortcodes - let the commander control it
         add_action('wp_enqueue_scripts', array($this, 'enqueue_styles'));
         add_action('init', array($this, 'maybe_register_shortcodes'), 15); // Later priority
-        add_action('wp_loaded', array($this, 'ensure_shortcodes_registered'), 20); // Ensure registration before content processing
+        add_action('init', array($this, 'always_register_dynamic_shortcodes'), 20); // ALWAYS register dynamic shortcodes
+        add_action('wp_loaded', array($this, 'always_register_dynamic_shortcodes'), 20); // Double-check dynamic shortcodes
+        add_action('wp', array($this, 'always_register_dynamic_shortcodes'), 25); // Triple-check before content rendering
     }
     
     /**
@@ -119,6 +123,22 @@ class Grove_Zen_Shortcodes {
         if ($this->is_grove_controlling_shortcodes()) {
             $this->register_dynamic_shortcodes();
         }
+    }
+    
+    /**
+     * ALWAYS register dynamic shortcodes from the general shortcodes table
+     * These should work regardless of which plugin is handling other shortcodes
+     */
+    public function always_register_dynamic_shortcodes() {
+        // Prevent duplicate registration
+        if (self::$dynamic_shortcodes_registered) {
+            return;
+        }
+        
+        // Dynamic shortcodes from the zen_general_shortcodes table should ALWAYS work
+        // regardless of whether Grove or Snefuruplin is handling other shortcodes
+        $this->register_dynamic_shortcodes();
+        self::$dynamic_shortcodes_registered = true;
     }
     
     /**
