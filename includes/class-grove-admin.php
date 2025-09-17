@@ -1913,6 +1913,9 @@ class Grove_Admin {
                     tbody.append(tr);
                 });
                 
+                // Load image previews and dimensions after table is rendered
+                loadImagePreviews();
+                
                 // Inline editing for text fields only
                 $('[data-field]:not(.image-cell)').click(function() {
                     let cell = $(this);
@@ -2111,6 +2114,8 @@ class Grove_Admin {
                                 <th data-sort="description1_short" style="padding: 12px 8px; border: 1px solid #ddd; font-weight: bold; text-transform: lowercase; cursor: pointer; background: #f8f9fa;">description1_short</th>
                                 <th data-sort="description1_long" style="padding: 12px 8px; border: 1px solid #ddd; font-weight: bold; text-transform: lowercase; cursor: pointer; background: #f8f9fa;">description1_long</th>
                                 <th data-sort="rel_image1_id" style="padding: 12px 8px; border: 1px solid #ddd; font-weight: bold; text-transform: lowercase; cursor: pointer; background: #f8f9fa;">rel_image1_id</th>
+                                <th style="padding: 12px 8px; border: 1px solid #ddd; font-weight: bold; text-transform: lowercase; background: #f8f9fa;">width</th>
+                                <th style="padding: 12px 8px; border: 1px solid #ddd; font-weight: bold; text-transform: lowercase; background: #f8f9fa;">height</th>
                                 <th data-sort="is_pinned_service" style="padding: 12px 8px; border: 1px solid #ddd; font-weight: bold; text-transform: lowercase; cursor: pointer; background: #f8f9fa;">is_pinned_service</th>
                                 <th style="padding: 12px 8px; border: 1px solid #ddd; font-weight: bold; background: #f8f9fa;">Actions</th>
                             </tr>
@@ -2269,23 +2274,48 @@ class Grove_Admin {
                     tr.append('<td style="padding: 8px; border: 1px solid #ddd; cursor: pointer;" data-field="description1_short" data-id="' + service.service_id + '">' + (service.description1_short || '') + '</td>');
                     tr.append('<td style="padding: 8px; border: 1px solid #ddd; cursor: pointer;" data-field="description1_long" data-id="' + service.service_id + '">' + (service.description1_long || '') + '</td>');
                     
-                    // Image column with buttons
+                    // Image column with preview and buttons
                     let imageCell = '<td style="padding: 8px; border: 1px solid #ddd; text-align: center;" class="image-cell" data-id="' + service.service_id + '">';
                     imageCell += '<div style="display: flex; flex-direction: column; gap: 4px; align-items: center;">';
                     
                     if (service.rel_image1_id && service.rel_image1_id > 0) {
-                        imageCell += '<span style="color: green; font-size: 12px;">Image #' + service.rel_image1_id + '</span>';
+                        imageCell += '<div class="image-preview-container" data-attachment-id="' + service.rel_image1_id + '" style="height: 100px; display: flex; align-items: center; justify-content: center; border: 1px solid #ddd; background: #f9f9f9; margin-bottom: 4px;">';
+                        imageCell += '<span style="color: #666; font-size: 12px;">Loading...</span>';
+                        imageCell += '</div>';
+                        imageCell += '<span style="color: green; font-size: 10px;">ID: ' + service.rel_image1_id + '</span>';
                         imageCell += '<div style="display: flex; gap: 4px;">';
                         imageCell += '<button class="button button-small edit-image-btn" data-id="' + service.service_id + '" data-image="' + service.rel_image1_id + '" style="font-size: 11px; padding: 2px 6px;">Edit</button>';
                         imageCell += '<button class="button button-small delete-image-btn" data-id="' + service.service_id + '" style="font-size: 11px; padding: 2px 6px; background: #dc3545; color: white; border-color: #dc3545;">Clear</button>';
                         imageCell += '</div>';
                     } else {
+                        imageCell += '<div style="height: 100px; display: flex; align-items: center; justify-content: center; border: 1px solid #ddd; background: #f9f9f9; margin-bottom: 4px;">';
                         imageCell += '<span style="color: #999; font-size: 12px;">No image</span>';
-                        imageCell += '<button class="button button-small upload-image-btn" data-id="' + service.service_id + '" style="font-size: 11px; padding: 2px 6px; margin-top: 4px;">Upload</button>';
+                        imageCell += '</div>';
+                        imageCell += '<button class="button button-small upload-image-btn" data-id="' + service.service_id + '" style="font-size: 11px; padding: 2px 6px;">Upload</button>';
                     }
                     
                     imageCell += '</div></td>';
                     tr.append(imageCell);
+                    
+                    // Width column
+                    let widthCell = '<td style="padding: 8px; border: 1px solid #ddd; text-align: center;" class="image-width-cell" data-attachment-id="' + (service.rel_image1_id || '') + '">';
+                    if (service.rel_image1_id && service.rel_image1_id > 0) {
+                        widthCell += '<span class="width-value">-</span>';
+                    } else {
+                        widthCell += '-';
+                    }
+                    widthCell += '</td>';
+                    tr.append(widthCell);
+                    
+                    // Height column  
+                    let heightCell = '<td style="padding: 8px; border: 1px solid #ddd; text-align: center;" class="image-height-cell" data-attachment-id="' + (service.rel_image1_id || '') + '">';
+                    if (service.rel_image1_id && service.rel_image1_id > 0) {
+                        heightCell += '<span class="height-value">-</span>';
+                    } else {
+                        heightCell += '-';
+                    }
+                    heightCell += '</td>';
+                    tr.append(heightCell);
                     
                     tr.append('<td style="padding: 8px; border: 1px solid #ddd; text-align: center;">' + (service.is_pinned_service ? 'Yes' : 'No') + '</td>');
                     tr.append('<td style="padding: 8px; border: 1px solid #ddd;"><button class="button button-small delete-btn" data-id="' + service.service_id + '">Delete</button></td>');
@@ -2371,6 +2401,40 @@ class Grove_Admin {
                     },
                     error: function() {
                         alert('Error updating image');
+                    }
+                });
+            }
+            
+            function loadImagePreviews() {
+                $('.image-preview-container').each(function() {
+                    let container = $(this);
+                    let attachmentId = container.data('attachment-id');
+                    
+                    if (attachmentId) {
+                        // Get image data from WordPress REST API
+                        $.ajax({
+                            url: '/wp-json/wp/v2/media/' + attachmentId,
+                            type: 'GET',
+                            success: function(response) {
+                                let imageUrl = response.source_url;
+                                let width = response.media_details.width;
+                                let height = response.media_details.height;
+                                
+                                // Calculate aspect ratio for 100px height
+                                let aspectRatio = width / height;
+                                let displayWidth = Math.round(100 * aspectRatio);
+                                
+                                // Update image preview
+                                container.html('<img src="' + imageUrl + '" style="height: 100px; width: ' + displayWidth + 'px; object-fit: contain;">');
+                                
+                                // Update width and height columns
+                                $('[data-attachment-id="' + attachmentId + '"] .width-value').text(width + 'px');
+                                $('[data-attachment-id="' + attachmentId + '"] .height-value').text(height + 'px');
+                            },
+                            error: function() {
+                                container.html('<span style="color: #dc3545; font-size: 12px;">Load error</span>');
+                            }
+                        });
                     }
                 });
             }
