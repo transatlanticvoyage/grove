@@ -1913,33 +1913,13 @@ class Grove_Admin {
                     tbody.append(tr);
                 });
                 
-                // Inline editing
-                $('[data-field]').click(function() {
+                // Inline editing for text fields only
+                $('[data-field]:not(.image-cell)').click(function() {
                     let cell = $(this);
                     let field = cell.data('field');
                     let id = cell.data('id');
-                    
-                    // Special handling for image field
-                    if (field === 'rel_image1_id') {
-                        let mediaUploader = wp.media({
-                            title: 'Select Service Image',
-                            button: {
-                                text: 'Use this image'
-                            },
-                            multiple: false
-                        });
-                        
-                        mediaUploader.on('select', function() {
-                            let attachment = mediaUploader.state().get('selection').first().toJSON();
-                            updateField(id, field, attachment.id, cell);
-                        });
-                        
-                        mediaUploader.open();
-                        return;
-                    }
-                    
-                    // Regular text/textarea fields
                     let currentValue = cell.text();
+                    
                     let input = $('<input type="text" style="width: 100%; padding: 4px;">');
                     input.val(currentValue);
                     cell.html(input);
@@ -1957,6 +1937,36 @@ class Grove_Admin {
                             cell.text(currentValue);
                         }
                     });
+                });
+                
+                // Image button handlers
+                $(document).on('click', '.upload-image-btn, .edit-image-btn', function() {
+                    let btn = $(this);
+                    let id = btn.data('id');
+                    
+                    let mediaUploader = wp.media({
+                        title: 'Select Service Image',
+                        button: {
+                            text: 'Use this image'
+                        },
+                        multiple: false
+                    });
+                    
+                    mediaUploader.on('select', function() {
+                        let attachment = mediaUploader.state().get('selection').first().toJSON();
+                        updateImageField(id, attachment.id);
+                    });
+                    
+                    mediaUploader.open();
+                });
+                
+                $(document).on('click', '.delete-image-btn', function() {
+                    let btn = $(this);
+                    let id = btn.data('id');
+                    
+                    if (confirm('Are you sure you want to remove this image?')) {
+                        updateImageField(id, null);
+                    }
                 });
             }
             
@@ -2130,7 +2140,7 @@ class Grove_Admin {
                                 <th data-sort="service_moniker" style="padding: 12px 8px; border: 1px solid #ddd; font-weight: bold; text-transform: lowercase; cursor: pointer; background: #f8f9fa;">service_moniker</th>
                                 <th data-sort="description1_short" style="padding: 12px 8px; border: 1px solid #ddd; font-weight: bold; text-transform: lowercase; cursor: pointer; background: #f8f9fa;">description1_short</th>
                                 <th data-sort="description1_long" style="padding: 12px 8px; border: 1px solid #ddd; font-weight: bold; text-transform: lowercase; cursor: pointer; background: #f8f9fa;">description1_long</th>
-                                <th data-sort="rel_image1_id" style="padding: 12px 8px; border: 1px solid #ddd; font-weight: bold; text-transform: lowercase; cursor: pointer; background: #f8f9fa;">image</th>
+                                <th data-sort="rel_image1_id" style="padding: 12px 8px; border: 1px solid #ddd; font-weight: bold; text-transform: lowercase; cursor: pointer; background: #f8f9fa;">rel_image1_id</th>
                                 <th data-sort="is_pinned_service" style="padding: 12px 8px; border: 1px solid #ddd; font-weight: bold; text-transform: lowercase; cursor: pointer; background: #f8f9fa;">is_pinned_service</th>
                                 <th style="padding: 12px 8px; border: 1px solid #ddd; font-weight: bold; background: #f8f9fa;">Actions</th>
                             </tr>
@@ -2242,14 +2252,22 @@ class Grove_Admin {
                     tr.append('<td style="padding: 8px; border: 1px solid #ddd; cursor: pointer;" data-field="description1_short" data-id="' + service.service_id + '">' + (service.description1_short || '') + '</td>');
                     tr.append('<td style="padding: 8px; border: 1px solid #ddd; cursor: pointer;" data-field="description1_long" data-id="' + service.service_id + '">' + (service.description1_long || '') + '</td>');
                     
-                    // Image column
-                    let imageCell = '<td style="padding: 8px; border: 1px solid #ddd; text-align: center; cursor: pointer;" class="image-cell" data-field="rel_image1_id" data-id="' + service.service_id + '">';
+                    // Image column with buttons
+                    let imageCell = '<td style="padding: 8px; border: 1px solid #ddd; text-align: center;" class="image-cell" data-id="' + service.service_id + '">';
+                    imageCell += '<div style="display: flex; flex-direction: column; gap: 4px; align-items: center;">';
+                    
                     if (service.rel_image1_id && service.rel_image1_id > 0) {
-                        imageCell += '<span style="color: green;">✓ Image #' + service.rel_image1_id + '</span>';
+                        imageCell += '<span style="color: green; font-size: 12px;">Image #' + service.rel_image1_id + '</span>';
+                        imageCell += '<div style="display: flex; gap: 4px;">';
+                        imageCell += '<button class="button button-small edit-image-btn" data-id="' + service.service_id + '" data-image="' + service.rel_image1_id + '" style="font-size: 11px; padding: 2px 6px;">Edit</button>';
+                        imageCell += '<button class="button button-small delete-image-btn" data-id="' + service.service_id + '" style="font-size: 11px; padding: 2px 6px; background: #dc3545; color: white; border-color: #dc3545;">Clear</button>';
+                        imageCell += '</div>';
                     } else {
-                        imageCell += '<span style="color: #999;">No image</span>';
+                        imageCell += '<span style="color: #999; font-size: 12px;">No image</span>';
+                        imageCell += '<button class="button button-small upload-image-btn" data-id="' + service.service_id + '" style="font-size: 11px; padding: 2px 6px; margin-top: 4px;">Upload</button>';
                     }
-                    imageCell += '</td>';
+                    
+                    imageCell += '</div></td>';
                     tr.append(imageCell);
                     
                     tr.append('<td style="padding: 8px; border: 1px solid #ddd; text-align: center;">' + (service.is_pinned_service ? 'Yes' : 'No') + '</td>');
@@ -2304,22 +2322,38 @@ class Grove_Admin {
                     },
                     success: function(response) {
                         if (response.success) {
-                            // Special display for image field
-                            if (field === 'rel_image1_id') {
-                                if (value && value > 0) {
-                                    cell.html('<span style="color: green;">✓ Image #' + value + '</span>');
-                                } else {
-                                    cell.html('<span style="color: #999;">No image</span>');
-                                }
-                            } else {
-                                cell.text(value);
-                            }
+                            cell.text(value);
                         } else {
                             alert('Error updating field: ' + response.data);
                         }
                     },
                     error: function() {
                         alert('Error updating field');
+                    }
+                });
+            }
+            
+            function updateImageField(id, imageId) {
+                $.ajax({
+                    url: ajaxurl,
+                    type: 'POST',
+                    data: {
+                        action: 'grove_services_update_field',
+                        nonce: '<?php echo wp_create_nonce('grove_services_nonce'); ?>',
+                        id: id,
+                        field: 'rel_image1_id',
+                        value: imageId || ''
+                    },
+                    success: function(response) {
+                        if (response.success) {
+                            // Refresh the data to update the button display
+                            loadServicesData();
+                        } else {
+                            alert('Error updating image: ' + response.data);
+                        }
+                    },
+                    error: function() {
+                        alert('Error updating image');
                     }
                 });
             }
