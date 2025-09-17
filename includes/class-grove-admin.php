@@ -1940,9 +1940,22 @@ class Grove_Admin {
                 });
                 
                 // Image button handlers
-                $(document).on('click', '.upload-image-btn, .edit-image-btn', function() {
+                $(document).on('click', '.upload-image-btn, .edit-image-btn', function(e) {
+                    e.preventDefault();
+                    e.stopPropagation();
+                    
+                    console.log('Image button clicked'); // Debug
+                    
                     let btn = $(this);
                     let id = btn.data('id');
+                    
+                    console.log('Service ID:', id); // Debug
+                    
+                    // Check if wp.media is available
+                    if (typeof wp === 'undefined' || typeof wp.media === 'undefined') {
+                        alert('WordPress media library is not loaded. Please refresh the page.');
+                        return;
+                    }
                     
                     let mediaUploader = wp.media({
                         title: 'Select Service Image',
@@ -1954,13 +1967,17 @@ class Grove_Admin {
                     
                     mediaUploader.on('select', function() {
                         let attachment = mediaUploader.state().get('selection').first().toJSON();
+                        console.log('Selected attachment:', attachment); // Debug
                         updateImageField(id, attachment.id);
                     });
                     
                     mediaUploader.open();
                 });
                 
-                $(document).on('click', '.delete-image-btn', function() {
+                $(document).on('click', '.delete-image-btn', function(e) {
+                    e.preventDefault();
+                    e.stopPropagation();
+                    
                     let btn = $(this);
                     let id = btn.data('id');
                     
