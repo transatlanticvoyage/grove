@@ -4377,13 +4377,13 @@ class Grove_Admin {
                 <table id="shortcodes-table" class="wp-list-table widefat fixed striped">
                     <thead>
                         <tr>
-                            <th style="width: 60px;">ID</th>
-                            <th style="width: 200px;">Name</th>
-                            <th style="width: 150px;">Slug</th>
-                            <th>Content</th>
-                            <th style="width: 120px;">Type</th>
-                            <th style="width: 100px;">Category</th>
-                            <th style="width: 80px;">Active</th>
+                            <th style="width: 60px;"><b>shortcode_id</b></th>
+                            <th style="width: 200px;"><b>shortcode_name</b></th>
+                            <th style="width: 150px;"><b>shortcode_slug</b></th>
+                            <th><b>shortcode_content</b></th>
+                            <th style="width: 120px;"><b>shortcode_type</b></th>
+                            <th style="width: 100px;"><b>shortcode_category</b></th>
+                            <th style="width: 80px;"><b>is_active</b></th>
                             <th style="width: 120px;">Actions</th>
                         </tr>
                     </thead>
