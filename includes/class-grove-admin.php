@@ -1918,8 +1918,28 @@ class Grove_Admin {
                     let cell = $(this);
                     let field = cell.data('field');
                     let id = cell.data('id');
-                    let currentValue = cell.text();
                     
+                    // Special handling for image field
+                    if (field === 'rel_image1_id') {
+                        let mediaUploader = wp.media({
+                            title: 'Select Service Image',
+                            button: {
+                                text: 'Use this image'
+                            },
+                            multiple: false
+                        });
+                        
+                        mediaUploader.on('select', function() {
+                            let attachment = mediaUploader.state().get('selection').first().toJSON();
+                            updateField(id, field, attachment.id, cell);
+                        });
+                        
+                        mediaUploader.open();
+                        return;
+                    }
+                    
+                    // Regular text/textarea fields
+                    let currentValue = cell.text();
                     let input = $('<input type="text" style="width: 100%; padding: 4px;">');
                     input.val(currentValue);
                     cell.html(input);
@@ -2110,6 +2130,7 @@ class Grove_Admin {
                                 <th data-sort="service_moniker" style="padding: 12px 8px; border: 1px solid #ddd; font-weight: bold; text-transform: lowercase; cursor: pointer; background: #f8f9fa;">service_moniker</th>
                                 <th data-sort="description1_short" style="padding: 12px 8px; border: 1px solid #ddd; font-weight: bold; text-transform: lowercase; cursor: pointer; background: #f8f9fa;">description1_short</th>
                                 <th data-sort="description1_long" style="padding: 12px 8px; border: 1px solid #ddd; font-weight: bold; text-transform: lowercase; cursor: pointer; background: #f8f9fa;">description1_long</th>
+                                <th data-sort="rel_image1_id" style="padding: 12px 8px; border: 1px solid #ddd; font-weight: bold; text-transform: lowercase; cursor: pointer; background: #f8f9fa;">image</th>
                                 <th data-sort="is_pinned_service" style="padding: 12px 8px; border: 1px solid #ddd; font-weight: bold; text-transform: lowercase; cursor: pointer; background: #f8f9fa;">is_pinned_service</th>
                                 <th style="padding: 12px 8px; border: 1px solid #ddd; font-weight: bold; background: #f8f9fa;">Actions</th>
                             </tr>
@@ -2152,6 +2173,17 @@ class Grove_Admin {
                     <div style="margin-bottom: 20px;">
                         <label style="display: block; font-weight: bold; margin-bottom: 5px;">Long Description:</label>
                         <textarea name="description1_long" rows="5" style="width: 100%; padding: 8px; border: 1px solid #ccc; border-radius: 4px; resize: vertical;"></textarea>
+                    </div>
+                    <div style="margin-bottom: 20px;">
+                        <label style="display: block; font-weight: bold; margin-bottom: 5px;">Service Image:</label>
+                        <div style="display: flex; gap: 10px; align-items: center;">
+                            <input type="hidden" name="rel_image1_id" id="rel_image1_id" value="">
+                            <button type="button" class="button" id="upload-image-btn">Select Image</button>
+                            <button type="button" class="button" id="clear-image-btn" style="display: none;">Clear</button>
+                            <div id="image-preview" style="max-width: 150px;">
+                                <!-- Image preview will appear here -->
+                            </div>
+                        </div>
                     </div>
                     <div style="text-align: right;">
                         <button type="button" id="cancel-btn" class="button button-secondary" style="margin-right: 10px;">Cancel</button>
@@ -2209,6 +2241,17 @@ class Grove_Admin {
                     tr.append('<td style="padding: 8px; border: 1px solid #ddd; cursor: pointer;" data-field="service_moniker" data-id="' + service.service_id + '">' + (service.service_moniker || '') + '</td>');
                     tr.append('<td style="padding: 8px; border: 1px solid #ddd; cursor: pointer;" data-field="description1_short" data-id="' + service.service_id + '">' + (service.description1_short || '') + '</td>');
                     tr.append('<td style="padding: 8px; border: 1px solid #ddd; cursor: pointer;" data-field="description1_long" data-id="' + service.service_id + '">' + (service.description1_long || '') + '</td>');
+                    
+                    // Image column
+                    let imageCell = '<td style="padding: 8px; border: 1px solid #ddd; text-align: center; cursor: pointer;" class="image-cell" data-field="rel_image1_id" data-id="' + service.service_id + '">';
+                    if (service.rel_image1_id && service.rel_image1_id > 0) {
+                        imageCell += '<span style="color: green;">✓ Image #' + service.rel_image1_id + '</span>';
+                    } else {
+                        imageCell += '<span style="color: #999;">No image</span>';
+                    }
+                    imageCell += '</td>';
+                    tr.append(imageCell);
+                    
                     tr.append('<td style="padding: 8px; border: 1px solid #ddd; text-align: center;">' + (service.is_pinned_service ? 'Yes' : 'No') + '</td>');
                     tr.append('<td style="padding: 8px; border: 1px solid #ddd;"><button class="button button-small delete-btn" data-id="' + service.service_id + '">Delete</button></td>');
                     
@@ -2261,7 +2304,16 @@ class Grove_Admin {
                     },
                     success: function(response) {
                         if (response.success) {
-                            cell.text(value);
+                            // Special display for image field
+                            if (field === 'rel_image1_id') {
+                                if (value && value > 0) {
+                                    cell.html('<span style="color: green;">✓ Image #' + value + '</span>');
+                                } else {
+                                    cell.html('<span style="color: #999;">No image</span>');
+                                }
+                            } else {
+                                cell.text(value);
+                            }
                         } else {
                             alert('Error updating field: ' + response.data);
                         }
@@ -2281,7 +2333,38 @@ class Grove_Admin {
                 if (e.target === this) {
                     $('#create-modal').hide();
                     $('#create-form')[0].reset();
+                    $('#image-preview').empty();
+                    $('#clear-image-btn').hide();
                 }
+            });
+            
+            // Media uploader for service image
+            $('#upload-image-btn').click(function(e) {
+                e.preventDefault();
+                
+                let mediaUploader = wp.media({
+                    title: 'Select Service Image',
+                    button: {
+                        text: 'Use this image'
+                    },
+                    multiple: false
+                });
+                
+                mediaUploader.on('select', function() {
+                    let attachment = mediaUploader.state().get('selection').first().toJSON();
+                    $('#rel_image1_id').val(attachment.id);
+                    $('#image-preview').html('<img src="' + attachment.url + '" style="max-width: 100%; height: auto;">');
+                    $('#clear-image-btn').show();
+                });
+                
+                mediaUploader.open();
+            });
+            
+            // Clear image button
+            $('#clear-image-btn').click(function() {
+                $('#rel_image1_id').val('');
+                $('#image-preview').empty();
+                $(this).hide();
             });
             
             // Create form submission
