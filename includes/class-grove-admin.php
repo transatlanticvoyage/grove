@@ -4591,13 +4591,13 @@ class Grove_Admin {
                 editRow.find('input[name="shortcode_name"]').val(row.find('.shortcode-name').text());
                 editRow.find('input[name="shortcode_slug"]').val(row.find('.shortcode-slug').text());
                 editRow.find('textarea[name="shortcode_content"]').val(row.find('.shortcode-content').data('full-content'));
-                editRow.find('textarea[name="shortcode_description"]').val(row.find('.shortcode-description').text());
+                editRow.find('textarea[name="shortcode_description"]').val(row.data('description'));
                 editRow.find('input[name="shortcode_category"]').val(row.find('.shortcode-category').text());
                 editRow.find('select[name="shortcode_type"]').val(row.find('.shortcode-type').text());
-                editRow.find('input[name="shortcode_usage_example"]').val(row.find('.shortcode-usage').text());
+                editRow.find('input[name="shortcode_usage_example"]').val(row.data('usage'));
                 editRow.find('input[name="is_active"]').prop('checked', row.find('.shortcode-active').text() === 'Yes');
-                editRow.find('input[name="is_global"]').prop('checked', row.find('.shortcode-global').data('global') === '1');
-                editRow.find('input[name="is_adminpublic"]').prop('checked', row.find('.shortcode-adminpublic').data('adminpublic') === '1');
+                editRow.find('input[name="is_global"]').prop('checked', row.data('global') == '1');
+                editRow.find('input[name="is_adminpublic"]').prop('checked', row.find('.shortcode-adminpublic').data('adminpublic') == '1');
                 
                 editRow.data('shortcode-id', shortcodeId);
                 row.after(editRow);
@@ -4648,6 +4648,15 @@ class Grove_Admin {
             function renderTable(shortcodes) {
                 let html = '';
                 shortcodes.forEach(function(shortcode) {
+                    // Ensure all fields have at least empty string values
+                    shortcode.shortcode_name = shortcode.shortcode_name || '';
+                    shortcode.shortcode_slug = shortcode.shortcode_slug || '';
+                    shortcode.shortcode_content = shortcode.shortcode_content || '';
+                    shortcode.shortcode_type = shortcode.shortcode_type || 'custom';
+                    shortcode.shortcode_category = shortcode.shortcode_category || '';
+                    shortcode.shortcode_description = shortcode.shortcode_description || '';
+                    shortcode.shortcode_usage_example = shortcode.shortcode_usage_example || '';
+                    
                     const truncatedContent = shortcode.shortcode_content.length > 50 
                         ? shortcode.shortcode_content.substring(0, 50) + '...'
                         : shortcode.shortcode_content;
@@ -4657,7 +4666,9 @@ class Grove_Admin {
                         : '';
                         
                     html += `
-                        <tr>
+                        <tr data-description="${(shortcode.shortcode_description || '').replace(/"/g, '&quot;')}" 
+                            data-usage="${(shortcode.shortcode_usage_example || '').replace(/"/g, '&quot;')}" 
+                            data-global="${shortcode.is_global}">
                             <td>${shortcode.shortcode_id}</td>
                             <td class="shortcode-name">${shortcode.shortcode_name}</td>
                             <td class="shortcode-slug">${shortcode.shortcode_slug}</td>
