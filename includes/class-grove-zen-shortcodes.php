@@ -1188,12 +1188,13 @@ class Grove_Zen_Shortcodes {
      * Wrap any CSS found in content with proper <style> tags
      */
     private function wrap_css_in_style_tags($content) {
-        // Look for CSS patterns - selectors followed by curly braces
-        if (preg_match('/([.#][\w-]+[\s\S]*?\{[\s\S]*?\}[\s\S]*?)$/m', $content, $matches)) {
+        // Look for CSS patterns at the end of content - multiple CSS rules
+        if (preg_match('/\n\s*([.#][\w-]+[^{]*\{[^}]*\}[\s\S]*?)$/m', $content, $matches)) {
             $css_part = trim($matches[1]);
             
             // Remove the CSS from the main content
-            $content = preg_replace('/([.#][\w-]+[\s\S]*?\{[\s\S]*?\}[\s\S]*?)$/m', '', $content);
+            $content = preg_replace('/\n\s*([.#][\w-]+[^{]*\{[^}]*\}[\s\S]*?)$/m', '', $content);
+            $content = trim($content);
             
             // Wrap CSS in style tags and append
             $content .= "\n<style>\n" . $css_part . "\n</style>";
