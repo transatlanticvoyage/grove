@@ -1172,6 +1172,9 @@ class Grove_Zen_Shortcodes {
             $content = str_replace('{' . $key . '}', $value, $content);
         }
         
+        // Fix escaped quotes in shortcodes - stripslashes to clean them
+        $content = stripslashes($content);
+        
         // Debug: Check what shortcodes are registered
         global $shortcode_tags;
         error_log('Grove Debug: zen_service registered? ' . (isset($shortcode_tags['zen_service']) ? 'YES' : 'NO'));
