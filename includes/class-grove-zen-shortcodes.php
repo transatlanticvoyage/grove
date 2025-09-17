@@ -1172,8 +1172,21 @@ class Grove_Zen_Shortcodes {
             $content = str_replace('{' . $key . '}', $value, $content);
         }
         
+        // Debug: Check what shortcodes are registered
+        global $shortcode_tags;
+        error_log('Grove Debug: zen_service registered? ' . (isset($shortcode_tags['zen_service']) ? 'YES' : 'NO'));
+        if (isset($shortcode_tags['zen_service'])) {
+            error_log('Grove Debug: zen_service handler: ' . print_r($shortcode_tags['zen_service'], true));
+        }
+        
+        // Debug: Log content before do_shortcode
+        error_log('Grove Debug: Content before do_shortcode: ' . $content);
+        
         // Process any nested shortcodes (like [zen_service], [zen_location], etc.)
         $content = do_shortcode($content);
+        
+        // Debug: Log content after do_shortcode
+        error_log('Grove Debug: Content after do_shortcode: ' . substr($content, 0, 200) . '...');
         
         return $content;
     }
