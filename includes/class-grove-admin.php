@@ -2893,13 +2893,21 @@ class Grove_Admin {
         
         $id = intval($_POST['id']);
         $field = sanitize_text_field($_POST['field']);
-        $value = sanitize_textarea_field($_POST['value']);
         
-        $allowed_fields = ['service_name', 'service_placard', 'service_moniker', 'service_sobriquet', 'description1_short', 'description1_long'];
+        $allowed_fields = ['service_name', 'service_placard', 'service_moniker', 'service_sobriquet', 'description1_short', 'description1_long', 'rel_image1_id'];
         
         if (!in_array($field, $allowed_fields)) {
             wp_send_json_error('Invalid field name');
             return;
+        }
+        
+        // Handle different data types
+        if ($field === 'rel_image1_id') {
+            $value = !empty($_POST['value']) ? intval($_POST['value']) : null;
+            $format = '%d';
+        } else {
+            $value = sanitize_textarea_field($_POST['value']);
+            $format = '%s';
         }
         
         global $wpdb;
@@ -2910,7 +2918,7 @@ class Grove_Admin {
                 $table_name,
                 array($field => $value),
                 array('service_id' => $id),
-                array('%s'),
+                array($format),
                 array('%d')
             );
             
