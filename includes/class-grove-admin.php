@@ -1321,16 +1321,9 @@ class Grove_Admin {
                             use_custom_position: $('#use-custom-position').is(':checked')
                         },
                         success: function(response) {
-                            console.log('Nova Beluga Both - Full Response:', response);
-                            console.log('Nova Beluga Both - Response success:', response.success);
-                            console.log('Nova Beluga Both - Response data:', response.data);
-                            console.log('Nova Beluga Both - Data length:', response.data ? response.data.length : 0);
-                            console.log('Nova Beluga Both - Data preview:', response.data ? response.data.substring(0, 200) : 'empty');
-                            
                             if (response.success) {
                                 // Check if data is actually empty
                                 if (!response.data || response.data.trim() === '') {
-                                    console.error('Nova Beluga Both - Data is empty!');
                                     alert('Error: No data to copy (response data is empty)');
                                     return;
                                 }
@@ -1338,14 +1331,12 @@ class Grove_Admin {
                                 // Copy to clipboard
                                 if (navigator.clipboard && navigator.clipboard.writeText) {
                                     navigator.clipboard.writeText(response.data).then(function() {
-                                        console.log('Nova Beluga Both - Successfully copied to clipboard');
                                         alert('Nova Beluga data (both field sets) copied to clipboard!');
                                     }).catch(function(err) {
-                                        console.error('Nova Beluga Both - Failed to copy:', err);
+                                        console.error('Failed to copy:', err);
                                         fallbackCopy(response.data, 'Nova Beluga Both');
                                     });
                                 } else {
-                                    console.log('Nova Beluga Both - Using fallback copy method');
                                     fallbackCopy(response.data, 'Nova Beluga Both');
                                 }
                             } else {
@@ -1368,16 +1359,9 @@ class Grove_Admin {
                             use_custom_position: $('#use-custom-position').is(':checked')
                         },
                         success: function(response) {
-                            console.log('Nova Beluga Friendly - Full Response:', response);
-                            console.log('Nova Beluga Friendly - Response success:', response.success);
-                            console.log('Nova Beluga Friendly - Response data:', response.data);
-                            console.log('Nova Beluga Friendly - Data length:', response.data ? response.data.length : 0);
-                            console.log('Nova Beluga Friendly - Data preview:', response.data ? response.data.substring(0, 200) : 'empty');
-                            
                             if (response.success) {
                                 // Check if data is actually empty
                                 if (!response.data || response.data.trim() === '') {
-                                    console.error('Nova Beluga Friendly - Data is empty!');
                                     alert('Error: No data to copy (response data is empty)');
                                     return;
                                 }
@@ -1385,14 +1369,12 @@ class Grove_Admin {
                                 // Copy to clipboard
                                 if (navigator.clipboard && navigator.clipboard.writeText) {
                                     navigator.clipboard.writeText(response.data).then(function() {
-                                        console.log('Nova Beluga Friendly - Successfully copied to clipboard');
                                         alert('Nova Beluga data (friendly names only) copied to clipboard!');
                                     }).catch(function(err) {
-                                        console.error('Nova Beluga Friendly - Failed to copy:', err);
+                                        console.error('Failed to copy:', err);
                                         fallbackCopy(response.data, 'Nova Beluga Friendly');
                                     });
                                 } else {
-                                    console.log('Nova Beluga Friendly - Using fallback copy method');
                                     fallbackCopy(response.data, 'Nova Beluga Friendly');
                                 }
                             } else {
@@ -1415,10 +1397,6 @@ class Grove_Admin {
             
             // Fallback copy function for older browsers
             function fallbackCopy(text, type) {
-                console.log('Fallback Copy - Type:', type);
-                console.log('Fallback Copy - Text length:', text ? text.length : 0);
-                console.log('Fallback Copy - Text preview:', text ? text.substring(0, 100) : 'empty');
-                
                 let tempInput = $('<textarea>');
                 $('body').append(tempInput);
                 tempInput.val(text).select();
@@ -1426,9 +1404,8 @@ class Grove_Admin {
                 let success = false;
                 try {
                     success = document.execCommand('copy');
-                    console.log('Fallback Copy - execCommand result:', success);
                 } catch (err) {
-                    console.error('Fallback Copy - execCommand error:', err);
+                    console.error('Fallback copy error:', err);
                 }
                 
                 tempInput.remove();
@@ -3455,69 +3432,23 @@ class Grove_Admin {
         global $wpdb;
         $table_name = $wpdb->prefix . 'zen_sitespren';
         
-        // Debug: Log the query
-        error_log('Nova Beluga Both - Table name: ' . $table_name);
-        error_log('Nova Beluga Both - Query: SELECT * FROM ' . $table_name . ' WHERE wppma_id = 1');
-        
         // Get the sitespren data - get the first (and likely only) record
         // Changed from WHERE wppma_id = 1 to LIMIT 1 to match how the display page loads data
         $sitespren_data = $wpdb->get_row("SELECT * FROM $table_name LIMIT 1", ARRAY_A);
         
-        // Debug: Log what we got from database
-        error_log('Nova Beluga Both - Data found: ' . ($sitespren_data ? 'Yes' : 'No'));
-        if ($sitespren_data) {
-            error_log('Nova Beluga Both - Number of fields in data: ' . count($sitespren_data));
-            error_log('Nova Beluga Both - Sample fields: ' . implode(', ', array_slice(array_keys($sitespren_data), 0, 5)));
-        }
-        
         if (!$sitespren_data) {
-            // Try to get ANY record to see if table has data
-            $any_data = $wpdb->get_row("SELECT * FROM $table_name LIMIT 1", ARRAY_A);
-            if ($any_data) {
-                error_log('Nova Beluga Both - Table has data but no record with wppma_id = 1');
-                error_log('Nova Beluga Both - Found record with wppma_id = ' . ($any_data['wppma_id'] ?? 'NULL'));
-                wp_send_json_error('No data found with wppma_id = 1. Table has records but not with ID 1.');
-            } else {
-                error_log('Nova Beluga Both - Table appears to be empty');
-                wp_send_json_error('No data found - table appears to be empty');
-            }
-            return;
+            wp_send_json_error('No data found');
         }
         
         // Get checkbox options
         $omit_no_friendly = isset($_POST['omit_no_friendly']) && $_POST['omit_no_friendly'] === 'true';
         $use_custom_position = isset($_POST['use_custom_position']) && $_POST['use_custom_position'] === 'true';
         
-        error_log('Nova Beluga Both - omit_no_friendly: ' . ($omit_no_friendly ? 'true' : 'false'));
-        error_log('Nova Beluga Both - use_custom_position: ' . ($use_custom_position ? 'true' : 'false'));
-        
         // Get field order from the UI (same as displayed in table)
         $fields = $this->get_driggs_field_order();
-        error_log('Nova Beluga Both - Number of fields to process: ' . count($fields));
         
         // Generate nova beluga format with both field sets
         $output = Grove_Tax_Exports::generate_nova_beluga_both($sitespren_data, array_column($fields, 'key'), $omit_no_friendly, $use_custom_position);
-        
-        // Debug: Log output to error log
-        error_log('Nova Beluga Both - Output length: ' . strlen($output));
-        error_log('Nova Beluga Both - Output preview: ' . substr($output, 0, 200));
-        
-        // If output is empty, let's check why
-        if (empty($output)) {
-            error_log('Nova Beluga Both - Output is empty! Checking field values...');
-            $field_keys = array_column($fields, 'key');
-            $found_values = 0;
-            foreach ($field_keys as $key) {
-                if (isset($sitespren_data[$key]) && !empty($sitespren_data[$key])) {
-                    $found_values++;
-                    error_log('Nova Beluga Both - Field ' . $key . ' has value: ' . substr($sitespren_data[$key], 0, 50));
-                    if ($found_values >= 3) break; // Just log a few examples
-                }
-            }
-            if ($found_values == 0) {
-                error_log('Nova Beluga Both - All fields appear to be empty in the data');
-            }
-        }
         
         wp_send_json_success($output);
     }
@@ -3542,52 +3473,23 @@ class Grove_Admin {
         global $wpdb;
         $table_name = $wpdb->prefix . 'zen_sitespren';
         
-        // Debug: Log the query
-        error_log('Nova Beluga Friendly - Table name: ' . $table_name);
-        
         // Get the sitespren data - get the first (and likely only) record
         // Changed from WHERE wppma_id = 1 to LIMIT 1 to match how the display page loads data
         $sitespren_data = $wpdb->get_row("SELECT * FROM $table_name LIMIT 1", ARRAY_A);
         
-        // Debug: Log what we got from database
-        error_log('Nova Beluga Friendly - Data found: ' . ($sitespren_data ? 'Yes' : 'No'));
-        
         if (!$sitespren_data) {
-            // Try to get ANY record to see if table has data
-            $any_data = $wpdb->get_row("SELECT * FROM $table_name LIMIT 1", ARRAY_A);
-            if ($any_data) {
-                error_log('Nova Beluga Friendly - Table has data but no record with wppma_id = 1');
-                error_log('Nova Beluga Friendly - Found record with wppma_id = ' . ($any_data['wppma_id'] ?? 'NULL'));
-                wp_send_json_error('No data found with wppma_id = 1. Table has records but not with ID 1.');
-            } else {
-                error_log('Nova Beluga Friendly - Table appears to be empty');
-                wp_send_json_error('No data found - table appears to be empty');
-            }
-            return;
+            wp_send_json_error('No data found');
         }
         
         // Get checkbox options
         $omit_no_friendly = isset($_POST['omit_no_friendly']) && $_POST['omit_no_friendly'] === 'true';
         $use_custom_position = isset($_POST['use_custom_position']) && $_POST['use_custom_position'] === 'true';
         
-        error_log('Nova Beluga Friendly - omit_no_friendly: ' . ($omit_no_friendly ? 'true' : 'false'));
-        error_log('Nova Beluga Friendly - use_custom_position: ' . ($use_custom_position ? 'true' : 'false'));
-        
         // Get field order from the UI (same as displayed in table)
         $fields = $this->get_driggs_field_order();
-        error_log('Nova Beluga Friendly - Number of fields to process: ' . count($fields));
         
         // Generate nova beluga format with friendly names only
         $output = Grove_Tax_Exports::generate_nova_beluga_friendly($sitespren_data, array_column($fields, 'key'), $omit_no_friendly, $use_custom_position);
-        
-        // Debug: Log output to error log
-        error_log('Nova Beluga Friendly - Output length: ' . strlen($output));
-        error_log('Nova Beluga Friendly - Output preview: ' . substr($output, 0, 200));
-        
-        // If output is empty, let's check why
-        if (empty($output)) {
-            error_log('Nova Beluga Friendly - Output is empty! This might be because all fields are filtered out by omit_no_friendly setting');
-        }
         
         wp_send_json_success($output);
     }
