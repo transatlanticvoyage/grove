@@ -2112,6 +2112,7 @@ class Grove_Admin {
                                 <th data-sort="service_name" style="padding: 12px 8px; border: 1px solid #ddd; font-weight: bold; text-transform: lowercase; cursor: pointer; background: #f8f9fa;">service_name</th>
                                 <th data-sort="service_placard" style="padding: 12px 8px; border: 1px solid #ddd; font-weight: bold; text-transform: lowercase; cursor: pointer; background: #f8f9fa;">service_placard</th>
                                 <th data-sort="service_moniker" style="padding: 12px 8px; border: 1px solid #ddd; font-weight: bold; text-transform: lowercase; cursor: pointer; background: #f8f9fa;">service_moniker</th>
+                                <th data-sort="service_slug_id" style="padding: 12px 8px; border: 1px solid #ddd; font-weight: bold; text-transform: lowercase; cursor: pointer; background: #f8f9fa;">service_slug_id</th>
                                 <th data-sort="description1_short" style="padding: 12px 8px; border: 1px solid #ddd; font-weight: bold; text-transform: lowercase; cursor: pointer; background: #f8f9fa;">description1_short</th>
                                 <th data-sort="description1_long" style="padding: 12px 8px; border: 1px solid #ddd; font-weight: bold; text-transform: lowercase; cursor: pointer; background: #f8f9fa;">description1_long</th>
                                 <th data-sort="rel_image1_id" style="padding: 12px 8px; border: 1px solid #ddd; font-weight: bold; text-transform: lowercase; cursor: pointer; background: #f8f9fa;">rel_image1_id</th>
@@ -2146,6 +2147,10 @@ class Grove_Admin {
                         <div>
                             <label style="display: block; font-weight: bold; margin-bottom: 5px;">Service Moniker:</label>
                             <input type="text" name="service_moniker" style="width: 100%; padding: 8px; border: 1px solid #ccc; border-radius: 4px;">
+                        </div>
+                        <div>
+                            <label style="display: block; font-weight: bold; margin-bottom: 5px;">Service Slug ID:</label>
+                            <input type="text" name="service_slug_id" style="width: 100%; padding: 8px; border: 1px solid #ccc; border-radius: 4px;">
                         </div>
                         <div>
                             <label style="display: block; font-weight: bold; margin-bottom: 5px;">Service Sobriquet:</label>
@@ -2272,6 +2277,7 @@ class Grove_Admin {
                     tr.append('<td style="padding: 8px; border: 1px solid #ddd; cursor: pointer;" data-field="service_name" data-id="' + service.service_id + '">' + (service.service_name || '') + '</td>');
                     tr.append('<td style="padding: 8px; border: 1px solid #ddd; cursor: pointer;" data-field="service_placard" data-id="' + service.service_id + '">' + (service.service_placard || '') + '</td>');
                     tr.append('<td style="padding: 8px; border: 1px solid #ddd; cursor: pointer;" data-field="service_moniker" data-id="' + service.service_id + '">' + (service.service_moniker || '') + '</td>');
+                    tr.append('<td style="padding: 8px; border: 1px solid #ddd; cursor: pointer;" data-field="service_slug_id" data-id="' + service.service_id + '">' + (service.service_slug_id || '') + '</td>');
                     tr.append('<td style="padding: 8px; border: 1px solid #ddd; cursor: pointer;" data-field="description1_short" data-id="' + service.service_id + '">' + (service.description1_short || '') + '</td>');
                     tr.append('<td style="padding: 8px; border: 1px solid #ddd; cursor: pointer;" data-field="description1_long" data-id="' + service.service_id + '">' + (service.description1_long || '') + '</td>');
                     
@@ -2968,7 +2974,7 @@ class Grove_Admin {
         $id = intval($_POST['id']);
         $field = sanitize_text_field($_POST['field']);
         
-        $allowed_fields = ['service_name', 'service_placard', 'service_moniker', 'service_sobriquet', 'description1_short', 'description1_long', 'rel_image1_id'];
+        $allowed_fields = ['service_name', 'service_placard', 'service_moniker', 'service_sobriquet', 'description1_short', 'description1_long', 'rel_image1_id', 'service_slug_id'];
         
         if (!in_array($field, $allowed_fields)) {
             wp_send_json_error('Invalid field name');
@@ -3024,6 +3030,7 @@ class Grove_Admin {
             'service_name' => sanitize_text_field($_POST['service_name']),
             'service_placard' => sanitize_text_field($_POST['service_placard']),
             'service_moniker' => sanitize_text_field($_POST['service_moniker']),
+            'service_slug_id' => sanitize_text_field($_POST['service_slug_id']),
             'service_sobriquet' => sanitize_text_field($_POST['service_sobriquet']),
             'description1_short' => sanitize_textarea_field($_POST['description1_short']),
             'description1_long' => sanitize_textarea_field($_POST['description1_long']),
