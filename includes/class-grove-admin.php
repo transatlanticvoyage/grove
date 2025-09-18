@@ -17,6 +17,7 @@ class Grove_Admin {
         add_action('wp_ajax_grove_services_update_field', array($this, 'grove_services_update_field'));
         add_action('wp_ajax_grove_services_delete', array($this, 'grove_services_delete'));
         add_action('wp_ajax_grove_services_create', array($this, 'grove_services_create'));
+        add_action('wp_ajax_grove_get_image_data', array($this, 'grove_get_image_data'));
         add_action('wp_ajax_grove_shortcode_update_mode', array($this, 'grove_shortcode_update_mode'));
         add_action('wp_ajax_grove_shortcode_test', array($this, 'grove_shortcode_test'));
         // Factory codes handlers
@@ -2411,25 +2412,34 @@ class Grove_Admin {
                     let attachmentId = container.data('attachment-id');
                     
                     if (attachmentId) {
-                        // Get image data from WordPress REST API
+                        // Get image data via AJAX to WordPress admin
                         $.ajax({
-                            url: '/wp-json/wp/v2/media/' + attachmentId,
-                            type: 'GET',
+                            url: ajaxurl,
+                            type: 'POST',
+                            data: {
+                                action: 'grove_get_image_data',
+                                nonce: '<?php echo wp_create_nonce('grove_services_nonce'); ?>',
+                                attachment_id: attachmentId
+                            },
                             success: function(response) {
-                                let imageUrl = response.source_url;
-                                let width = response.media_details.width;
-                                let height = response.media_details.height;
-                                
-                                // Calculate aspect ratio for 100px height
-                                let aspectRatio = width / height;
-                                let displayWidth = Math.round(100 * aspectRatio);
-                                
-                                // Update image preview
-                                container.html('<img src="' + imageUrl + '" style="height: 100px; width: ' + displayWidth + 'px; object-fit: contain;">');
-                                
-                                // Update width and height columns
-                                $('[data-attachment-id="' + attachmentId + '"] .width-value').text(width + 'px');
-                                $('[data-attachment-id="' + attachmentId + '"] .height-value').text(height + 'px');
+                                if (response.success && response.data) {
+                                    let imageUrl = response.data.url;
+                                    let width = response.data.width;
+                                    let height = response.data.height;
+                                    
+                                    // Calculate aspect ratio for 100px height
+                                    let aspectRatio = width / height;
+                                    let displayWidth = Math.round(100 * aspectRatio);
+                                    
+                                    // Update image preview
+                                    container.html('<img src="' + imageUrl + '" style="height: 100px; width: ' + displayWidth + 'px; object-fit: contain;">');
+                                    
+                                    // Update width and height columns
+                                    $('.image-width-cell[data-attachment-id="' + attachmentId + '"] .width-value').text(width + 'px');
+                                    $('.image-height-cell[data-attachment-id="' + attachmentId + '"] .height-value').text(height + 'px');
+                                } else {
+                                    container.html('<span style="color: #dc3545; font-size: 12px;">No image found</span>');
+                                }
                             },
                             error: function() {
                                 container.html('<span style="color: #dc3545; font-size: 12px;">Load error</span>');
@@ -3066,6 +3076,41 @@ class Grove_Admin {
         } catch (Exception $e) {
             wp_send_json_error('Error deleting service: ' . $e->getMessage());
         }
+    }
+    
+    /**
+     * AJAX: Get image data for preview
+     */
+    public function grove_get_image_data() {
+        check_ajax_referer('grove_services_nonce', 'nonce');
+        
+        if (!current_user_can('manage_options')) {
+            wp_die('Unauthorized');
+        }
+        
+        $attachment_id = intval($_POST['attachment_id']);
+        
+        if (!$attachment_id) {
+            wp_send_json_error('Invalid attachment ID');
+            return;
+        }
+        
+        // Get attachment URL and metadata
+        $image_url = wp_get_attachment_image_url($attachment_id, 'full');
+        $metadata = wp_get_attachment_metadata($attachment_id);
+        
+        if (!$image_url || !$metadata) {
+            wp_send_json_error('Image not found or no metadata available');
+            return;
+        }
+        
+        $response_data = array(
+            'url' => $image_url,
+            'width' => isset($metadata['width']) ? $metadata['width'] : 0,
+            'height' => isset($metadata['height']) ? $metadata['height'] : 0
+        );
+        
+        wp_send_json_success($response_data);
     }
     
     /**
