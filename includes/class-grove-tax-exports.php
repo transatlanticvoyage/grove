@@ -325,7 +325,14 @@ class Grove_Tax_Exports {
      * @return string Formatted nova beluga output with both names
      */
     public static function generate_nova_beluga_both($data, $fields = null, $omit_no_friendly = false, $use_custom_position = false) {
+        error_log('generate_nova_beluga_both - Called with data: ' . ($data ? 'Yes' : 'No'));
+        error_log('generate_nova_beluga_both - Number of data fields: ' . ($data ? count($data) : 0));
+        error_log('generate_nova_beluga_both - Fields provided: ' . ($fields ? count($fields) : 'null'));
+        error_log('generate_nova_beluga_both - omit_no_friendly: ' . ($omit_no_friendly ? 'true' : 'false'));
+        error_log('generate_nova_beluga_both - use_custom_position: ' . ($use_custom_position ? 'true' : 'false'));
+        
         if (!$data) {
+            error_log('generate_nova_beluga_both - Returning empty because no data');
             return '';
         }
         
@@ -337,7 +344,11 @@ class Grove_Tax_Exports {
                     $fields[] = $key;
                 }
             }
+            error_log('generate_nova_beluga_both - Auto-detected ' . count($fields) . ' fields');
         }
+        
+        error_log('generate_nova_beluga_both - Processing ' . count($fields) . ' fields');
+        error_log('generate_nova_beluga_both - First 5 fields: ' . implode(', ', array_slice($fields, 0, 5)));
         
         global $wpdb;
         
@@ -382,7 +393,13 @@ class Grove_Tax_Exports {
         
         $output = '';
         
+        error_log('generate_nova_beluga_both - Starting output generation with ' . count($fields) . ' fields');
+        $processed_count = 0;
+        $skipped_count = 0;
+        
         foreach ($fields as $field) {
+            error_log('generate_nova_beluga_both - Processing field: ' . $field);
+            
             // Check if this is a section header (doesn't start with 'driggs_' or 'sitespren_')
             $isSection = strpos($field, 'driggs_') !== 0 && 
                          strpos($field, 'sitespren_') !== 0 && 
@@ -393,13 +410,18 @@ class Grove_Tax_Exports {
                 $output .= $field . "\n";
                 $output .= "-----------------------------------\n";
                 $output .= "\n"; // Empty line for sections
+                $processed_count++;
             } else {
                 // Get friendly name from lighthouse table
                 $table_name = str_replace('zen_', '', 'sitespren'); // Remove zen_ prefix if present
                 $friendly_name = Grove_Database::get_friendly_name($table_name, $field);
                 
+                error_log('generate_nova_beluga_both - Field ' . $field . ' friendly name: ' . ($friendly_name ?: 'none'));
+                
                 // Skip this field if omit_no_friendly is true and there's no friendly name
                 if ($omit_no_friendly && empty($friendly_name)) {
+                    error_log('generate_nova_beluga_both - Skipping field ' . $field . ' (no friendly name)');
+                    $skipped_count++;
                     continue;
                 }
                 
@@ -413,8 +435,12 @@ class Grove_Tax_Exports {
                 // Get the actual value from data
                 $value = isset($data[$field]) ? $data[$field] : '';
                 $output .= $value . "\n";
+                $processed_count++;
             }
         }
+        
+        error_log('generate_nova_beluga_both - Processed ' . $processed_count . ' fields, skipped ' . $skipped_count);
+        error_log('generate_nova_beluga_both - Final output length: ' . strlen($output));
         
         return $output;
     }
