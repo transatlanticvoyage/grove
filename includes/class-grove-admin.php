@@ -3411,9 +3411,37 @@ class Grove_Admin {
     }
     
     /**
+     * Ensure lighthouse friendly names table exists
+     */
+    private function ensure_lighthouse_table() {
+        global $wpdb;
+        require_once(ABSPATH . 'wp-admin/includes/upgrade.php');
+        
+        $table_name = $wpdb->prefix . 'zen_lighthouse_friendly_names';
+        $charset_collate = $wpdb->get_charset_collate();
+        
+        $sql = "CREATE TABLE IF NOT EXISTS $table_name (
+            fname_id int(11) NOT NULL AUTO_INCREMENT,
+            db_table_name text NOT NULL,
+            db_column_name text NOT NULL,
+            friendly_name_1_datum text NOT NULL,
+            friendly_name_1_custom_position_a int(11) DEFAULT NULL,
+            created_at timestamp DEFAULT CURRENT_TIMESTAMP,
+            updated_at timestamp DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+            PRIMARY KEY (fname_id),
+            INDEX idx_table_column (db_table_name(100), db_column_name(100))
+        ) $charset_collate;";
+        
+        dbDelta($sql);
+    }
+    
+    /**
      * Export data with Nova Beluga format (both field name sets)
      */
     public function grove_export_nova_beluga_both() {
+        // Ensure lighthouse table exists
+        $this->ensure_lighthouse_table();
+        
         // Verify nonce
         if (!isset($_POST['nonce']) || !wp_verify_nonce($_POST['nonce'], 'grove_export_nonce')) {
             wp_send_json_error('Invalid nonce');
@@ -3498,6 +3526,9 @@ class Grove_Admin {
      * Export data with Nova Beluga format (friendly names only)
      */
     public function grove_export_nova_beluga_friendly() {
+        // Ensure lighthouse table exists
+        $this->ensure_lighthouse_table();
+        
         // Verify nonce
         if (!isset($_POST['nonce']) || !wp_verify_nonce($_POST['nonce'], 'grove_export_nonce')) {
             wp_send_json_error('Invalid nonce');
