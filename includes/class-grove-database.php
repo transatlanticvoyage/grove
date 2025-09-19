@@ -396,68 +396,7 @@ class Grove_Database {
             );
         }
         
-        // Insert default factory codes if table is empty
-        $factory_codes_table = $wpdb->prefix . 'zen_factory_codes';
-        $existing_codes_count = $wpdb->get_var("SELECT COUNT(*) FROM $factory_codes_table");
-        
-        if ($existing_codes_count == 0) {
-            $phone_link_code = <<<'PHP'
-// Sitespren Phone Link Shortcode Recovery Code
-// Add this to your theme's functions.php if Grove/Snefuruplin plugins are removed
-
-if (!function_exists('sitespren_phone_link_shortcode')) {
-    function sitespren_phone_link_shortcode($atts) {
-        global $wpdb;
-        
-        $atts = shortcode_atts(array(
-            'wppma_id' => '1',
-            'prefix' => '+1',
-            'text' => 'Call us: ',
-            'class' => 'phone-link'
-        ), $atts, 'sitespren_phone_link');
-        
-        // Direct database query fallback
-        $table = $wpdb->prefix . 'zen_sitespren';
-        $phone = $wpdb->get_var($wpdb->prepare(
-            "SELECT driggs_phone_1 FROM $table WHERE wppma_id = %d",
-            $atts['wppma_id']
-        ));
-        
-        if (empty($phone)) {
-            return '<!-- No phone number found -->';
-        }
-        
-        $clean_phone = preg_replace('/[^0-9]/', '', $phone);
-        
-        return sprintf(
-            '<a href="tel:%s%s" class="%s">%s%s</a>',
-            esc_attr($atts['prefix']),
-            esc_attr($clean_phone),
-            esc_attr($atts['class']),
-            esc_html($atts['text']),
-            esc_html($phone)
-        );
-    }
-    add_shortcode('sitespren_phone_link', 'sitespren_phone_link_shortcode');
-}
-PHP;
-
-            $wpdb->insert(
-                $factory_codes_table,
-                array(
-                    'code_slug' => 'sitespren_phone_link',
-                    'code_type' => 'shortcode',
-                    'code_title' => 'Sitespren Phone Link Shortcode',
-                    'code_description' => 'Creates a clickable phone link using data from zen_sitespren table. Works as standalone recovery code if plugins are removed.',
-                    'code_snippet' => $phone_link_code,
-                    'usage_example' => '[sitespren_phone_link] or [sitespren_phone_link prefix="+1" text="Call now: "]',
-                    'is_active' => 1,
-                    'is_core' => 1,
-                    'plugin_source' => 'both'
-                ),
-                array('%s', '%s', '%s', '%s', '%s', '%s', '%d', '%d', '%s')
-            );
-        }
+        // Factory codes table creation - no default PHP code insertion
         
         // Insert default hoof codes using version-based migration
         $this->migrate_default_hoof_codes();
@@ -973,55 +912,6 @@ PHP;
                     'is_adminpublic' => 1,
                     'position_order' => 1
                 ),
-                array(
-                    'shortcode_name' => 'Zen Service Field',
-                    'shortcode_slug' => 'zen_service',
-                    'shortcode_content' => '<?php
-// This shortcode pulls individual fields from zen_services table
-function zen_service_shortcode($atts) {
-    $atts = shortcode_atts(array(
-        "id" => "1",
-        "field" => "service_name"
-    ), $atts);
-    
-    global $wpdb;
-    $table = $wpdb->prefix . "zen_services";
-    
-    $service = $wpdb->get_row($wpdb->prepare(
-        "SELECT * FROM $table WHERE service_id = %d", 
-        $atts["id"]
-    ));
-    
-    if (!$service) return "";
-    
-    switch($atts["field"]) {
-        case "service_name":
-            return esc_html($service->service_name);
-        case "service_image":
-            if ($service->rel_image1_id) {
-                return wp_get_attachment_image($service->rel_image1_id, "medium");
-            }
-            return "";
-        case "description1_short":
-            return esc_html($service->description1_short);
-        case "description1_long":
-            return wp_kses_post($service->description1_long);
-        default:
-            return "";
-    }
-}
-add_shortcode("zen_service", "zen_service_shortcode");
-?>',
-                    'shortcode_description' => 'Individual field access shortcode for zen_services table. Use with field parameter to get specific data.',
-                    'shortcode_category' => 'elementor',
-                    'shortcode_type' => 'shortcode',
-                    'shortcode_usage_example' => '[zen_service id="1" field="service_name"]',
-                    'is_active' => 1,
-                    'is_system' => 1,
-                    'is_global' => 1,
-                    'is_adminpublic' => 1,
-                    'position_order' => 2
-                )
             )
         );
         
