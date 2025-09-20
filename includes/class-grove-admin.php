@@ -17,6 +17,9 @@ class Grove_Admin {
         add_action('wp_ajax_grove_services_update_field', array($this, 'grove_services_update_field'));
         add_action('wp_ajax_grove_services_delete', array($this, 'grove_services_delete'));
         add_action('wp_ajax_grove_services_create', array($this, 'grove_services_create'));
+        add_action('wp_ajax_grove_get_all_pages', array($this, 'grove_get_all_pages'));
+        add_action('wp_ajax_grove_get_page_title', array($this, 'grove_get_page_title'));
+        add_action('wp_ajax_grove_update_service_page', array($this, 'grove_update_service_page'));
         add_action('wp_ajax_grove_get_image_data', array($this, 'grove_get_image_data'));
         add_action('wp_ajax_grove_shortcode_update_mode', array($this, 'grove_shortcode_update_mode'));
         add_action('wp_ajax_grove_shortcode_test', array($this, 'grove_shortcode_test'));
@@ -2144,6 +2147,7 @@ class Grove_Admin {
                                 <th data-sort="rel_image1_id" style="padding: 12px 8px; border: 1px solid #ddd; font-weight: bold; text-transform: lowercase; cursor: pointer; background: #f8f9fa;">rel_image1_id</th>
                                 <th style="padding: 12px 8px; border: 1px solid #ddd; font-weight: bold; text-transform: lowercase; background: #f8f9fa;">width</th>
                                 <th style="padding: 12px 8px; border: 1px solid #ddd; font-weight: bold; text-transform: lowercase; background: #f8f9fa;">height</th>
+                                <th style="padding: 12px 8px; border: 1px solid #ddd; font-weight: bold; text-transform: lowercase; background: #f8f9fa;">asn_service_page_id</th>
                                 <th data-sort="is_pinned_service" style="padding: 12px 8px; border: 1px solid #ddd; font-weight: bold; text-transform: lowercase; cursor: pointer; background: #f8f9fa;">is_pinned_service</th>
                                 <th style="padding: 12px 8px; border: 1px solid #ddd; font-weight: bold; background: #f8f9fa;">Actions</th>
                             </tr>
@@ -2207,6 +2211,46 @@ class Grove_Admin {
                         <button type="submit" class="button button-primary">Create Service</button>
                     </div>
                 </form>
+            </div>
+        </div>
+        
+        <!-- Page Selector Modal -->
+        <div id="page-selector-modal" style="display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.5); z-index: 1000;">
+            <div style="position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); background: white; padding: 30px; border-radius: 8px; width: 80%; max-width: 1200px; max-height: 80vh; overflow-y: auto;">
+                <h2 style="margin-top: 0;">Select a Page or Post</h2>
+                
+                <!-- Search Box -->
+                <div style="margin-bottom: 20px;">
+                    <input type="text" id="page-search" placeholder="Search pages and posts..." style="width: 300px; padding: 8px; border: 1px solid #ddd; border-radius: 4px;">
+                    <button id="clear-page-search" class="button button-small" style="margin-left: 10px;">Clear Search</button>
+                </div>
+                
+                <!-- Pages Table -->
+                <div style="border: 1px solid #ddd; border-radius: 5px; overflow: hidden;">
+                    <table id="pages-table" style="width: 100%; border-collapse: collapse;">
+                        <thead style="background: #f8f9fa;">
+                            <tr>
+                                <th style="padding: 10px; border: 1px solid #ddd; text-align: left;">Select</th>
+                                <th style="padding: 10px; border: 1px solid #ddd; text-align: left;">ID</th>
+                                <th style="padding: 10px; border: 1px solid #ddd; text-align: left;">Title</th>
+                                <th style="padding: 10px; border: 1px solid #ddd; text-align: left;">Type</th>
+                                <th style="padding: 10px; border: 1px solid #ddd; text-align: left;">Status</th>
+                                <th style="padding: 10px; border: 1px solid #ddd; text-align: left;">Date</th>
+                            </tr>
+                        </thead>
+                        <tbody id="pages-tbody">
+                            <!-- Pages will be loaded here -->
+                        </tbody>
+                    </table>
+                </div>
+                
+                <div style="margin-top: 20px; text-align: right;">
+                    <button type="button" id="cancel-page-select" class="button button-secondary" style="margin-right: 10px;">Cancel</button>
+                    <button type="button" id="clear-page-select" class="button" style="margin-right: 10px; background: #dc3545; color: white; border-color: #dc3545;">Clear Selection</button>
+                    <button type="button" id="confirm-page-select" class="button button-primary">Confirm Selection</button>
+                </div>
+                
+                <input type="hidden" id="current-service-id" value="">
             </div>
         </div>
         
@@ -2350,6 +2394,17 @@ class Grove_Admin {
                     }
                     heightCell += '</td>';
                     tr.append(heightCell);
+                    
+                    // ASN Service Page ID column
+                    let pageCell = '<td style="padding: 8px; border: 1px solid #ddd;">';
+                    pageCell += '<button class="button button-small choose-page-btn" data-service-id="' + service.service_id + '" style="margin-right: 8px;">Choose Page</button>';
+                    if (service.asn_service_page_id) {
+                        pageCell += '<span class="page-info" data-page-id="' + service.asn_service_page_id + '">';
+                        pageCell += '(' + service.asn_service_page_id + ') | <span class="page-title-text">Loading...</span>';
+                        pageCell += '</span>';
+                    }
+                    pageCell += '</td>';
+                    tr.append(pageCell);
                     
                     tr.append('<td style="padding: 8px; border: 1px solid #ddd; text-align: center;">' + (service.is_pinned_service ? 'Yes' : 'No') + '</td>');
                     tr.append('<td style="padding: 8px; border: 1px solid #ddd;"><button class="button button-small delete-btn" data-id="' + service.service_id + '">Delete</button></td>');
@@ -2599,6 +2654,161 @@ class Grove_Admin {
                 $('#search-box').val('');
                 filteredData = currentData;
                 displayData();
+            });
+            
+            // Page selector functionality
+            let allPagesData = [];
+            let selectedPageId = null;
+            
+            // Load page titles for existing assignments
+            function loadPageTitles() {
+                $('.page-info').each(function() {
+                    let pageId = $(this).data('page-id');
+                    let titleElement = $(this).find('.page-title-text');
+                    
+                    $.ajax({
+                        url: ajaxurl,
+                        type: 'POST',
+                        data: {
+                            action: 'grove_get_page_title',
+                            nonce: '<?php echo wp_create_nonce('grove_services_nonce'); ?>',
+                            page_id: pageId
+                        },
+                        success: function(response) {
+                            if (response.success) {
+                                titleElement.text(response.data.title);
+                            } else {
+                                titleElement.text('(Not found)');
+                            }
+                        }
+                    });
+                });
+            }
+            
+            // Call loadPageTitles after displaying data
+            let originalDisplayData = displayData;
+            displayData = function() {
+                originalDisplayData();
+                setTimeout(loadPageTitles, 100);
+            };
+            
+            // Open page selector modal
+            $(document).on('click', '.choose-page-btn', function() {
+                let serviceId = $(this).data('service-id');
+                $('#current-service-id').val(serviceId);
+                selectedPageId = null;
+                
+                // Load all pages and posts
+                $.ajax({
+                    url: ajaxurl,
+                    type: 'POST',
+                    data: {
+                        action: 'grove_get_all_pages',
+                        nonce: '<?php echo wp_create_nonce('grove_services_nonce'); ?>'
+                    },
+                    success: function(response) {
+                        if (response.success) {
+                            allPagesData = response.data;
+                            displayPages(allPagesData);
+                            $('#page-selector-modal').show();
+                        }
+                    }
+                });
+            });
+            
+            // Display pages in the modal table
+            function displayPages(pages) {
+                let tbody = $('#pages-tbody');
+                tbody.empty();
+                
+                pages.forEach(function(page) {
+                    let row = $('<tr>');
+                    row.append('<td style="padding: 8px; border: 1px solid #ddd;"><input type="radio" name="page-select" value="' + page.ID + '" data-title="' + page.post_title + '"></td>');
+                    row.append('<td style="padding: 8px; border: 1px solid #ddd;">' + page.ID + '</td>');
+                    row.append('<td style="padding: 8px; border: 1px solid #ddd;">' + page.post_title + '</td>');
+                    row.append('<td style="padding: 8px; border: 1px solid #ddd;">' + page.post_type + '</td>');
+                    row.append('<td style="padding: 8px; border: 1px solid #ddd;">' + page.post_status + '</td>');
+                    row.append('<td style="padding: 8px; border: 1px solid #ddd;">' + page.post_date + '</td>');
+                    tbody.append(row);
+                });
+            }
+            
+            // Handle page selection
+            $(document).on('change', 'input[name="page-select"]', function() {
+                selectedPageId = $(this).val();
+            });
+            
+            // Search pages
+            $('#page-search').on('input', function() {
+                let searchTerm = $(this).val().toLowerCase();
+                let filtered = allPagesData.filter(function(page) {
+                    return page.post_title.toLowerCase().includes(searchTerm) ||
+                           page.ID.toString().includes(searchTerm);
+                });
+                displayPages(filtered);
+            });
+            
+            // Clear page search
+            $('#clear-page-search').click(function() {
+                $('#page-search').val('');
+                displayPages(allPagesData);
+            });
+            
+            // Confirm page selection
+            $('#confirm-page-select').click(function() {
+                if (!selectedPageId) {
+                    alert('Please select a page');
+                    return;
+                }
+                
+                let serviceId = $('#current-service-id').val();
+                let selectedTitle = $('input[name="page-select"]:checked').closest('tr').find('td:eq(2)').text();
+                
+                $.ajax({
+                    url: ajaxurl,
+                    type: 'POST',
+                    data: {
+                        action: 'grove_update_service_page',
+                        nonce: '<?php echo wp_create_nonce('grove_services_nonce'); ?>',
+                        service_id: serviceId,
+                        page_id: selectedPageId
+                    },
+                    success: function(response) {
+                        if (response.success) {
+                            $('#page-selector-modal').hide();
+                            loadServicesData();
+                        } else {
+                            alert('Error updating service page: ' + response.data);
+                        }
+                    }
+                });
+            });
+            
+            // Clear page selection
+            $('#clear-page-select').click(function() {
+                let serviceId = $('#current-service-id').val();
+                
+                $.ajax({
+                    url: ajaxurl,
+                    type: 'POST',
+                    data: {
+                        action: 'grove_update_service_page',
+                        nonce: '<?php echo wp_create_nonce('grove_services_nonce'); ?>',
+                        service_id: serviceId,
+                        page_id: 0
+                    },
+                    success: function(response) {
+                        if (response.success) {
+                            $('#page-selector-modal').hide();
+                            loadServicesData();
+                        }
+                    }
+                });
+            });
+            
+            // Cancel page selection
+            $('#cancel-page-select').click(function() {
+                $('#page-selector-modal').hide();
             });
         });
         </script>
@@ -3001,7 +3211,7 @@ class Grove_Admin {
         $id = intval($_POST['id']);
         $field = sanitize_text_field($_POST['field']);
         
-        $allowed_fields = ['service_name', 'suggested_url_slug', 'service_placard', 'service_moniker', 'service_sobriquet', 'description1_short', 'description1_long', 'rel_image1_id', 'service_slug_id'];
+        $allowed_fields = ['service_name', 'suggested_url_slug', 'service_placard', 'service_moniker', 'service_sobriquet', 'description1_short', 'description1_long', 'rel_image1_id', 'service_slug_id', 'asn_service_page_id'];
         
         if (!in_array($field, $allowed_fields)) {
             wp_send_json_error('Invalid field name');
@@ -5343,6 +5553,93 @@ class Grove_Admin {
             wp_send_json_success('Shortcode deleted successfully');
         } else {
             wp_send_json_error('Failed to delete shortcode');
+        }
+    }
+    
+    /**
+     * Get all pages and posts for the page selector
+     */
+    public function grove_get_all_pages() {
+        // Check nonce
+        if (!wp_verify_nonce($_POST['nonce'], 'grove_services_nonce')) {
+            wp_send_json_error('Invalid nonce');
+            return;
+        }
+        
+        $posts = get_posts(array(
+            'post_type' => array('page', 'post'),
+            'post_status' => array('publish', 'draft', 'private'),
+            'numberposts' => -1,
+            'orderby' => 'date',
+            'order' => 'DESC'
+        ));
+        
+        $pages_data = array();
+        foreach ($posts as $post) {
+            $pages_data[] = array(
+                'ID' => $post->ID,
+                'post_title' => $post->post_title,
+                'post_type' => $post->post_type,
+                'post_status' => $post->post_status,
+                'post_date' => date('Y-m-d', strtotime($post->post_date))
+            );
+        }
+        
+        wp_send_json_success($pages_data);
+    }
+    
+    /**
+     * Get page title by ID
+     */
+    public function grove_get_page_title() {
+        // Check nonce
+        if (!wp_verify_nonce($_POST['nonce'], 'grove_services_nonce')) {
+            wp_send_json_error('Invalid nonce');
+            return;
+        }
+        
+        $page_id = intval($_POST['page_id']);
+        $post = get_post($page_id);
+        
+        if ($post) {
+            wp_send_json_success(array('title' => $post->post_title));
+        } else {
+            wp_send_json_error('Page not found');
+        }
+    }
+    
+    /**
+     * Update service page assignment
+     */
+    public function grove_update_service_page() {
+        global $wpdb;
+        
+        // Check nonce
+        if (!wp_verify_nonce($_POST['nonce'], 'grove_services_nonce')) {
+            wp_send_json_error('Invalid nonce');
+            return;
+        }
+        
+        $service_id = intval($_POST['service_id']);
+        $page_id = intval($_POST['page_id']);
+        
+        // If page_id is 0, set to NULL to clear the assignment
+        $page_id = ($page_id === 0) ? null : $page_id;
+        
+        $table_name = $wpdb->prefix . 'zen_services';
+        
+        $result = $wpdb->update(
+            $table_name,
+            array('asn_service_page_id' => $page_id),
+            array('service_id' => $service_id),
+            array('%d'),
+            array('%d')
+        );
+        
+        if ($result !== false) {
+            wp_send_json_success('Service page updated successfully');
+        } else {
+            wp_send_json_error('Failed to update service page');
         }
     }
 }
