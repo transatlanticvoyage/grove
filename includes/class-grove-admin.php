@@ -2135,6 +2135,7 @@ class Grove_Admin {
                                 </th>
                                 <th data-sort="service_id" style="padding: 12px 8px; border: 1px solid #ddd; font-weight: bold; text-transform: lowercase; cursor: pointer; background: #f8f9fa;">service_id</th>
                                 <th data-sort="service_name" style="padding: 12px 8px; border: 1px solid #ddd; font-weight: bold; text-transform: lowercase; cursor: pointer; background: #f8f9fa;">service_name</th>
+                                <th data-sort="suggested_url_slug" style="padding: 12px 8px; border: 1px solid #ddd; font-weight: bold; text-transform: lowercase; cursor: pointer; background: #f8f9fa;">suggested_url_slug</th>
                                 <th data-sort="service_placard" style="padding: 12px 8px; border: 1px solid #ddd; font-weight: bold; text-transform: lowercase; cursor: pointer; background: #f8f9fa;">service_placard</th>
                                 <th data-sort="service_moniker" style="padding: 12px 8px; border: 1px solid #ddd; font-weight: bold; text-transform: lowercase; cursor: pointer; background: #f8f9fa;">service_moniker</th>
                                 <th data-sort="service_slug_id" style="padding: 12px 8px; border: 1px solid #ddd; font-weight: bold; text-transform: lowercase; cursor: pointer; background: #f8f9fa;">service_slug_id</th>
@@ -2300,6 +2301,7 @@ class Grove_Admin {
                     // Data columns
                     tr.append('<td style="padding: 8px; border: 1px solid #ddd;">' + (service.service_id || '') + '</td>');
                     tr.append('<td style="padding: 8px; border: 1px solid #ddd; cursor: pointer;" data-field="service_name" data-id="' + service.service_id + '">' + (service.service_name || '') + '</td>');
+                    tr.append('<td style="padding: 8px; border: 1px solid #ddd; cursor: pointer;" data-field="suggested_url_slug" data-id="' + service.service_id + '">' + (service.suggested_url_slug || '') + '</td>');
                     tr.append('<td style="padding: 8px; border: 1px solid #ddd; cursor: pointer;" data-field="service_placard" data-id="' + service.service_id + '">' + (service.service_placard || '') + '</td>');
                     tr.append('<td style="padding: 8px; border: 1px solid #ddd; cursor: pointer;" data-field="service_moniker" data-id="' + service.service_id + '">' + (service.service_moniker || '') + '</td>');
                     tr.append('<td style="padding: 8px; border: 1px solid #ddd; cursor: pointer;" data-field="service_slug_id" data-id="' + service.service_id + '">' + (service.service_slug_id || '') + '</td>');
@@ -2999,7 +3001,7 @@ class Grove_Admin {
         $id = intval($_POST['id']);
         $field = sanitize_text_field($_POST['field']);
         
-        $allowed_fields = ['service_name', 'service_placard', 'service_moniker', 'service_sobriquet', 'description1_short', 'description1_long', 'rel_image1_id', 'service_slug_id'];
+        $allowed_fields = ['service_name', 'suggested_url_slug', 'service_placard', 'service_moniker', 'service_sobriquet', 'description1_short', 'description1_long', 'rel_image1_id', 'service_slug_id'];
         
         if (!in_array($field, $allowed_fields)) {
             wp_send_json_error('Invalid field name');
