@@ -2145,6 +2145,7 @@ class Grove_Admin {
                                 <th data-sort="description1_short" style="padding: 12px 8px; border: 1px solid #ddd; font-weight: bold; text-transform: lowercase; cursor: pointer; background: #f8f9fa;">description1_short</th>
                                 <th data-sort="description1_long" style="padding: 12px 8px; border: 1px solid #ddd; font-weight: bold; text-transform: lowercase; cursor: pointer; background: #f8f9fa;">description1_long</th>
                                 <th data-sort="rel_image1_id" style="padding: 12px 8px; border: 1px solid #ddd; font-weight: bold; text-transform: lowercase; cursor: pointer; background: #f8f9fa;">rel_image1_id</th>
+                                <th style="padding: 12px 8px; border: 1px solid #ddd; font-weight: bold; font-size: 16px; text-transform: lowercase; background: #f8f9fa;">image-alternative-display-method</th>
                                 <th style="padding: 12px 8px; border: 1px solid #ddd; font-weight: bold; text-transform: lowercase; background: #f8f9fa;">width</th>
                                 <th style="padding: 12px 8px; border: 1px solid #ddd; font-weight: bold; text-transform: lowercase; background: #f8f9fa;">height</th>
                                 <th style="padding: 12px 8px; border: 1px solid #ddd; font-weight: bold; text-transform: lowercase; background: #f8f9fa;">asn_service_page_id</th>
@@ -2374,6 +2375,16 @@ class Grove_Admin {
                     
                     imageCell += '</div></td>';
                     tr.append(imageCell);
+                    
+                    // Image alternative display method column
+                    let altImageCell = '<td style="padding: 8px; border: 1px solid #ddd; text-align: center;">';
+                    if (service.rel_image1_id && service.rel_image1_id > 0) {
+                        altImageCell += '<img src="/wp-content/uploads/' + service.rel_image1_id + '.jpg" style="height: 60px; max-width: 100px; object-fit: contain;" onerror="this.src=\'/wp-admin/admin-ajax.php?action=wp_get_attachment_image&attachment_id=' + service.rel_image1_id + '&size=thumbnail\';">';
+                    } else {
+                        altImageCell += '-';
+                    }
+                    altImageCell += '</td>';
+                    tr.append(altImageCell);
                     
                     // Width column
                     let widthCell = '<td style="padding: 8px; border: 1px solid #ddd; text-align: center;" class="image-width-cell" data-attachment-id="' + (service.rel_image1_id || '') + '">';
