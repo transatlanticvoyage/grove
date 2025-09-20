@@ -2510,6 +2510,8 @@ class Grove_Admin {
                                 attachment_id: attachmentId
                             },
                             success: function(response) {
+                                console.log('Image AJAX response for ID ' + attachmentId + ':', response);
+                                
                                 if (response.success && response.data) {
                                     let imageUrl = response.data.url;
                                     let width = response.data.width;
@@ -2526,10 +2528,12 @@ class Grove_Admin {
                                     $('.image-width-cell[data-attachment-id="' + attachmentId + '"] .width-value').text(width + 'px');
                                     $('.image-height-cell[data-attachment-id="' + attachmentId + '"] .height-value').text(height + 'px');
                                 } else {
+                                    console.error('Image load failed for ID ' + attachmentId + ':', response);
                                     container.html('<span style="color: #dc3545; font-size: 12px;">No image found</span>');
                                 }
                             },
-                            error: function() {
+                            error: function(xhr, status, error) {
+                                console.error('Image AJAX error for ID ' + attachmentId + ':', {xhr: xhr, status: status, error: error});
                                 container.html('<span style="color: #dc3545; font-size: 12px;">Load error</span>');
                             }
                         });
@@ -3343,15 +3347,27 @@ class Grove_Admin {
         $image_url = wp_get_attachment_image_url($attachment_id, 'full');
         $metadata = wp_get_attachment_metadata($attachment_id);
         
-        if (!$image_url || !$metadata) {
-            wp_send_json_error('Image not found or no metadata available');
+        // Debug logging
+        error_log("Grove Image Debug - ID: {$attachment_id}, URL: " . ($image_url ?: 'NULL') . ", Metadata: " . print_r($metadata, true));
+        
+        if (!$image_url) {
+            wp_send_json_error('Image URL not found for attachment ID: ' . $attachment_id);
+            return;
+        }
+        
+        if (!$metadata) {
+            wp_send_json_error('Image metadata not found for attachment ID: ' . $attachment_id);
             return;
         }
         
         $response_data = array(
             'url' => $image_url,
             'width' => isset($metadata['width']) ? $metadata['width'] : 0,
-            'height' => isset($metadata['height']) ? $metadata['height'] : 0
+            'height' => isset($metadata['height']) ? $metadata['height'] : 0,
+            'debug_info' => array(
+                'attachment_id' => $attachment_id,
+                'metadata_keys' => array_keys($metadata)
+            )
         );
         
         wp_send_json_success($response_data);
