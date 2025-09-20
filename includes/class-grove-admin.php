@@ -2412,6 +2412,9 @@ class Grove_Admin {
                     tbody.append(tr);
                 });
                 
+                // Load image previews after table is rendered
+                loadImagePreviews();
+                
                 // Inline editing
                 $('[data-field]').click(function() {
                     let cell = $(this);
