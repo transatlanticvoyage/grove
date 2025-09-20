@@ -2355,22 +2355,26 @@ class Grove_Admin {
                     
                     // Image column with preview and buttons
                     let imageCell = '<td style="padding: 8px; border: 1px solid #ddd; text-align: center;" class="image-cell" data-id="' + service.service_id + '">';
-                    imageCell += '<div style="display: flex; flex-direction: column; gap: 4px; align-items: center;">';
+                    imageCell += '<div style="display: flex; gap: 8px; align-items: center;">';
                     
                     if (service.rel_image1_id && service.rel_image1_id > 0) {
-                        imageCell += '<div class="image-preview-container" data-attachment-id="' + service.rel_image1_id + '" style="height: 100px; display: flex; align-items: center; justify-content: center; border: 1px solid #ddd; background: #f9f9f9; margin-bottom: 4px;">';
-                        imageCell += '<span style="color: #666; font-size: 12px;">Loading...</span>';
-                        imageCell += '</div>';
+                        imageCell += '<div style="display: flex; flex-direction: column; gap: 2px;">';
                         imageCell += '<span style="color: green; font-size: 10px;">ID: ' + service.rel_image1_id + '</span>';
                         imageCell += '<div style="display: flex; gap: 4px;">';
                         imageCell += '<button class="button button-small edit-image-btn" data-id="' + service.service_id + '" data-image="' + service.rel_image1_id + '" style="font-size: 11px; padding: 2px 6px;">Edit</button>';
                         imageCell += '<button class="button button-small delete-image-btn" data-id="' + service.service_id + '" style="font-size: 11px; padding: 2px 6px; background: #dc3545; color: white; border-color: #dc3545;">Clear</button>';
                         imageCell += '</div>';
+                        imageCell += '</div>';
+                        imageCell += '<div class="image-preview-container" data-attachment-id="' + service.rel_image1_id + '" style="height: 60px; width: 80px; display: flex; align-items: center; justify-content: center; border: 1px solid #ddd; background: #f9f9f9;">';
+                        imageCell += '<span style="color: #666; font-size: 12px;">Loading...</span>';
+                        imageCell += '</div>';
                     } else {
-                        imageCell += '<div style="height: 100px; display: flex; align-items: center; justify-content: center; border: 1px solid #ddd; background: #f9f9f9; margin-bottom: 4px;">';
+                        imageCell += '<div style="display: flex; flex-direction: column; gap: 2px;">';
+                        imageCell += '<button class="button button-small upload-image-btn" data-id="' + service.service_id + '" style="font-size: 11px; padding: 2px 6px;">Upload</button>';
+                        imageCell += '</div>';
+                        imageCell += '<div style="height: 60px; width: 80px; display: flex; align-items: center; justify-content: center; border: 1px solid #ddd; background: #f9f9f9;">';
                         imageCell += '<span style="color: #999; font-size: 12px;">No image</span>';
                         imageCell += '</div>';
-                        imageCell += '<button class="button button-small upload-image-btn" data-id="' + service.service_id + '" style="font-size: 11px; padding: 2px 6px;">Upload</button>';
                     }
                     
                     imageCell += '</div></td>';
