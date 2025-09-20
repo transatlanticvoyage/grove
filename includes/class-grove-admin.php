@@ -2475,8 +2475,8 @@ class Grove_Admin {
                             currentData = response.data;
                             filteredData = currentData;
                             displayData();
-                            // Initialize pagination after data is loaded
-                            applyPagination();
+                            // Initialize pagination displays after data is loaded
+                            updatePaginationDisplays();
                         } else {
                             alert('Error loading services data: ' + response.data);
                         }
@@ -3062,7 +3062,18 @@ class Grove_Admin {
                 let paginatedData = currentData.slice(startRow, endRow);
                 filteredData = paginatedData;
                 
-                // Apply column pagination by hiding/showing columns
+                // Refresh the display first
+                displayData();
+                
+                // Then apply column pagination by hiding/showing columns
+                applyColumnPagination();
+                
+                // Update pagination displays
+                updatePaginationDisplays();
+            }
+            
+            // Separate function for column pagination
+            function applyColumnPagination() {
                 if (currentColsPerPage !== 'all') {
                     let startCol = (currentColPage - 1) * currentColsPerPage;
                     let endCol = startCol + currentColsPerPage;
@@ -3094,10 +3105,6 @@ class Grove_Admin {
                     // Show all columns
                     $('#services-table th, #services-table td').show();
                 }
-                
-                // Refresh the display
-                displayData();
-                updatePaginationDisplays();
             }
             
             // Rows per page handlers
