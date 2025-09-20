@@ -27,6 +27,7 @@ class Grove_Database {
      */
     public function on_activation() {
         $this->create_zen_tables();
+        $this->ensure_sitespren_columns(); // Ensure columns exist even after table creation
         $this->maybe_insert_default_data();
     }
     
@@ -40,6 +41,9 @@ class Grove_Database {
             $this->create_zen_tables();
             update_option('zen_db_version', self::ZEN_DB_VERSION);
         }
+        
+        // Always check for missing columns in zen_sitespren table
+        $this->ensure_sitespren_columns();
     }
     
     /**
@@ -271,6 +275,42 @@ class Grove_Database {
         ) $charset_collate;";
         
         dbDelta($sql);
+    }
+    
+    /**
+     * Ensure all required columns exist in sitespren table
+     * This method directly checks and adds missing columns
+     */
+    private function ensure_sitespren_columns() {
+        global $wpdb;
+        
+        $table_name = $wpdb->prefix . 'zen_sitespren';
+        
+        // Check if the table exists
+        $table_exists = $wpdb->get_var("SHOW TABLES LIKE '$table_name'") === $table_name;
+        
+        if (!$table_exists) {
+            return; // Table doesn't exist, will be created by create_zen_tables
+        }
+        
+        // Check if driggs_gmaps_widget_location_1 column exists
+        $column_exists = $wpdb->get_var(
+            "SHOW COLUMNS FROM `$table_name` LIKE 'driggs_gmaps_widget_location_1'"
+        );
+        
+        if (!$column_exists) {
+            // Add the missing column
+            $wpdb->query(
+                "ALTER TABLE `$table_name` 
+                ADD COLUMN `driggs_gmaps_widget_location_1` TEXT DEFAULT NULL 
+                AFTER `driggs_country`"
+            );
+            
+            // Log the addition
+            if (defined('WP_DEBUG') && WP_DEBUG) {
+                error_log('Grove: Added missing column driggs_gmaps_widget_location_1 to ' . $table_name);
+            }
+        }
     }
     
     /**
