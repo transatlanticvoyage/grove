@@ -3023,8 +3023,8 @@ class Grove_Admin {
             // Calculate pagination values
             function calculatePagination() {
                 totalDataRows = currentData.length;
-                // Count actual columns in the table (minus checkbox column)
-                totalDataCols = $('#services-table th').length - 1;
+                // Count actual columns in the table from one row (minus checkbox column)
+                totalDataCols = $('#services-table thead tr:last th').length - 1;
                 
                 if (currentRowsPerPage === 'all') {
                     totalRowPages = 1;
@@ -3097,18 +3097,20 @@ class Grove_Admin {
                     let startCol = (currentColPage - 1) * currentColsPerPage;
                     let endCol = startCol + currentColsPerPage;
                     
-                    // Hide all columns except checkbox first
-                    $('#services-table th').each(function(index) {
-                        if (index === 0) {
-                            $(this).show(); // Always show checkbox column
-                        } else if (index >= startCol + 1 && index <= endCol) {
-                            $(this).show();
-                        } else {
-                            $(this).hide();
-                        }
+                    // Apply to each header row separately
+                    $('#services-table thead tr').each(function() {
+                        $(this).find('th').each(function(index) {
+                            if (index === 0) {
+                                $(this).show(); // Always show checkbox column
+                            } else if (index >= startCol + 1 && index <= endCol) {
+                                $(this).show();
+                            } else {
+                                $(this).hide();
+                            }
+                        });
                     });
                     
-                    // Apply same logic to all rows
+                    // Apply same logic to all data rows
                     $('#services-table tbody tr').each(function() {
                         $(this).find('td').each(function(index) {
                             if (index === 0) {
