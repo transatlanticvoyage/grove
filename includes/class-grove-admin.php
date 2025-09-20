@@ -2296,7 +2296,7 @@ class Grove_Admin {
                                 <th data-sort="description1_short" style="padding: 12px 8px; border: 1px solid #ddd; font-weight: bold; text-transform: lowercase; cursor: pointer; background: #f8f9fa;">description1_short</th>
                                 <th data-sort="description1_long" style="padding: 12px 8px; border: 1px solid #ddd; font-weight: bold; text-transform: lowercase; cursor: pointer; background: #f8f9fa;">description1_long</th>
                                 <th data-sort="rel_image1_id" style="padding: 12px 8px; border: 1px solid #ddd; font-weight: bold; text-transform: lowercase; cursor: pointer; background: #f8f9fa;">rel_image1_id</th>
-                                <th style="padding: 12px 8px; border: 1px solid #ddd; font-weight: bold; text-transform: lowercase; background: #f8f9fa;">image-main-display</th>
+                                <th style="padding: 12px 8px; border: 1px solid #ddd; font-weight: bold; text-transform: lowercase; background: #f8f9fa; text-align: left; white-space: nowrap;">image-main-display</th>
                                 <th style="padding: 12px 8px; border: 1px solid #ddd; font-weight: bold; font-size: 16px; text-transform: lowercase; background: #f8f9fa;">image-alternative-display-method</th>
                                 <th style="padding: 12px 8px; border: 1px solid #ddd; font-weight: bold; text-transform: lowercase; background: #f8f9fa;">width</th>
                                 <th style="padding: 12px 8px; border: 1px solid #ddd; font-weight: bold; text-transform: lowercase; background: #f8f9fa;">height</th>
@@ -2528,14 +2528,14 @@ class Grove_Admin {
                     tr.append(imageCell);
                     
                     // Image main display column
-                    let mainImageCell = '<td style="padding: 8px; border: 1px solid #ddd; text-align: center;">';
+                    let mainImageCell = '<td style="padding: 8px; border: 1px solid #ddd; text-align: left; white-space: nowrap;">';
                     if (service.rel_image1_id && service.rel_image1_id > 0) {
-                        mainImageCell += '<div class="image-preview-container" data-attachment-id="' + service.rel_image1_id + '" style="height: 60px; width: 80px; display: flex; align-items: center; justify-content: center; border: 1px solid #ddd; background: #f9f9f9; margin: 0 auto;">';
-                        mainImageCell += '<span style="color: #666; font-size: 12px;">Loading...</span>';
+                        mainImageCell += '<div class="image-preview-container" data-attachment-id="' + service.rel_image1_id + '" style="height: 60px; min-width: 80px; display: inline-flex; align-items: center; justify-content: flex-start; border: 1px solid #ddd; background: #f9f9f9;">';
+                        mainImageCell += '<span style="color: #666; font-size: 12px; padding: 0 8px;">Loading...</span>';
                         mainImageCell += '</div>';
                     } else {
-                        mainImageCell += '<div style="height: 60px; width: 80px; display: flex; align-items: center; justify-content: center; border: 1px solid #ddd; background: #f9f9f9; margin: 0 auto;">';
-                        mainImageCell += '<span style="color: #999; font-size: 12px;">No image</span>';
+                        mainImageCell += '<div style="height: 60px; min-width: 80px; display: inline-flex; align-items: center; justify-content: flex-start; border: 1px solid #ddd; background: #f9f9f9;">';
+                        mainImageCell += '<span style="color: #999; font-size: 12px; padding: 0 8px;">No image</span>';
                         mainImageCell += '</div>';
                     }
                     mainImageCell += '</td>';
