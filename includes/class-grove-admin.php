@@ -2186,19 +2186,21 @@ class Grove_Admin {
                                                 <div style="display: flex; align-items: center;">
                                                     <span style="font-size: 12px; color: #4B5563; margin-right: 8px;">Row page:</span>
                                                     <nav style="display: inline-flex; border-radius: 6px; box-shadow: 0 1px 2px 0 rgba(0, 0, 0, 0.05);">
-                                                        <button type="button" id="grove-prev-page" style="position: relative; display: inline-flex; align-items: center; border-radius: 6px 0 0 6px; padding: 8px; font-size: 14px; padding-top: 10px; padding-bottom: 10px; color: #9CA3AF; border: 1px solid #D1D5DB; cursor: pointer; background: white;">
+                                                        <button type="button" id="grove-first-row-page" style="position: relative; display: inline-flex; align-items: center; border-radius: 6px 0 0 0; padding: 8px; font-size: 14px; padding-top: 10px; padding-bottom: 10px; color: #9CA3AF; border: 1px solid #D1D5DB; cursor: pointer; background: white;">≪</button>
+                                                        <button type="button" id="grove-prev-row-page" style="position: relative; display: inline-flex; align-items: center; padding: 8px; font-size: 14px; padding-top: 10px; padding-bottom: 10px; color: #9CA3AF; border: 1px solid #D1D5DB; margin-left: -1px; cursor: pointer; background: white;">
                                                             <svg style="width: 16px; height: 16px; color: #6B7280;" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3">
                                                                 <path d="M1 4v6h6" />
                                                                 <path d="M3.51 15a9 9 0 1 0 2.13-9.36L1 10" />
                                                             </svg>
                                                         </button>
-                                                        <button type="button" id="grove-page-info-btn" style="position: relative; display: inline-flex; align-items: center; padding: 8px 12px; font-size: 14px; padding-top: 10px; padding-bottom: 10px; border: 1px solid #D1D5DB; margin-left: -1px; cursor: pointer; background: white; font-weight: bold;">1</button>
-                                                        <button type="button" id="grove-next-page" style="position: relative; display: inline-flex; align-items: center; border-radius: 0 6px 6px 0; padding: 8px; font-size: 14px; padding-top: 10px; padding-bottom: 10px; color: #9CA3AF; border: 1px solid #D1D5DB; margin-left: -1px; cursor: pointer; background: white;">
+                                                        <span style="position: relative; display: inline-flex; align-items: center; padding: 8px 12px; font-size: 14px; padding-top: 10px; padding-bottom: 10px; border: 1px solid #D1D5DB; margin-left: -1px; background: white; font-weight: bold;"><span id="grove-current-row-page">1</span> of <span id="grove-total-row-pages">1</span></span>
+                                                        <button type="button" id="grove-next-row-page" style="position: relative; display: inline-flex; align-items: center; padding: 8px; font-size: 14px; padding-top: 10px; padding-bottom: 10px; color: #9CA3AF; border: 1px solid #D1D5DB; margin-left: -1px; cursor: pointer; background: white;">
                                                             <svg style="width: 16px; height: 16px; color: #6B7280;" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3">
                                                                 <path d="M23 4v6h-6" />
                                                                 <path d="M20.49 15a9 9 0 1 1-2.13-9.36L23 10" />
                                                             </svg>
                                                         </button>
+                                                        <button type="button" id="grove-last-row-page" style="position: relative; display: inline-flex; align-items: center; border-radius: 0 6px 6px 0; padding: 8px; font-size: 14px; padding-top: 10px; padding-bottom: 10px; color: #9CA3AF; border: 1px solid #D1D5DB; margin-left: -1px; cursor: pointer; background: white;">≫</button>
                                                     </nav>
                                                 </div>
                                             </div>
@@ -2239,7 +2241,7 @@ class Grove_Admin {
                                                             <path d="M3.51 15a9 9 0 1 0 2.13-9.36L1 10" />
                                                         </svg>
                                                     </button>
-                                                    <button type="button" id="grove-col-page-display" style="padding: 8px 12px; font-size: 14px; padding-top: 10px; padding-bottom: 10px; border: 1px solid #000; margin-right: -1px; cursor: pointer; background: white; font-weight: bold;">1</button>
+                                                    <span style="padding: 8px 12px; font-size: 14px; padding-top: 10px; padding-bottom: 10px; border: 1px solid #000; margin-right: -1px; background: white; font-weight: bold; display: inline-flex; align-items: center;"><span id="grove-current-col-page">1</span> of <span id="grove-total-col-pages">1</span></span>
                                                     <button type="button" id="grove-next-col-page" style="padding: 8px; font-size: 14px; padding-top: 10px; padding-bottom: 10px; border: 1px solid #000; margin-right: -1px; cursor: pointer; background: white;">
                                                         <svg style="width: 16px; height: 16px; color: #6B7280;" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3">
                                                             <path d="M23 4v6h-6" />
@@ -2294,6 +2296,7 @@ class Grove_Admin {
                                 <th data-sort="description1_short" style="padding: 12px 8px; border: 1px solid #ddd; font-weight: bold; text-transform: lowercase; cursor: pointer; background: #f8f9fa;">description1_short</th>
                                 <th data-sort="description1_long" style="padding: 12px 8px; border: 1px solid #ddd; font-weight: bold; text-transform: lowercase; cursor: pointer; background: #f8f9fa;">description1_long</th>
                                 <th data-sort="rel_image1_id" style="padding: 12px 8px; border: 1px solid #ddd; font-weight: bold; text-transform: lowercase; cursor: pointer; background: #f8f9fa;">rel_image1_id</th>
+                                <th style="padding: 12px 8px; border: 1px solid #ddd; font-weight: bold; text-transform: lowercase; background: #f8f9fa;">image-main-display</th>
                                 <th style="padding: 12px 8px; border: 1px solid #ddd; font-weight: bold; font-size: 16px; text-transform: lowercase; background: #f8f9fa;">image-alternative-display-method</th>
                                 <th style="padding: 12px 8px; border: 1px solid #ddd; font-weight: bold; text-transform: lowercase; background: #f8f9fa;">width</th>
                                 <th style="padding: 12px 8px; border: 1px solid #ddd; font-weight: bold; text-transform: lowercase; background: #f8f9fa;">height</th>
@@ -2472,6 +2475,8 @@ class Grove_Admin {
                             currentData = response.data;
                             filteredData = currentData;
                             displayData();
+                            // Initialize pagination after data is loaded
+                            applyPagination();
                         } else {
                             alert('Error loading services data: ' + response.data);
                         }
@@ -2502,32 +2507,39 @@ class Grove_Admin {
                     tr.append('<td style="padding: 8px; border: 1px solid #ddd; cursor: pointer;" data-field="description1_short" data-id="' + service.service_id + '">' + (service.description1_short || '') + '</td>');
                     tr.append('<td style="padding: 8px; border: 1px solid #ddd; cursor: pointer;" data-field="description1_long" data-id="' + service.service_id + '">' + (service.description1_long || '') + '</td>');
                     
-                    // Image column with preview and buttons
+                    // Image column with only buttons and ID
                     let imageCell = '<td style="padding: 8px; border: 1px solid #ddd; text-align: center;" class="image-cell" data-id="' + service.service_id + '">';
-                    imageCell += '<div style="display: flex; gap: 8px; align-items: center;">';
                     
                     if (service.rel_image1_id && service.rel_image1_id > 0) {
-                        imageCell += '<div style="display: flex; flex-direction: column; gap: 2px;">';
+                        imageCell += '<div style="display: flex; flex-direction: column; gap: 2px; align-items: center;">';
                         imageCell += '<span style="color: green; font-size: 10px;">ID: ' + service.rel_image1_id + '</span>';
                         imageCell += '<div style="display: flex; gap: 4px;">';
                         imageCell += '<button class="button button-small edit-image-btn" data-id="' + service.service_id + '" data-image="' + service.rel_image1_id + '" style="font-size: 11px; padding: 2px 6px;">Edit</button>';
                         imageCell += '<button class="button button-small delete-image-btn" data-id="' + service.service_id + '" style="font-size: 11px; padding: 2px 6px; background: #dc3545; color: white; border-color: #dc3545;">Clear</button>';
                         imageCell += '</div>';
                         imageCell += '</div>';
-                        imageCell += '<div class="image-preview-container" data-attachment-id="' + service.rel_image1_id + '" style="height: 60px; width: 80px; display: flex; align-items: center; justify-content: center; border: 1px solid #ddd; background: #f9f9f9;">';
-                        imageCell += '<span style="color: #666; font-size: 12px;">Loading...</span>';
-                        imageCell += '</div>';
                     } else {
-                        imageCell += '<div style="display: flex; flex-direction: column; gap: 2px;">';
+                        imageCell += '<div style="display: flex; flex-direction: column; gap: 2px; align-items: center;">';
                         imageCell += '<button class="button button-small upload-image-btn" data-id="' + service.service_id + '" style="font-size: 11px; padding: 2px 6px;">Upload</button>';
-                        imageCell += '</div>';
-                        imageCell += '<div style="height: 60px; width: 80px; display: flex; align-items: center; justify-content: center; border: 1px solid #ddd; background: #f9f9f9;">';
-                        imageCell += '<span style="color: #999; font-size: 12px;">No image</span>';
                         imageCell += '</div>';
                     }
                     
-                    imageCell += '</div></td>';
+                    imageCell += '</td>';
                     tr.append(imageCell);
+                    
+                    // Image main display column
+                    let mainImageCell = '<td style="padding: 8px; border: 1px solid #ddd; text-align: center;">';
+                    if (service.rel_image1_id && service.rel_image1_id > 0) {
+                        mainImageCell += '<div class="image-preview-container" data-attachment-id="' + service.rel_image1_id + '" style="height: 60px; width: 80px; display: flex; align-items: center; justify-content: center; border: 1px solid #ddd; background: #f9f9f9; margin: 0 auto;">';
+                        mainImageCell += '<span style="color: #666; font-size: 12px;">Loading...</span>';
+                        mainImageCell += '</div>';
+                    } else {
+                        mainImageCell += '<div style="height: 60px; width: 80px; display: flex; align-items: center; justify-content: center; border: 1px solid #ddd; background: #f9f9f9; margin: 0 auto;">';
+                        mainImageCell += '<span style="color: #999; font-size: 12px;">No image</span>';
+                        mainImageCell += '</div>';
+                    }
+                    mainImageCell += '</td>';
+                    tr.append(mainImageCell);
                     
                     // Image alternative display method column
                     let altImageCell = '<td style="padding: 8px; border: 1px solid #ddd; text-align: center;">';
@@ -2976,6 +2988,221 @@ class Grove_Admin {
                     }
                 });
             });
+            
+            // PAGINATION FUNCTIONALITY FOR ROCKET CHAMBER
+            
+            // Global pagination state
+            let currentRowsPerPage = 25;
+            let currentColsPerPage = 15;
+            let currentRowPage = 1;
+            let currentColPage = 1;
+            let totalRowPages = 1;
+            let totalColPages = 1;
+            let totalDataRows = 0;
+            let totalDataCols = 0;
+            
+            // Calculate pagination values
+            function calculatePagination() {
+                totalDataRows = currentData.length;
+                // Count actual columns in the table (minus checkbox column)
+                totalDataCols = $('#services-table th').length - 1;
+                
+                if (currentRowsPerPage === 'all') {
+                    totalRowPages = 1;
+                } else {
+                    totalRowPages = Math.ceil(totalDataRows / currentRowsPerPage);
+                }
+                
+                if (currentColsPerPage === 'all') {
+                    totalColPages = 1;
+                } else {
+                    totalColPages = Math.ceil(totalDataCols / currentColsPerPage);
+                }
+                
+                // Ensure current pages are within bounds
+                currentRowPage = Math.min(currentRowPage, Math.max(1, totalRowPages));
+                currentColPage = Math.min(currentColPage, Math.max(1, totalColPages));
+            }
+            
+            // Update pagination displays
+            function updatePaginationDisplays() {
+                calculatePagination();
+                
+                // Update row page display
+                $('#grove-current-row-page').text(currentRowPage);
+                $('#grove-total-row-pages').text(totalRowPages);
+                
+                // Update column page display  
+                $('#grove-current-col-page').text(currentColPage);
+                $('#grove-total-col-pages').text(totalColPages);
+                
+                // Update button states
+                $('#grove-first-row-page').prop('disabled', currentRowPage <= 1);
+                $('#grove-prev-row-page').prop('disabled', currentRowPage <= 1);
+                $('#grove-next-row-page').prop('disabled', currentRowPage >= totalRowPages);
+                $('#grove-last-row-page').prop('disabled', currentRowPage >= totalRowPages);
+                
+                $('#grove-first-col-page').prop('disabled', currentColPage <= 1);
+                $('#grove-prev-col-page').prop('disabled', currentColPage <= 1);
+                $('#grove-next-col-page').prop('disabled', currentColPage >= totalColPages);
+                $('#grove-last-col-page').prop('disabled', currentColPage >= totalColPages);
+            }
+            
+            // Apply pagination to data display
+            function applyPagination() {
+                let startRow = 0;
+                let endRow = totalDataRows;
+                
+                if (currentRowsPerPage !== 'all') {
+                    startRow = (currentRowPage - 1) * currentRowsPerPage;
+                    endRow = Math.min(startRow + currentRowsPerPage, totalDataRows);
+                }
+                
+                // Get paginated data
+                let paginatedData = currentData.slice(startRow, endRow);
+                filteredData = paginatedData;
+                
+                // Apply column pagination by hiding/showing columns
+                if (currentColsPerPage !== 'all') {
+                    let startCol = (currentColPage - 1) * currentColsPerPage;
+                    let endCol = startCol + currentColsPerPage;
+                    
+                    // Hide all columns except checkbox first
+                    $('#services-table th').each(function(index) {
+                        if (index === 0) {
+                            $(this).show(); // Always show checkbox column
+                        } else if (index >= startCol + 1 && index <= endCol) {
+                            $(this).show();
+                        } else {
+                            $(this).hide();
+                        }
+                    });
+                    
+                    // Apply same logic to all rows
+                    $('#services-table tbody tr').each(function() {
+                        $(this).find('td').each(function(index) {
+                            if (index === 0) {
+                                $(this).show(); // Always show checkbox column
+                            } else if (index >= startCol + 1 && index <= endCol) {
+                                $(this).show();
+                            } else {
+                                $(this).hide();
+                            }
+                        });
+                    });
+                } else {
+                    // Show all columns
+                    $('#services-table th, #services-table td').show();
+                }
+                
+                // Refresh the display
+                displayData();
+                updatePaginationDisplays();
+            }
+            
+            // Rows per page handlers
+            $('.grove-rows-per-page-btn').click(function() {
+                $('.grove-rows-per-page-btn').removeClass('active').css({
+                    'background': 'white',
+                    'color': 'black',
+                    'border': '1px solid #D1D5DB'
+                });
+                
+                $(this).addClass('active').css({
+                    'background': '#3B82F6',
+                    'color': 'white',
+                    'border': '1px solid #3B82F6'
+                });
+                
+                let newRowsPerPage = $(this).data('rows');
+                if (newRowsPerPage === 'all') {
+                    currentRowsPerPage = 'all';
+                } else {
+                    currentRowsPerPage = parseInt(newRowsPerPage);
+                }
+                
+                currentRowPage = 1; // Reset to first page
+                applyPagination();
+            });
+            
+            // Columns per page handlers
+            $('.grove-cols-per-page-btn').click(function() {
+                $('.grove-cols-per-page-btn').removeClass('active').css({
+                    'background': 'white',
+                    'color': 'black',
+                    'border': '1px solid #000'
+                });
+                
+                $(this).addClass('active').css({
+                    'background': '#f8f782',
+                    'color': 'black',
+                    'border': '1px solid #000'
+                });
+                
+                let newColsPerPage = $(this).data('cols');
+                if (newColsPerPage === 'all') {
+                    currentColsPerPage = 'all';
+                } else {
+                    currentColsPerPage = parseInt(newColsPerPage);
+                }
+                
+                currentColPage = 1; // Reset to first page
+                applyPagination();
+            });
+            
+            // Row navigation handlers
+            $('#grove-first-row-page').click(function() {
+                currentRowPage = 1;
+                applyPagination();
+            });
+            
+            $('#grove-prev-row-page').click(function() {
+                if (currentRowPage > 1) {
+                    currentRowPage--;
+                    applyPagination();
+                }
+            });
+            
+            $('#grove-next-row-page').click(function() {
+                if (currentRowPage < totalRowPages) {
+                    currentRowPage++;
+                    applyPagination();
+                }
+            });
+            
+            $('#grove-last-row-page').click(function() {
+                currentRowPage = totalRowPages;
+                applyPagination();
+            });
+            
+            // Column navigation handlers
+            $('#grove-first-col-page').click(function() {
+                currentColPage = 1;
+                applyPagination();
+            });
+            
+            $('#grove-prev-col-page').click(function() {
+                if (currentColPage > 1) {
+                    currentColPage--;
+                    applyPagination();
+                }
+            });
+            
+            $('#grove-next-col-page').click(function() {
+                if (currentColPage < totalColPages) {
+                    currentColPage++;
+                    applyPagination();
+                }
+            });
+            
+            $('#grove-last-col-page').click(function() {
+                currentColPage = totalColPages;
+                applyPagination();
+            });
+            
+            // Pagination is initialized when data is loaded in the AJAX success callback
+            
+            // END PAGINATION FUNCTIONALITY
             
             // Cancel page selection
             $('#cancel-page-select').click(function() {
