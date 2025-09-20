@@ -1,5 +1,10 @@
 <?php
 
+// Include the shared schema definitions if available
+if (file_exists(dirname(dirname(dirname(__FILE__))) . '/shenzi-shared-db-schema/schema-definitions.php')) {
+    require_once dirname(dirname(dirname(__FILE__))) . '/shenzi-shared-db-schema/schema-definitions.php';
+}
+
 /**
  * Grove Database Class
  * Handles shared database schema creation and management
@@ -7,7 +12,7 @@
  */
 class Grove_Database {
     
-    const ZEN_DB_VERSION = '1.7';
+    const ZEN_DB_VERSION = '1.8';
     
     public function __construct() {
         // Check and create tables on initialization
@@ -39,40 +44,131 @@ class Grove_Database {
     
     /**
      * Create all zen tables with shared schema
-     * Uses CREATE TABLE IF NOT EXISTS for safe operation
+     * Now uses dbDelta for automatic column updates
      */
     public function create_zen_tables() {
         global $wpdb;
         
-        $charset_collate = $wpdb->get_charset_collate();
-        
-        // Include WordPress upgrade functions
-        require_once(ABSPATH . 'wp-admin/includes/upgrade.php');
-        
-        // Create zen_sitespren table
-        $this->create_sitespren_table($charset_collate);
-        
-        // Create zen_services table
-        $this->create_services_table($charset_collate);
-        
-        // Create zen_locations table
-        $this->create_locations_table($charset_collate);
-        
-        // Create zen_factory_codes table
-        $this->create_factory_codes_table($charset_collate);
-        
-        // Create zen_hoof_codes table
-        $this->create_hoof_codes_table($charset_collate);
-        
-        // Create zen_lighthouse_friendly_names table
-        $this->create_lighthouse_friendly_names_table($charset_collate);
-        
-        // Create zen_general_shortcodes table
-        $this->create_general_shortcodes_table($charset_collate);
+        // If shared schema class is available, use it with dbDelta
+        if (class_exists('Shenzi_Shared_Schema')) {
+            // Use the shared schema with dbDelta for automatic column updates
+            $results = Shenzi_Shared_Schema::create_or_update_tables($wpdb->prefix);
+            
+            // Log results if in debug mode
+            if (defined('WP_DEBUG') && WP_DEBUG) {
+                error_log('Grove: Tables updated using dbDelta - ' . print_r($results, true));
+            }
+        } else {
+            // Fallback to original method if shared schema not available
+            $charset_collate = $wpdb->get_charset_collate();
+            
+            // Include WordPress upgrade functions
+            require_once(ABSPATH . 'wp-admin/includes/upgrade.php');
+            
+            // Use dbDelta for sitespren table
+            $this->create_sitespren_table_with_dbdelta($charset_collate);
+            
+            // Create other tables
+            $this->create_services_table($charset_collate);
+            $this->create_locations_table($charset_collate);
+            $this->create_factory_codes_table($charset_collate);
+            $this->create_hoof_codes_table($charset_collate);
+            $this->create_lighthouse_friendly_names_table($charset_collate);
+            $this->create_general_shortcodes_table($charset_collate);
+        }
     }
     
     /**
-     * Create zen_sitespren table
+     * Create zen_sitespren table using dbDelta for automatic column updates
+     */
+    private function create_sitespren_table_with_dbdelta($charset_collate) {
+        global $wpdb;
+        require_once(ABSPATH . 'wp-admin/includes/upgrade.php');
+        
+        $table_name = $wpdb->prefix . 'zen_sitespren';
+        
+        // Note: dbDelta requires specific formatting:
+        // - Two spaces after PRIMARY KEY
+        // - Must have PRIMARY KEY on same line as column definition
+        $sql = "CREATE TABLE $table_name (
+            wppma_id int(11) NOT NULL AUTO_INCREMENT,
+            wppma_db_only_created_at timestamp DEFAULT CURRENT_TIMESTAMP,
+            wppma_db_only_updated_at timestamp DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+            id varchar(255) NOT NULL,
+            created_at timestamp NULL,
+            sitespren_base varchar(255) DEFAULT NULL,
+            true_root_domain varchar(255) DEFAULT NULL,
+            full_subdomain varchar(255) DEFAULT NULL,
+            webproperty_type varchar(255) DEFAULT NULL,
+            fk_users_id varchar(255) DEFAULT NULL,
+            updated_at timestamp NULL,
+            wpuser1 varchar(255) DEFAULT NULL,
+            wppass1 varchar(255) DEFAULT NULL,
+            wp_plugin_installed1 tinyint(1) DEFAULT NULL,
+            wp_plugin_connected2 tinyint(1) DEFAULT NULL,
+            fk_domreg_hostaccount varchar(255) DEFAULT NULL,
+            is_wp_site tinyint(1) DEFAULT NULL,
+            wp_rest_app_pass varchar(255) DEFAULT NULL,
+            driggs_industry varchar(255) DEFAULT NULL,
+            driggs_city varchar(255) DEFAULT NULL,
+            driggs_brand_name varchar(255) DEFAULT NULL,
+            driggs_site_type_purpose varchar(255) DEFAULT NULL,
+            driggs_email_1 varchar(255) DEFAULT NULL,
+            driggs_address_full text DEFAULT NULL,
+            driggs_address_species_id int(11) DEFAULT NULL,
+            driggs_phone_country_code int(11) DEFAULT 1,
+            driggs_phone_1 varchar(255) DEFAULT NULL,
+            driggs_phone1_platform_id int(11) DEFAULT NULL,
+            driggs_cgig_id int(11) DEFAULT NULL,
+            driggs_citations_done tinyint(1) DEFAULT NULL,
+            driggs_social_profiles_done tinyint(1) DEFAULT NULL,
+            driggs_special_note_for_ai_tool text DEFAULT NULL,
+            driggs_hours text DEFAULT NULL,
+            driggs_owner_name varchar(255) DEFAULT NULL,
+            driggs_short_descr text DEFAULT NULL,
+            driggs_long_descr text DEFAULT NULL,
+            driggs_year_opened int(11) DEFAULT NULL,
+            driggs_employees_qty int(11) DEFAULT NULL,
+            driggs_keywords text DEFAULT NULL,
+            driggs_category varchar(255) DEFAULT NULL,
+            driggs_address_species_note text DEFAULT NULL,
+            driggs_payment_methods text DEFAULT NULL,
+            driggs_social_media_links text DEFAULT NULL,
+            driggs_street_1 varchar(255) DEFAULT NULL,
+            driggs_street_2 varchar(255) DEFAULT NULL,
+            driggs_state_code varchar(10) DEFAULT NULL,
+            driggs_zip varchar(20) DEFAULT NULL,
+            driggs_state_full varchar(255) DEFAULT NULL,
+            driggs_country varchar(255) DEFAULT NULL,
+            driggs_gmaps_widget_location_1 text DEFAULT NULL,
+            driggs_revenue_goal decimal(15,2) DEFAULT NULL,
+            ns_full varchar(255) DEFAULT NULL,
+            ip_address varchar(45) DEFAULT NULL,
+            is_starred1 varchar(10) DEFAULT NULL,
+            icon_name varchar(255) DEFAULT NULL,
+            icon_color varchar(50) DEFAULT NULL,
+            is_bulldozer tinyint(1) DEFAULT 0,
+            is_competitor tinyint(1) DEFAULT 0,
+            is_external tinyint(1) DEFAULT 0,
+            is_internal tinyint(1) DEFAULT 0,
+            is_ppx tinyint(1) DEFAULT 0,
+            is_ms tinyint(1) DEFAULT 0,
+            is_wayback_rebuild tinyint(1) DEFAULT 0,
+            is_naked_wp_build tinyint(1) DEFAULT 0,
+            is_rnr tinyint(1) DEFAULT 0,
+            is_aff tinyint(1) DEFAULT 0,
+            is_other1 tinyint(1) DEFAULT 0,
+            is_other2 tinyint(1) DEFAULT 0,
+            driggs_logo_url text DEFAULT NULL,
+            PRIMARY KEY  (wppma_id)
+        ) $charset_collate;";
+        
+        // Use dbDelta to create or update the table
+        dbDelta($sql);
+    }
+    
+    /**
+     * Legacy method for backward compatibility
      */
     private function create_sitespren_table($charset_collate) {
         global $wpdb;
