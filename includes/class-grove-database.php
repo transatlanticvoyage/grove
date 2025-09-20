@@ -129,6 +129,7 @@ class Grove_Database {
             driggs_zip varchar(20) DEFAULT NULL,
             driggs_state_full varchar(255) DEFAULT NULL,
             driggs_country varchar(255) DEFAULT NULL,
+            driggs_gmaps_widget_location_1 text DEFAULT NULL,
             driggs_revenue_goal decimal(15,2) DEFAULT NULL,
             ns_full varchar(255) DEFAULT NULL,
             ip_address varchar(45) DEFAULT NULL,

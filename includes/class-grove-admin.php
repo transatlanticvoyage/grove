@@ -476,6 +476,7 @@ class Grove_Admin {
                     {key: 'driggs_zip', label: 'driggs_zip', type: 'text'},
                     {key: 'driggs_state_full', label: 'driggs_state_full', type: 'text'},
                     {key: 'driggs_country', label: 'driggs_country', type: 'text'},
+                    {key: 'driggs_gmaps_widget_location_1', label: 'driggs_gmaps_widget_location_1', type: 'text'},
                     
                     // backlinks section
                     {key: 'backlinks_section_separator', label: 'backlinks section', type: 'separator'},
@@ -1649,7 +1650,7 @@ class Grove_Admin {
             
             // Address fields
             'driggs_address_full', 'driggs_address_species_id', 'driggs_street_1', 'driggs_street_2',
-            'driggs_state_code', 'driggs_zip', 'driggs_state_full', 'driggs_country', 'driggs_address_species_note',
+            'driggs_state_code', 'driggs_zip', 'driggs_state_full', 'driggs_country', 'driggs_gmaps_widget_location_1', 'driggs_address_species_note',
             
             // Contact fields
             'driggs_phone_country_code', 'driggs_phone_1', 'driggs_phone1_platform_id',
@@ -3867,6 +3868,7 @@ class Grove_Admin {
             array('key' => 'driggs_zip', 'label' => 'driggs_zip', 'type' => 'text'),
             array('key' => 'driggs_state_full', 'label' => 'driggs_state_full', 'type' => 'text'),
             array('key' => 'driggs_country', 'label' => 'driggs_country', 'type' => 'text'),
+            array('key' => 'driggs_gmaps_widget_location_1', 'label' => 'driggs_gmaps_widget_location_1', 'type' => 'text'),
             array('key' => 'ns_full', 'label' => 'ns_full', 'type' => 'text'),
             array('key' => 'ip_address', 'label' => 'ip_address', 'type' => 'text'),
             array('key' => 'is_starred1', 'label' => 'is_starred1', 'type' => 'text'),
