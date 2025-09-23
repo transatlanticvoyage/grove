@@ -7,6 +7,7 @@ class Grove_Admin {
     
     public function __construct() {
         add_action('admin_menu', array($this, 'add_admin_menu'));
+        add_action('admin_enqueue_scripts', array($this, 'enqueue_admin_styles'));
         add_action('wp_ajax_grove_driggs_get_data', array($this, 'grove_driggs_get_data'));
         add_action('wp_ajax_grove_driggs_update_field', array($this, 'grove_driggs_update_field'));
         add_action('wp_ajax_grove_locations_get_data', array($this, 'grove_locations_get_data'));
@@ -50,6 +51,18 @@ class Grove_Admin {
         add_action('wp_ajax_grove_generalshortcodes_delete', array($this, 'grove_generalshortcodes_delete'));
         // WordPress native settings handlers
         add_action('wp_ajax_grove_update_site_settings', array($this, 'grove_update_site_settings'));
+    }
+    
+    public function enqueue_admin_styles($hook) {
+        // Only enqueue on Grove admin pages
+        if (strpos($hook, 'grove') !== false) {
+            wp_enqueue_style(
+                'shenfur-grove-styles',
+                plugin_dir_url(dirname(__FILE__)) . 'assets/css/shenfur_grove_styles.css',
+                array(),
+                '1.0.0'
+            );
+        }
     }
     
     public function add_admin_menu() {
