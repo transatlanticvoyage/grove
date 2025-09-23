@@ -2439,6 +2439,19 @@ class Grove_Admin {
             let currentData = [];
             let filteredData = [];
             
+            // Wolf Exclusion Band - Columns that are always visible (sticky)
+            const wolfExclusionBandColumns = ['service_id', 'service_name', 'suggested_url_slug'];
+            
+            // Paginated Columns - Columns subject to pagination controls (excluding wolf band and special columns)
+            const paginatedColumns = [
+                'service_placard', 'service_moniker', 'service_slug_id', 
+                'description1_short', 'description1_long', 'rel_image1_id',
+                'asn_service_page_id', 'is_pinned_service'
+            ];
+            
+            // Special columns that are always shown but not in wolf band
+            const specialColumns = ['image-main-display', 'image-alternative-display-method', 'width', 'height'];
+            
             // Load initial data
             loadServicesData();
             
@@ -3028,11 +3041,14 @@ class Grove_Admin {
             let totalDataRows = 0;
             let totalDataCols = 0;
             
-            // Calculate pagination values
+            // Calculate pagination values with Wolf Exclusion Band support
             function calculatePagination() {
                 totalDataRows = currentData.length;
-                // Count actual columns in the table from one row (minus checkbox column)
-                totalDataCols = $('#services-table thead tr:last th').length - 1;
+                
+                // Count actual columns in the table, excluding wolf exclusion band columns
+                let totalTableCols = $('#services-table thead tr:last th').length;
+                const wolfBandColumnCount = 4; // checkbox, service_id, service_name, suggested_url_slug
+                totalDataCols = Math.max(0, totalTableCols - wolfBandColumnCount);
                 
                 if (currentRowsPerPage === 'all') {
                     totalRowPages = 1;
@@ -3099,21 +3115,26 @@ class Grove_Admin {
                 updatePaginationDisplays();
             }
             
-            // Separate function for column pagination
+            // Separate function for column pagination with Wolf Exclusion Band support
             function applyColumnPagination() {
                 if (currentColsPerPage !== 'all') {
-                    let startCol = (currentColPage - 1) * currentColsPerPage;
-                    let endCol = startCol + currentColsPerPage;
+                    // Wolf Exclusion Band: checkbox + service_id + service_name + suggested_url_slug (indices 0,1,2,3)
+                    const wolfBandIndices = [0, 1, 2, 3]; // checkbox, service_id, service_name, suggested_url_slug
+                    const wolfBandCount = wolfBandIndices.length;
+                    
+                    // Calculate paginated column range (starts after wolf band)
+                    let startCol = wolfBandCount + (currentColPage - 1) * currentColsPerPage;
+                    let endCol = startCol + currentColsPerPage - 1;
                     
                     // Apply to each header row separately
                     $('#services-table thead tr').each(function() {
                         $(this).find('th').each(function(index) {
-                            if (index === 0) {
-                                $(this).show(); // Always show checkbox column
-                            } else if (index >= startCol + 1 && index <= endCol) {
-                                $(this).show();
+                            if (wolfBandIndices.includes(index)) {
+                                $(this).show().addClass('wolf-exclusion-band'); // Always show wolf band columns
+                            } else if (index >= startCol && index <= endCol) {
+                                $(this).show().removeClass('wolf-exclusion-band');
                             } else {
-                                $(this).hide();
+                                $(this).hide().removeClass('wolf-exclusion-band');
                             }
                         });
                     });
@@ -3121,18 +3142,18 @@ class Grove_Admin {
                     // Apply same logic to all data rows
                     $('#services-table tbody tr').each(function() {
                         $(this).find('td').each(function(index) {
-                            if (index === 0) {
-                                $(this).show(); // Always show checkbox column
-                            } else if (index >= startCol + 1 && index <= endCol) {
-                                $(this).show();
+                            if (wolfBandIndices.includes(index)) {
+                                $(this).show().addClass('wolf-exclusion-band'); // Always show wolf band columns
+                            } else if (index >= startCol && index <= endCol) {
+                                $(this).show().removeClass('wolf-exclusion-band');
                             } else {
-                                $(this).hide();
+                                $(this).hide().removeClass('wolf-exclusion-band');
                             }
                         });
                     });
                 } else {
                     // Show all columns
-                    $('#services-table th, #services-table td').show();
+                    $('#services-table th, #services-table td').show().removeClass('wolf-exclusion-band');
                 }
             }
             

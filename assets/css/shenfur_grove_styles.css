@@ -2,3 +2,62 @@
  * Shenfur Grove Plugin Styles
  * Central CSS file for all Grove admin pages
  */
+
+/* Wolf Exclusion Band - Sticky columns that remain visible during pagination */
+.wolf-exclusion-band {
+    position: sticky !important;
+    background: #f0f8ff !important;
+    border-right: 2px solid #4a90e2 !important;
+    z-index: 10 !important;
+}
+
+/* Wolf exclusion band sticky positioning for each column */
+.wolf-exclusion-band:nth-child(1) {
+    left: 0px !important;
+    width: 50px !important;
+}
+
+.wolf-exclusion-band:nth-child(2) {
+    left: 50px !important;
+    min-width: 80px !important;
+}
+
+.wolf-exclusion-band:nth-child(3) {
+    left: 130px !important;
+    min-width: 120px !important;
+}
+
+.wolf-exclusion-band:nth-child(4) {
+    left: 250px !important;
+    min-width: 140px !important;
+}
+
+/* Wolf exclusion band visual separator */
+.wolf-exclusion-band:last-of-type::after {
+    content: '';
+    position: absolute;
+    top: 0;
+    right: -1px;
+    bottom: 0;
+    width: 3px;
+    background: linear-gradient(to bottom, #4a90e2, #357abd);
+    z-index: 11;
+}
+
+/* Ensure table has proper styling for sticky columns */
+#services-table {
+    position: relative;
+    overflow-x: auto;
+}
+
+/* Wolf exclusion band header styling */
+thead .wolf-exclusion-band {
+    background: #e6f3ff !important;
+    font-weight: bold !important;
+    color: #2c5282 !important;
+}
+
+/* Wolf exclusion band row hover effect */
+tbody tr:hover .wolf-exclusion-band {
+    background: #dbeafe !important;
+}
