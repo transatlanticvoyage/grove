@@ -34,8 +34,7 @@
 
 /* Override for content-fitting: allow wolf band columns to size naturally while staying sticky */
 .wolf-exclusion-band {
-    width: auto !important;
-    max-width: none !important;
+    max-width: none;
 }
 
 /* Wolf exclusion band visual separator */
@@ -54,31 +53,32 @@
 #services-table {
     position: relative;
     overflow-x: auto;
-    width: auto !important;
-    table-layout: auto !important;
+    width: auto;
+    table-layout: auto;
 }
 
-/* Make all table cells fit their content */
-#services-table th,
-#services-table td {
-    white-space: nowrap !important;
-    width: auto !important;
-    padding: 8px 12px !important;
+/* Make visible table cells fit their content - only apply to visible cells */
+#services-table th:not([style*="display: none"]),
+#services-table td:not([style*="display: none"]) {
+    white-space: nowrap;
+    padding: 8px 12px;
 }
 
 /* Special width handling for specific columns */
 #services-table th:first-child,
 #services-table td:first-child {
-    width: 50px !important;
-    text-align: center !important;
+    width: 50px;
+    text-align: center;
 }
 
-/* Allow longer text columns to wrap if needed, but still fit content */
+/* Allow longer text columns to wrap if needed */
 #services-table th[data-sort="description1_long"],
-#services-table td[data-field="description1_long"] {
-    white-space: normal !important;
-    max-width: 200px !important;
-    word-wrap: break-word !important;
+#services-table td[data-field="description1_long"],
+#services-table th[data-sort="description1_short"],
+#services-table td[data-field="description1_short"] {
+    white-space: normal;
+    max-width: 200px;
+    word-wrap: break-word;
 }
 
 /* Wolf exclusion band header styling */
