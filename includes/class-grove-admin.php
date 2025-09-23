@@ -2132,6 +2132,14 @@ class Grove_Admin {
                         <input type="text" id="search-box" placeholder="Search services..." style="padding: 8px 40px 8px 12px; border: 1px solid #ccc; border-radius: 4px; width: 250px; font-size: 14px;">
                         <button id="clear-search" style="position: absolute; right: 8px; top: 50%; transform: translateY(-50%); background: #ffeb3b; border: none; padding: 4px 8px; font-size: 12px; font-weight: bold; border-radius: 3px; cursor: pointer;">CL</button>
                     </div>
+                    <div style="position: relative; margin-left: 10px;">
+                        <button id="nebularis-toggle" style="padding: 8px 16px; border: 1px solid #ccc; border-radius: 4px; background: white; cursor: pointer; font-size: 14px;">nebularis</button>
+                        <div id="nebularis-content" style="display: none; position: absolute; top: 100%; left: 0; background: white; border: 1px solid #ccc; border-radius: 4px; padding: 10px; min-width: 120px; z-index: 1000; margin-top: 2px;">
+                            <div style="margin-bottom: 5px;">option 1</div>
+                            <div style="margin-bottom: 5px;">option 2</div>
+                            <div style="margin-bottom: 5px;">option 3</div>
+                        </div>
+                    </div>
                 </div>
             </div>
             
@@ -2289,7 +2297,7 @@ class Grove_Admin {
             <!-- Main Table -->
             <div style="background: white; border: 1px solid #ddd; border-radius: 5px; overflow: hidden;">
                 <div style="overflow-x: auto;">
-                    <table id="services-table" style="width: 100%; border-collapse: collapse; font-size: 14px;">
+                    <table id="services-table" style="width: auto; border-collapse: collapse; font-size: 14px; table-layout: auto;">
                         <thead style="background: #f8f9fa;">
                             <tr class="shenfur_db_table_name_tr">
                                 <th style="padding: 12px 8px; border: 1px solid #ddd; font-weight: bold; text-align: center; background: #e0e0e0;">-</th>
@@ -2763,6 +2771,11 @@ class Grove_Admin {
             // Modal functionality
             $('#create-popup-btn').click(function() {
                 $('#create-modal').show();
+            });
+            
+            // Nebularis accordion functionality
+            $('#nebularis-toggle').click(function() {
+                $('#nebularis-content').toggle();
             });
             
             $('#cancel-btn, #create-modal').click(function(e) {

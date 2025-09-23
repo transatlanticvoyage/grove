@@ -11,7 +11,7 @@
     z-index: 10 !important;
 }
 
-/* Wolf exclusion band sticky positioning for each column */
+/* Wolf exclusion band sticky positioning - simplified for content-fitting */
 .wolf-exclusion-band:nth-child(1) {
     left: 0px !important;
     width: 50px !important;
@@ -32,6 +32,12 @@
     min-width: 140px !important;
 }
 
+/* Override for content-fitting: allow wolf band columns to size naturally while staying sticky */
+.wolf-exclusion-band {
+    width: auto !important;
+    max-width: none !important;
+}
+
 /* Wolf exclusion band visual separator */
 .wolf-exclusion-band:last-of-type::after {
     content: '';
@@ -44,10 +50,35 @@
     z-index: 11;
 }
 
-/* Ensure table has proper styling for sticky columns */
+/* Ensure table has proper styling for sticky columns and content-fitting */
 #services-table {
     position: relative;
     overflow-x: auto;
+    width: auto !important;
+    table-layout: auto !important;
+}
+
+/* Make all table cells fit their content */
+#services-table th,
+#services-table td {
+    white-space: nowrap !important;
+    width: auto !important;
+    padding: 8px 12px !important;
+}
+
+/* Special width handling for specific columns */
+#services-table th:first-child,
+#services-table td:first-child {
+    width: 50px !important;
+    text-align: center !important;
+}
+
+/* Allow longer text columns to wrap if needed, but still fit content */
+#services-table th[data-sort="description1_long"],
+#services-table td[data-field="description1_long"] {
+    white-space: normal !important;
+    max-width: 200px !important;
+    word-wrap: break-word !important;
 }
 
 /* Wolf exclusion band header styling */
