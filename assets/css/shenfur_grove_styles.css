@@ -1,6 +1,34 @@
 
 
 
+/* Text truncation rules for large text columns */
+div.cell_inner_wrapper_div.for_db_table_zen_services.for_db_column_service_placard {
+    width: 150px !important;
+    overflow: hidden !important;
+    text-overflow: ellipsis !important;
+    white-space: nowrap !important;
+}
+
+div.cell_inner_wrapper_div.for_db_table_zen_services.for_db_column_service_moniker {
+    width: 150px !important;
+    overflow: hidden !important;
+    text-overflow: ellipsis !important;
+    white-space: nowrap !important;
+}
+
+div.cell_inner_wrapper_div.for_db_table_zen_services.for_db_column_description1_short {
+    width: 150px !important;
+    overflow: hidden !important;
+    text-overflow: ellipsis !important;
+    white-space: nowrap !important;
+}
+
+div.cell_inner_wrapper_div.for_db_table_zen_services.for_db_column_description1_long {
+    width: 150px !important;
+    overflow: hidden !important;
+    text-overflow: ellipsis !important;
+    white-space: nowrap !important;
+}
 
 tr.shenfur_db_table_name_tr th.for_db_table_zen_services {background-color:#f4e69f !important;}
 
