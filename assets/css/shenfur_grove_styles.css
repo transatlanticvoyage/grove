@@ -162,3 +162,16 @@ thead .wolf-exclusion-band {
 tbody tr:hover .wolf-exclusion-band {
     background: #dbeafe !important;
 }
+
+/* Image section separators */
+/* Left separator - on rel_image1_id column (11th column after moving is_pinned_service) */
+#services-table th:nth-child(11),
+#services-table td:nth-child(11) {
+    border-left: 3px solid black !important;
+}
+
+/* Right separator - on height column (15th column) */
+#services-table th:nth-child(15),
+#services-table td:nth-child(15) {
+    border-right: 3px solid black !important;
+}
