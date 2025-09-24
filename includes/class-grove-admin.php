@@ -2134,10 +2134,10 @@ class Grove_Admin {
                     </div>
                     <div style="position: relative; margin-left: 10px;">
                         <button id="nebularis-toggle" style="padding: 8px 16px; border: 1px solid #ccc; border-radius: 4px; background: white; cursor: pointer; font-size: 14px;">nebularis</button>
-                        <div id="nebularis-content" style="display: none; position: absolute; top: 100%; left: 0; background: white; border: 1px solid #ccc; border-radius: 4px; padding: 10px; min-width: 120px; z-index: 1000; margin-top: 2px;">
-                            <div style="margin-bottom: 5px;">option 1</div>
-                            <div style="margin-bottom: 5px;">option 2</div>
-                            <div style="margin-bottom: 5px;">option 3</div>
+                        <div id="nebularis-content" style="display: none; position: absolute; top: 100%; left: 0; background: white; border: 1px solid #ccc; border-radius: 4px; padding: 10px; min-width: 180px; z-index: 1000; margin-top: 2px;">
+                            <div id="nebularis-export-markdown" style="margin-bottom: 8px; padding: 5px; cursor: pointer; border-radius: 3px; transition: background 0.2s;" onmouseover="this.style.background='#f0f0f0'" onmouseout="this.style.background='white'">export all in markdown</div>
+                            <div id="nebularis-export-xls" style="margin-bottom: 8px; padding: 5px; cursor: pointer; border-radius: 3px; transition: background 0.2s;" onmouseover="this.style.background='#f0f0f0'" onmouseout="this.style.background='white'">export all in xls copy</div>
+                            <div id="nebularis-export-sql" style="padding: 5px; cursor: pointer; border-radius: 3px; transition: background 0.2s;" onmouseover="this.style.background='#f0f0f0'" onmouseout="this.style.background='white'">export all in sql</div>
                         </div>
                     </div>
                 </div>
@@ -2776,6 +2776,84 @@ class Grove_Admin {
             // Nebularis accordion functionality
             $('#nebularis-toggle').click(function() {
                 $('#nebularis-content').toggle();
+            });
+            
+            // Nebularis export functions
+            function exportToMarkdown() {
+                let markdownContent = '# Grove Services Export\n\n';
+                markdownContent += '| Service ID | Service Name | Suggested URL Slug | Service Placard | Service Moniker | Service Slug ID | Description Short | Description Long | Image ID | ASN Service Page ID | Is Pinned |\n';
+                markdownContent += '|------------|--------------|-------------------|-----------------|-----------------|-----------------|-------------------|------------------|----------|---------------------|----------|\n';
+                
+                currentData.forEach(function(service) {
+                    markdownContent += `| ${service.service_id || ''} | ${service.service_name || ''} | ${service.suggested_url_slug || ''} | ${service.service_placard || ''} | ${service.service_moniker || ''} | ${service.service_slug_id || ''} | ${service.description1_short || ''} | ${service.description1_long || ''} | ${service.rel_image1_id || ''} | ${service.asn_service_page_id || ''} | ${service.is_pinned_service ? 'Yes' : 'No'} |\n`;
+                });
+                
+                downloadFile(markdownContent, 'grove-services-export.md', 'text/markdown');
+            }
+            
+            function exportToXLSCopy() {
+                let xlsContent = 'Service ID\tService Name\tSuggested URL Slug\tService Placard\tService Moniker\tService Slug ID\tDescription Short\tDescription Long\tImage ID\tASN Service Page ID\tIs Pinned\n';
+                
+                currentData.forEach(function(service) {
+                    xlsContent += `${service.service_id || ''}\t${service.service_name || ''}\t${service.suggested_url_slug || ''}\t${service.service_placard || ''}\t${service.service_moniker || ''}\t${service.service_slug_id || ''}\t${service.description1_short || ''}\t${service.description1_long || ''}\t${service.rel_image1_id || ''}\t${service.asn_service_page_id || ''}\t${service.is_pinned_service ? 'Yes' : 'No'}\n`;
+                });
+                
+                navigator.clipboard.writeText(xlsContent).then(function() {
+                    alert('Data copied to clipboard! Paste into Excel.');
+                }).catch(function() {
+                    alert('Failed to copy to clipboard. Please try again.');
+                });
+            }
+            
+            function exportToSQL() {
+                let sqlContent = '-- Grove Services Export SQL\n\n';
+                sqlContent += 'CREATE TABLE grove_services_export (\n';
+                sqlContent += '  service_id INT,\n';
+                sqlContent += '  service_name VARCHAR(255),\n';
+                sqlContent += '  suggested_url_slug VARCHAR(255),\n';
+                sqlContent += '  service_placard VARCHAR(255),\n';
+                sqlContent += '  service_moniker VARCHAR(255),\n';
+                sqlContent += '  service_slug_id INT,\n';
+                sqlContent += '  description1_short TEXT,\n';
+                sqlContent += '  description1_long TEXT,\n';
+                sqlContent += '  rel_image1_id INT,\n';
+                sqlContent += '  asn_service_page_id INT,\n';
+                sqlContent += '  is_pinned_service BOOLEAN\n';
+                sqlContent += ');\n\n';
+                
+                currentData.forEach(function(service) {
+                    sqlContent += `INSERT INTO grove_services_export VALUES (${service.service_id || 'NULL'}, '${(service.service_name || '').replace(/'/g, "''")}', '${(service.suggested_url_slug || '').replace(/'/g, "''")}', '${(service.service_placard || '').replace(/'/g, "''")}', '${(service.service_moniker || '').replace(/'/g, "''")}', ${service.service_slug_id || 'NULL'}, '${(service.description1_short || '').replace(/'/g, "''")}', '${(service.description1_long || '').replace(/'/g, "''")}', ${service.rel_image1_id || 'NULL'}, ${service.asn_service_page_id || 'NULL'}, ${service.is_pinned_service ? 'TRUE' : 'FALSE'});\n`;
+                });
+                
+                downloadFile(sqlContent, 'grove-services-export.sql', 'text/sql');
+            }
+            
+            function downloadFile(content, filename, mimeType) {
+                const blob = new Blob([content], { type: mimeType });
+                const url = URL.createObjectURL(blob);
+                const a = document.createElement('a');
+                a.href = url;
+                a.download = filename;
+                document.body.appendChild(a);
+                a.click();
+                document.body.removeChild(a);
+                URL.revokeObjectURL(url);
+            }
+            
+            // Nebularis export click handlers
+            $('#nebularis-export-markdown').click(function() {
+                exportToMarkdown();
+                $('#nebularis-content').hide();
+            });
+            
+            $('#nebularis-export-xls').click(function() {
+                exportToXLSCopy();
+                $('#nebularis-content').hide();
+            });
+            
+            $('#nebularis-export-sql').click(function() {
+                exportToSQL();
+                $('#nebularis-content').hide();
             });
             
             $('#cancel-btn, #create-modal').click(function(e) {
