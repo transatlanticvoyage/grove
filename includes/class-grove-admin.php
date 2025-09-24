@@ -3316,6 +3316,115 @@ class Grove_Admin {
                 }
             });
             
+            // IMAGE TITLE AND ALT TEXT EDITING
+            $(document).on('blur', '.img-title-input', function() {
+                let input = $(this);
+                let attachmentId = input.data('attachment-id');
+                let newTitle = input.val().trim();
+                let originalTitle = input.data('original-title') || '';
+                
+                // Only save if value changed
+                if (newTitle !== originalTitle) {
+                    // Show saving indicator
+                    input.css('background', '#ffffcc');
+                    
+                    $.ajax({
+                        url: ajaxurl,
+                        type: 'POST',
+                        data: {
+                            action: 'grove_update_image_title',
+                            nonce: '<?php echo wp_create_nonce('grove_services_nonce'); ?>',
+                            attachment_id: attachmentId,
+                            title: newTitle
+                        },
+                        success: function(response) {
+                            if (response.success) {
+                                // Update original value
+                                input.data('original-title', newTitle);
+                                // Flash green briefly
+                                input.css('background', '#d4ffd4');
+                                setTimeout(function() {
+                                    input.css('background', '');
+                                }, 1000);
+                            } else {
+                                alert('Error updating title: ' + (response.data || 'Unknown error'));
+                                // Revert to original
+                                input.val(originalTitle);
+                                input.css('background', '');
+                            }
+                        },
+                        error: function() {
+                            alert('Error updating title');
+                            // Revert to original
+                            input.val(originalTitle);
+                            input.css('background', '');
+                        }
+                    });
+                }
+            });
+            
+            $(document).on('blur', '.alt-text-input', function() {
+                let input = $(this);
+                let attachmentId = input.data('attachment-id');
+                let newAlt = input.val().trim();
+                let originalAlt = input.data('original-alt') || '';
+                
+                // Only save if value changed
+                if (newAlt !== originalAlt) {
+                    // Show saving indicator
+                    input.css('background', '#ffffcc');
+                    
+                    $.ajax({
+                        url: ajaxurl,
+                        type: 'POST',
+                        data: {
+                            action: 'grove_update_image_alt',
+                            nonce: '<?php echo wp_create_nonce('grove_services_nonce'); ?>',
+                            attachment_id: attachmentId,
+                            alt_text: newAlt
+                        },
+                        success: function(response) {
+                            if (response.success) {
+                                // Update original value
+                                input.data('original-alt', newAlt);
+                                // Flash green briefly
+                                input.css('background', '#d4ffd4');
+                                setTimeout(function() {
+                                    input.css('background', '');
+                                }, 1000);
+                            } else {
+                                alert('Error updating alt text: ' + (response.data || 'Unknown error'));
+                                // Revert to original
+                                input.val(originalAlt);
+                                input.css('background', '');
+                            }
+                        },
+                        error: function() {
+                            alert('Error updating alt text');
+                            // Revert to original
+                            input.val(originalAlt);
+                            input.css('background', '');
+                        }
+                    });
+                }
+            });
+            
+            // Handle escape key for title and alt inputs
+            $(document).on('keydown', '.img-title-input, .alt-text-input', function(e) {
+                if (e.key === 'Escape') {
+                    let input = $(this);
+                    if (input.hasClass('img-title-input')) {
+                        input.val(input.data('original-title') || '');
+                    } else {
+                        input.val(input.data('original-alt') || '');
+                    }
+                    input.blur();
+                } else if (e.key === 'Enter') {
+                    e.preventDefault();
+                    $(this).blur();
+                }
+            });
+            
             // PAGINATION FUNCTIONALITY FOR ROCKET CHAMBER
             
             // Global pagination state

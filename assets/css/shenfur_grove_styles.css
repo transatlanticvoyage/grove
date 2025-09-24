@@ -170,8 +170,8 @@ tbody tr:hover .wolf-exclusion-band {
     border-left: 3px solid black !important;
 }
 
-/* Right separator - on file name column (16th column) */
-#services-table th:nth-child(16),
-#services-table td:nth-child(16) {
+/* Right separator - on alt text column (18th column after adding title and alt columns) */
+#services-table th:nth-child(18),
+#services-table td:nth-child(18) {
     border-right: 3px solid black !important;
 }
