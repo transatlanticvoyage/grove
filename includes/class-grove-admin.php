@@ -22,6 +22,7 @@ class Grove_Admin {
         add_action('wp_ajax_grove_get_page_title', array($this, 'grove_get_page_title'));
         add_action('wp_ajax_grove_update_service_page', array($this, 'grove_update_service_page'));
         add_action('wp_ajax_grove_get_image_data', array($this, 'grove_get_image_data'));
+        add_action('wp_ajax_grove_rename_image_file', array($this, 'grove_rename_image_file'));
         add_action('wp_ajax_grove_shortcode_update_mode', array($this, 'grove_shortcode_update_mode'));
         add_action('wp_ajax_grove_shortcode_test', array($this, 'grove_shortcode_test'));
         // Factory codes handlers
@@ -3183,24 +3184,73 @@ class Grove_Admin {
                 let container = btn.closest('.filename-editor-container');
                 let input = container.find('.filename-input');
                 let changeBtn = container.find('.filename-change-btn');
+                let attachmentId = input.data('attachment-id');
+                let newFilename = input.val().trim();
                 
-                // TODO: Add actual save functionality here when needed
-                console.log('Filename save clicked:', input.val());
+                // Validate filename
+                if (!newFilename) {
+                    alert('Please enter a valid filename');
+                    return;
+                }
                 
-                // Reset to readonly state
-                input.prop('readonly', true);
-                input.css('background', '#f9f9f9');
+                // Disable button and show loading state
+                btn.prop('disabled', true).text('Saving...');
                 
-                // Hide and disable save button
-                btn.hide();
-                btn.prop('disabled', true);
-                btn.css({'background': '#ccc', 'color': '#666'});
-                
-                // Show change button
-                changeBtn.show();
+                // Call AJAX to rename file
+                $.ajax({
+                    url: ajaxurl,
+                    type: 'POST',
+                    data: {
+                        action: 'grove_rename_image_file',
+                        nonce: '<?php echo wp_create_nonce('grove_services_nonce'); ?>',
+                        attachment_id: attachmentId,
+                        new_filename: newFilename
+                    },
+                    success: function(response) {
+                        if (response.success && response.data) {
+                            // Update input with the actual new filename (may be different due to wp_unique_filename)
+                            input.val(response.data.new_filename);
+                            
+                            // Reset to readonly state
+                            input.prop('readonly', true);
+                            input.css('background', '#f9f9f9');
+                            
+                            // Show success message briefly
+                            let originalText = btn.text();
+                            btn.text('Saved!').css({'background': '#28a745', 'color': 'white'});
+                            
+                            setTimeout(function() {
+                                // Hide and reset save button
+                                btn.hide();
+                                btn.text('Save');
+                                btn.prop('disabled', true);
+                                btn.css({'background': '#ccc', 'color': '#666'});
+                                
+                                // Show change button
+                                changeBtn.show();
+                            }, 1500);
+                            
+                            if (response.data.warnings) {
+                                console.warn('File rename warnings:', response.data.warnings);
+                            }
+                        } else {
+                            let errorMsg = response.data || 'Failed to rename file';
+                            alert('Error: ' + errorMsg);
+                            
+                            // Re-enable button
+                            btn.prop('disabled', false).text('Save');
+                        }
+                    },
+                    error: function(xhr, status, error) {
+                        alert('Error renaming file: ' + error);
+                        
+                        // Re-enable button
+                        btn.prop('disabled', false).text('Save');
+                    }
+                });
             });
             
-            // Handle escape key to cancel filename editing
+            // Handle escape and enter keys for filename editing
             $(document).on('keydown', '.filename-input', function(e) {
                 if (e.key === 'Escape') {
                     let input = $(this);
@@ -3219,6 +3269,16 @@ class Grove_Admin {
                     // Hide save button, show change button
                     saveBtn.hide();
                     changeBtn.show();
+                } else if (e.key === 'Enter') {
+                    e.preventDefault();
+                    let input = $(this);
+                    let container = input.closest('.filename-editor-container');
+                    let saveBtn = container.find('.filename-save-btn');
+                    
+                    // Trigger save if button is visible and enabled
+                    if (saveBtn.is(':visible') && !saveBtn.prop('disabled')) {
+                        saveBtn.click();
+                    }
                 }
             });
             
@@ -4052,6 +4112,116 @@ class Grove_Admin {
         );
         
         wp_send_json_success($response_data);
+    }
+    
+    /**
+     * AJAX: Rename image file in WordPress media library
+     */
+    public function grove_rename_image_file() {
+        check_ajax_referer('grove_services_nonce', 'nonce');
+        
+        if (!current_user_can('manage_options')) {
+            wp_die('Unauthorized');
+        }
+        
+        $attachment_id = intval($_POST['attachment_id']);
+        $new_filename = sanitize_file_name($_POST['new_filename']);
+        
+        if (!$attachment_id || !$new_filename) {
+            wp_send_json_error('Invalid parameters');
+            return;
+        }
+        
+        // Get current file info
+        $attached_file = get_post_meta($attachment_id, '_wp_attached_file', true);
+        if (!$attached_file) {
+            wp_send_json_error('Could not find attached file');
+            return;
+        }
+        
+        // Get upload directory
+        $upload_dir = wp_upload_dir();
+        $old_file_path = $upload_dir['basedir'] . '/' . $attached_file;
+        
+        // Ensure the old file exists
+        if (!file_exists($old_file_path)) {
+            wp_send_json_error('Original file does not exist');
+            return;
+        }
+        
+        // Extract directory and extension from old file
+        $old_file_info = pathinfo($old_file_path);
+        $directory = $old_file_info['dirname'];
+        $extension = $old_file_info['extension'];
+        
+        // Ensure new filename has the same extension
+        $new_filename_info = pathinfo($new_filename);
+        if (!isset($new_filename_info['extension'])) {
+            $new_filename = $new_filename . '.' . $extension;
+        } elseif ($new_filename_info['extension'] !== $extension) {
+            wp_send_json_error('Cannot change file extension');
+            return;
+        }
+        
+        // Generate unique filename to prevent conflicts
+        $new_filename = wp_unique_filename($directory, $new_filename);
+        $new_file_path = $directory . '/' . $new_filename;
+        
+        // Get attachment metadata
+        $metadata = wp_get_attachment_metadata($attachment_id);
+        if (!$metadata) {
+            wp_send_json_error('Could not get attachment metadata');
+            return;
+        }
+        
+        // Rename the main file
+        if (!rename($old_file_path, $new_file_path)) {
+            wp_send_json_error('Failed to rename main file');
+            return;
+        }
+        
+        // Rename all thumbnail sizes
+        $errors = array();
+        if (isset($metadata['sizes']) && is_array($metadata['sizes'])) {
+            foreach ($metadata['sizes'] as $size => &$size_data) {
+                $old_thumb_name = $size_data['file'];
+                $old_thumb_path = $directory . '/' . $old_thumb_name;
+                
+                // Generate new thumbnail name
+                $size_suffix = str_replace($old_file_info['filename'], '', str_replace('.' . $extension, '', $old_thumb_name));
+                $new_thumb_name = $new_filename_info['filename'] . $size_suffix . '.' . $extension;
+                $new_thumb_path = $directory . '/' . $new_thumb_name;
+                
+                if (file_exists($old_thumb_path)) {
+                    if (rename($old_thumb_path, $new_thumb_path)) {
+                        $size_data['file'] = $new_thumb_name;
+                    } else {
+                        $errors[] = "Failed to rename thumbnail: $size";
+                    }
+                }
+            }
+        }
+        
+        // Update the attached file path
+        $new_attached_file = str_replace(basename($attached_file), $new_filename, $attached_file);
+        update_post_meta($attachment_id, '_wp_attached_file', $new_attached_file);
+        
+        // Update metadata with new file info
+        $metadata['file'] = $new_attached_file;
+        wp_update_attachment_metadata($attachment_id, $metadata);
+        
+        // Prepare response
+        $response = array(
+            'success' => true,
+            'new_filename' => $new_filename,
+            'message' => 'File renamed successfully'
+        );
+        
+        if (!empty($errors)) {
+            $response['warnings'] = $errors;
+        }
+        
+        wp_send_json_success($response);
     }
     
     /**
