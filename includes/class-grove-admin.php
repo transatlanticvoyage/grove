@@ -60,7 +60,7 @@ class Grove_Admin {
                 'shenfur-grove-styles',
                 plugin_dir_url(dirname(__FILE__)) . 'assets/css/shenfur_grove_styles.css',
                 array(),
-                '1.0.0'
+                time()
             );
         }
     }
