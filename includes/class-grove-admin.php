@@ -1965,7 +1965,16 @@ class Grove_Admin {
                     let id = cell.data('id');
                     let currentValue = cell.text();
                     
-                    let input = $('<input type="text" style="width: 100%; padding: 4px;">');
+                    // Set width constraints for specific columns
+                    let inputStyle = 'padding: 4px;';
+                    if (field === 'service_placard' || field === 'service_moniker' || 
+                        field === 'description1_short' || field === 'description1_long') {
+                        inputStyle += ' width: 150px !important; max-width: 150px !important;';
+                    } else {
+                        inputStyle += ' width: 100%;';
+                    }
+                    
+                    let input = $('<input type="text" style="' + inputStyle + '">');
                     input.val(currentValue);
                     cell.html(input);
                     input.focus();
