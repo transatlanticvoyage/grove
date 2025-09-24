@@ -2300,44 +2300,44 @@ class Grove_Admin {
                     <table id="services-table" style="width: auto; border-collapse: collapse; font-size: 14px; table-layout: auto;">
                         <thead style="background: #f8f9fa;">
                             <tr class="shenfur_db_table_name_tr">
-                                <th style="padding: 12px 8px; border: 1px solid #ddd; font-weight: bold; text-align: center; background: #e0e0e0;">-</th>
-                                <th class="for_db_table_zen_services" style="padding: 12px 8px; border: 1px solid #ddd; font-weight: bold; text-transform: lowercase; background: #e0e0e0;">wp_zen_services</th>
-                                <th class="for_db_table_zen_services" style="padding: 12px 8px; border: 1px solid #ddd; font-weight: bold; text-transform: lowercase; background: #e0e0e0;">wp_zen_services</th>
-                                <th class="for_db_table_zen_services" style="padding: 12px 8px; border: 1px solid #ddd; font-weight: bold; text-transform: lowercase; background: #e0e0e0;">wp_zen_services</th>
-                                <th class="for_db_table_zen_services" style="padding: 12px 8px; border: 1px solid #ddd; font-weight: bold; text-transform: lowercase; background: #e0e0e0;">wp_zen_services</th>
-                                <th class="for_db_table_zen_services" style="padding: 12px 8px; border: 1px solid #ddd; font-weight: bold; text-transform: lowercase; background: #e0e0e0;">wp_zen_services</th>
-                                <th class="for_db_table_zen_services" style="padding: 12px 8px; border: 1px solid #ddd; font-weight: bold; text-transform: lowercase; background: #e0e0e0;">wp_zen_services</th>
-                                <th class="for_db_table_zen_services" style="padding: 12px 8px; border: 1px solid #ddd; font-weight: bold; text-transform: lowercase; background: #e0e0e0;">wp_zen_services</th>
-                                <th class="for_db_table_zen_services" style="padding: 12px 8px; border: 1px solid #ddd; font-weight: bold; text-transform: lowercase; background: #e0e0e0;">wp_zen_services</th>
-                                <th class="for_db_table_zen_services" style="padding: 12px 8px; border: 1px solid #ddd; font-weight: bold; text-transform: lowercase; background: #e0e0e0;">wp_zen_services</th>
-                                <th style="padding: 12px 8px; border: 1px solid #ddd; font-weight: bold; text-transform: lowercase; background: #e0e0e0;">(filler)</th>
-                                <th style="padding: 12px 8px; border: 1px solid #ddd; font-weight: bold; text-transform: lowercase; background: #e0e0e0;">(filler)</th>
-                                <th style="padding: 12px 8px; border: 1px solid #ddd; font-weight: bold; text-transform: lowercase; background: #e0e0e0;">(filler)</th>
-                                <th style="padding: 12px 8px; border: 1px solid #ddd; font-weight: bold; text-transform: lowercase; background: #e0e0e0;">(filler)</th>
-                                <th class="for_db_table_zen_services" style="padding: 12px 8px; border: 1px solid #ddd; font-weight: bold; text-transform: lowercase; background: #e0e0e0;">wp_zen_services</th>
-                                <th class="for_db_table_zen_services" style="padding: 12px 8px; border: 1px solid #ddd; font-weight: bold; text-transform: lowercase; background: #e0e0e0;">wp_zen_services</th>
-                                <th style="padding: 12px 8px; border: 1px solid #ddd; font-weight: bold; background: #e0e0e0;">(filler)</th>
+                                <th style="border: 1px solid #ddd; font-weight: bold; text-align: center; background: #e0e0e0;"><div class="cell_inner_wrapper_div">-</div></th>
+                                <th class="for_db_table_zen_services" style="border: 1px solid #ddd; font-weight: bold; text-transform: lowercase; background: #e0e0e0;"><div class="cell_inner_wrapper_div for_db_table_zen_services">wp_zen_services</div></th>
+                                <th class="for_db_table_zen_services" style="border: 1px solid #ddd; font-weight: bold; text-transform: lowercase; background: #e0e0e0;"><div class="cell_inner_wrapper_div for_db_table_zen_services">wp_zen_services</div></th>
+                                <th class="for_db_table_zen_services" style="border: 1px solid #ddd; font-weight: bold; text-transform: lowercase; background: #e0e0e0;"><div class="cell_inner_wrapper_div for_db_table_zen_services">wp_zen_services</div></th>
+                                <th class="for_db_table_zen_services" style="border: 1px solid #ddd; font-weight: bold; text-transform: lowercase; background: #e0e0e0;"><div class="cell_inner_wrapper_div for_db_table_zen_services">wp_zen_services</div></th>
+                                <th class="for_db_table_zen_services" style="border: 1px solid #ddd; font-weight: bold; text-transform: lowercase; background: #e0e0e0;"><div class="cell_inner_wrapper_div for_db_table_zen_services">wp_zen_services</div></th>
+                                <th class="for_db_table_zen_services" style="border: 1px solid #ddd; font-weight: bold; text-transform: lowercase; background: #e0e0e0;"><div class="cell_inner_wrapper_div for_db_table_zen_services">wp_zen_services</div></th>
+                                <th class="for_db_table_zen_services" style="border: 1px solid #ddd; font-weight: bold; text-transform: lowercase; background: #e0e0e0;"><div class="cell_inner_wrapper_div for_db_table_zen_services">wp_zen_services</div></th>
+                                <th class="for_db_table_zen_services" style="border: 1px solid #ddd; font-weight: bold; text-transform: lowercase; background: #e0e0e0;"><div class="cell_inner_wrapper_div for_db_table_zen_services">wp_zen_services</div></th>
+                                <th class="for_db_table_zen_services" style="border: 1px solid #ddd; font-weight: bold; text-transform: lowercase; background: #e0e0e0;"><div class="cell_inner_wrapper_div for_db_table_zen_services">wp_zen_services</div></th>
+                                <th style="border: 1px solid #ddd; font-weight: bold; text-transform: lowercase; background: #e0e0e0;"><div class="cell_inner_wrapper_div">(filler)</div></th>
+                                <th style="border: 1px solid #ddd; font-weight: bold; text-transform: lowercase; background: #e0e0e0;"><div class="cell_inner_wrapper_div">(filler)</div></th>
+                                <th style="border: 1px solid #ddd; font-weight: bold; text-transform: lowercase; background: #e0e0e0;"><div class="cell_inner_wrapper_div">(filler)</div></th>
+                                <th style="border: 1px solid #ddd; font-weight: bold; text-transform: lowercase; background: #e0e0e0;"><div class="cell_inner_wrapper_div">(filler)</div></th>
+                                <th class="for_db_table_zen_services" style="border: 1px solid #ddd; font-weight: bold; text-transform: lowercase; background: #e0e0e0;"><div class="cell_inner_wrapper_div for_db_table_zen_services">wp_zen_services</div></th>
+                                <th class="for_db_table_zen_services" style="border: 1px solid #ddd; font-weight: bold; text-transform: lowercase; background: #e0e0e0;"><div class="cell_inner_wrapper_div for_db_table_zen_services">wp_zen_services</div></th>
+                                <th style="border: 1px solid #ddd; font-weight: bold; background: #e0e0e0;"><div class="cell_inner_wrapper_div">(filler)</div></th>
                             </tr>
                             <tr>
-                                <th style="padding: 12px 8px; border: 1px solid #ddd; font-weight: bold; text-align: left; background: #f0f0f0; width: 50px;">
-                                    <input type="checkbox" id="select-all" style="width: 20px; height: 20px;">
+                                <th style="border: 1px solid #ddd; font-weight: bold; text-align: left; background: #f0f0f0; width: 50px;">
+                                    <div class="cell_inner_wrapper_div"><input type="checkbox" id="select-all" style="width: 20px; height: 20px;"></div>
                                 </th>
-                                <th class="for_db_table_zen_services" data-sort="service_id" style="padding: 12px 8px; border: 1px solid #ddd; font-weight: bold; text-transform: lowercase; cursor: pointer; background: #f8f9fa;">service_id</th>
-                                <th class="for_db_table_zen_services" data-sort="service_name" style="padding: 12px 8px; border: 1px solid #ddd; font-weight: bold; text-transform: lowercase; cursor: pointer; background: #f8f9fa;">service_name</th>
-                                <th class="for_db_table_zen_services" data-sort="suggested_url_slug" style="padding: 12px 8px; border: 1px solid #ddd; font-weight: bold; text-transform: lowercase; cursor: pointer; background: #f8f9fa;">suggested_url_slug</th>
-                                <th class="for_db_table_zen_services" data-sort="service_placard" style="padding: 12px 8px; border: 1px solid #ddd; font-weight: bold; text-transform: lowercase; cursor: pointer; background: #f8f9fa;">service_placard</th>
-                                <th class="for_db_table_zen_services" data-sort="service_moniker" style="padding: 12px 8px; border: 1px solid #ddd; font-weight: bold; text-transform: lowercase; cursor: pointer; background: #f8f9fa;">service_moniker</th>
-                                <th class="for_db_table_zen_services" data-sort="service_slug_id" style="padding: 12px 8px; border: 1px solid #ddd; font-weight: bold; text-transform: lowercase; cursor: pointer; background: #f8f9fa;">service_slug_id</th>
-                                <th class="for_db_table_zen_services" data-sort="description1_short" style="padding: 12px 8px; border: 1px solid #ddd; font-weight: bold; text-transform: lowercase; cursor: pointer; background: #f8f9fa;">description1_short</th>
-                                <th class="for_db_table_zen_services" data-sort="description1_long" style="padding: 12px 8px; border: 1px solid #ddd; font-weight: bold; text-transform: lowercase; cursor: pointer; background: #f8f9fa;">description1_long</th>
-                                <th class="for_db_table_zen_services" data-sort="rel_image1_id" style="padding: 12px 8px; border: 1px solid #ddd; font-weight: bold; text-transform: lowercase; cursor: pointer; background: #f8f9fa;">rel_image1_id</th>
-                                <th style="padding: 12px 8px; border: 1px solid #ddd; font-weight: bold; text-transform: lowercase; background: #f8f9fa; text-align: left; white-space: nowrap;">image-main-display</th>
-                                <th style="padding: 12px 8px; border: 1px solid #ddd; font-weight: bold; font-size: 16px; text-transform: lowercase; background: #f8f9fa;">image-alternative-display-method</th>
-                                <th style="padding: 12px 8px; border: 1px solid #ddd; font-weight: bold; text-transform: lowercase; background: #f8f9fa;">width</th>
-                                <th style="padding: 12px 8px; border: 1px solid #ddd; font-weight: bold; text-transform: lowercase; background: #f8f9fa;">height</th>
-                                <th class="for_db_table_zen_services" style="padding: 12px 8px; border: 1px solid #ddd; font-weight: bold; text-transform: lowercase; background: #f8f9fa;">asn_service_page_id</th>
-                                <th class="for_db_table_zen_services" data-sort="is_pinned_service" style="padding: 12px 8px; border: 1px solid #ddd; font-weight: bold; text-transform: lowercase; cursor: pointer; background: #f8f9fa;">is_pinned_service</th>
-                                <th style="padding: 12px 8px; border: 1px solid #ddd; font-weight: bold; background: #f8f9fa;">Actions</th>
+                                <th class="for_db_table_zen_services" data-sort="service_id" style="border: 1px solid #ddd; font-weight: bold; text-transform: lowercase; cursor: pointer; background: #f8f9fa;"><div class="cell_inner_wrapper_div for_db_table_zen_services">service_id</div></th>
+                                <th class="for_db_table_zen_services" data-sort="service_name" style="border: 1px solid #ddd; font-weight: bold; text-transform: lowercase; cursor: pointer; background: #f8f9fa;"><div class="cell_inner_wrapper_div for_db_table_zen_services">service_name</div></th>
+                                <th class="for_db_table_zen_services" data-sort="suggested_url_slug" style="border: 1px solid #ddd; font-weight: bold; text-transform: lowercase; cursor: pointer; background: #f8f9fa;"><div class="cell_inner_wrapper_div for_db_table_zen_services">suggested_url_slug</div></th>
+                                <th class="for_db_table_zen_services" data-sort="service_placard" style="border: 1px solid #ddd; font-weight: bold; text-transform: lowercase; cursor: pointer; background: #f8f9fa;"><div class="cell_inner_wrapper_div for_db_table_zen_services">service_placard</div></th>
+                                <th class="for_db_table_zen_services" data-sort="service_moniker" style="border: 1px solid #ddd; font-weight: bold; text-transform: lowercase; cursor: pointer; background: #f8f9fa;"><div class="cell_inner_wrapper_div for_db_table_zen_services">service_moniker</div></th>
+                                <th class="for_db_table_zen_services" data-sort="service_slug_id" style="border: 1px solid #ddd; font-weight: bold; text-transform: lowercase; cursor: pointer; background: #f8f9fa;"><div class="cell_inner_wrapper_div for_db_table_zen_services">service_slug_id</div></th>
+                                <th class="for_db_table_zen_services" data-sort="description1_short" style="border: 1px solid #ddd; font-weight: bold; text-transform: lowercase; cursor: pointer; background: #f8f9fa;"><div class="cell_inner_wrapper_div for_db_table_zen_services">description1_short</div></th>
+                                <th class="for_db_table_zen_services" data-sort="description1_long" style="border: 1px solid #ddd; font-weight: bold; text-transform: lowercase; cursor: pointer; background: #f8f9fa;"><div class="cell_inner_wrapper_div for_db_table_zen_services">description1_long</div></th>
+                                <th class="for_db_table_zen_services" data-sort="rel_image1_id" style="border: 1px solid #ddd; font-weight: bold; text-transform: lowercase; cursor: pointer; background: #f8f9fa;"><div class="cell_inner_wrapper_div for_db_table_zen_services">rel_image1_id</div></th>
+                                <th style="border: 1px solid #ddd; font-weight: bold; text-transform: lowercase; background: #f8f9fa; text-align: left; white-space: nowrap;"><div class="cell_inner_wrapper_div">image-main-display</div></th>
+                                <th style="border: 1px solid #ddd; font-weight: bold; font-size: 16px; text-transform: lowercase; background: #f8f9fa;"><div class="cell_inner_wrapper_div">image-alternative-display-method</div></th>
+                                <th style="border: 1px solid #ddd; font-weight: bold; text-transform: lowercase; background: #f8f9fa;"><div class="cell_inner_wrapper_div">width</div></th>
+                                <th style="border: 1px solid #ddd; font-weight: bold; text-transform: lowercase; background: #f8f9fa;"><div class="cell_inner_wrapper_div">height</div></th>
+                                <th class="for_db_table_zen_services" style="border: 1px solid #ddd; font-weight: bold; text-transform: lowercase; background: #f8f9fa;"><div class="cell_inner_wrapper_div for_db_table_zen_services">asn_service_page_id</div></th>
+                                <th class="for_db_table_zen_services" data-sort="is_pinned_service" style="border: 1px solid #ddd; font-weight: bold; text-transform: lowercase; cursor: pointer; background: #f8f9fa;"><div class="cell_inner_wrapper_div for_db_table_zen_services">is_pinned_service</div></th>
+                                <th style="border: 1px solid #ddd; font-weight: bold; background: #f8f9fa;"><div class="cell_inner_wrapper_div">Actions</div></th>
                             </tr>
                         </thead>
                         <tbody id="table-body">
@@ -2543,20 +2543,20 @@ class Grove_Admin {
                     let tr = $('<tr></tr>');
                     
                     // Checkbox
-                    tr.append('<td style="padding: 8px; border: 1px solid #ddd; text-align: center;"><input type="checkbox" class="row-select" data-id="' + service.service_id + '"></td>');
+                    tr.append('<td style="border: 1px solid #ddd; text-align: center;"><div class="cell_inner_wrapper_div"><input type="checkbox" class="row-select" data-id="' + service.service_id + '"></div></td>');
                     
                     // Data columns
-                    tr.append('<td class="for_db_table_zen_services" style="padding: 8px; border: 1px solid #ddd;">' + (service.service_id || '') + '</td>');
-                    tr.append('<td class="for_db_table_zen_services" style="padding: 8px; border: 1px solid #ddd; cursor: pointer;" data-field="service_name" data-id="' + service.service_id + '">' + (service.service_name || '') + '</td>');
-                    tr.append('<td class="for_db_table_zen_services" style="padding: 8px; border: 1px solid #ddd; cursor: pointer;" data-field="suggested_url_slug" data-id="' + service.service_id + '">' + (service.suggested_url_slug || '') + '</td>');
-                    tr.append('<td class="for_db_table_zen_services" style="padding: 8px; border: 1px solid #ddd; cursor: pointer;" data-field="service_placard" data-id="' + service.service_id + '">' + (service.service_placard || '') + '</td>');
-                    tr.append('<td class="for_db_table_zen_services" style="padding: 8px; border: 1px solid #ddd; cursor: pointer;" data-field="service_moniker" data-id="' + service.service_id + '">' + (service.service_moniker || '') + '</td>');
-                    tr.append('<td class="for_db_table_zen_services" style="padding: 8px; border: 1px solid #ddd; cursor: pointer;" data-field="service_slug_id" data-id="' + service.service_id + '">' + (service.service_slug_id || '') + '</td>');
-                    tr.append('<td class="for_db_table_zen_services" style="padding: 8px; border: 1px solid #ddd; cursor: pointer;" data-field="description1_short" data-id="' + service.service_id + '">' + (service.description1_short || '') + '</td>');
-                    tr.append('<td class="for_db_table_zen_services" style="padding: 8px; border: 1px solid #ddd; cursor: pointer;" data-field="description1_long" data-id="' + service.service_id + '">' + (service.description1_long || '') + '</td>');
+                    tr.append('<td class="for_db_table_zen_services" style="border: 1px solid #ddd;"><div class="cell_inner_wrapper_div for_db_table_zen_services">' + (service.service_id || '') + '</div></td>');
+                    tr.append('<td class="for_db_table_zen_services" style="border: 1px solid #ddd; cursor: pointer;" data-field="service_name" data-id="' + service.service_id + '"><div class="cell_inner_wrapper_div for_db_table_zen_services">' + (service.service_name || '') + '</div></td>');
+                    tr.append('<td class="for_db_table_zen_services" style="border: 1px solid #ddd; cursor: pointer;" data-field="suggested_url_slug" data-id="' + service.service_id + '"><div class="cell_inner_wrapper_div for_db_table_zen_services">' + (service.suggested_url_slug || '') + '</div></td>');
+                    tr.append('<td class="for_db_table_zen_services" style="border: 1px solid #ddd; cursor: pointer;" data-field="service_placard" data-id="' + service.service_id + '"><div class="cell_inner_wrapper_div for_db_table_zen_services">' + (service.service_placard || '') + '</div></td>');
+                    tr.append('<td class="for_db_table_zen_services" style="border: 1px solid #ddd; cursor: pointer;" data-field="service_moniker" data-id="' + service.service_id + '"><div class="cell_inner_wrapper_div for_db_table_zen_services">' + (service.service_moniker || '') + '</div></td>');
+                    tr.append('<td class="for_db_table_zen_services" style="border: 1px solid #ddd; cursor: pointer;" data-field="service_slug_id" data-id="' + service.service_id + '"><div class="cell_inner_wrapper_div for_db_table_zen_services">' + (service.service_slug_id || '') + '</div></td>');
+                    tr.append('<td class="for_db_table_zen_services" style="border: 1px solid #ddd; cursor: pointer;" data-field="description1_short" data-id="' + service.service_id + '"><div class="cell_inner_wrapper_div for_db_table_zen_services">' + (service.description1_short || '') + '</div></td>');
+                    tr.append('<td class="for_db_table_zen_services" style="border: 1px solid #ddd; cursor: pointer;" data-field="description1_long" data-id="' + service.service_id + '"><div class="cell_inner_wrapper_div for_db_table_zen_services">' + (service.description1_long || '') + '</div></td>');
                     
                     // Image column with only buttons and ID
-                    let imageCell = '<td class="for_db_table_zen_services image-cell" style="padding: 8px; border: 1px solid #ddd; text-align: center;" data-id="' + service.service_id + '">';
+                    let imageCell = '<td class="for_db_table_zen_services image-cell" style="border: 1px solid #ddd; text-align: center;" data-id="' + service.service_id + '"><div class="cell_inner_wrapper_div for_db_table_zen_services">';
                     
                     if (service.rel_image1_id && service.rel_image1_id > 0) {
                         imageCell += '<div style="display: flex; flex-direction: column; gap: 2px; align-items: center;">';
@@ -2572,11 +2572,11 @@ class Grove_Admin {
                         imageCell += '</div>';
                     }
                     
-                    imageCell += '</td>';
+                    imageCell += '</div></td>';
                     tr.append(imageCell);
                     
                     // Image main display column
-                    let mainImageCell = '<td style="padding: 8px; border: 1px solid #ddd; text-align: left; white-space: nowrap;">';
+                    let mainImageCell = '<td style="border: 1px solid #ddd; text-align: left; white-space: nowrap;"><div class="cell_inner_wrapper_div">';
                     if (service.rel_image1_id && service.rel_image1_id > 0) {
                         mainImageCell += '<div class="image-preview-container" data-attachment-id="' + service.rel_image1_id + '" style="height: 60px; min-width: 80px; display: inline-flex; align-items: center; justify-content: flex-start; border: 1px solid #ddd; background: #f9f9f9;">';
                         mainImageCell += '<span style="color: #666; font-size: 12px; padding: 0 8px;">Loading...</span>';
@@ -2586,52 +2586,52 @@ class Grove_Admin {
                         mainImageCell += '<span style="color: #999; font-size: 12px; padding: 0 8px;">No image</span>';
                         mainImageCell += '</div>';
                     }
-                    mainImageCell += '</td>';
+                    mainImageCell += '</div></td>';
                     tr.append(mainImageCell);
                     
                     // Image alternative display method column
-                    let altImageCell = '<td style="padding: 8px; border: 1px solid #ddd; text-align: center;">';
+                    let altImageCell = '<td style="border: 1px solid #ddd; text-align: center;"><div class="cell_inner_wrapper_div">';
                     if (service.rel_image1_id && service.rel_image1_id > 0) {
                         altImageCell += '<img src="/wp-content/uploads/' + service.rel_image1_id + '.jpg" style="height: 60px; max-width: 100px; object-fit: contain;" onerror="this.src=\'/wp-admin/admin-ajax.php?action=wp_get_attachment_image&attachment_id=' + service.rel_image1_id + '&size=thumbnail\';">';
                     } else {
                         altImageCell += '-';
                     }
-                    altImageCell += '</td>';
+                    altImageCell += '</div></td>';
                     tr.append(altImageCell);
                     
                     // Width column
-                    let widthCell = '<td style="padding: 8px; border: 1px solid #ddd; text-align: center;" class="image-width-cell" data-attachment-id="' + (service.rel_image1_id || '') + '">';
+                    let widthCell = '<td style="border: 1px solid #ddd; text-align: center;" class="image-width-cell" data-attachment-id="' + (service.rel_image1_id || '') + '"><div class="cell_inner_wrapper_div">';
                     if (service.rel_image1_id && service.rel_image1_id > 0) {
                         widthCell += '<span class="width-value">-</span>';
                     } else {
                         widthCell += '-';
                     }
-                    widthCell += '</td>';
+                    widthCell += '</div></td>';
                     tr.append(widthCell);
                     
                     // Height column  
-                    let heightCell = '<td style="padding: 8px; border: 1px solid #ddd; text-align: center;" class="image-height-cell" data-attachment-id="' + (service.rel_image1_id || '') + '">';
+                    let heightCell = '<td style="border: 1px solid #ddd; text-align: center;" class="image-height-cell" data-attachment-id="' + (service.rel_image1_id || '') + '"><div class="cell_inner_wrapper_div">';
                     if (service.rel_image1_id && service.rel_image1_id > 0) {
                         heightCell += '<span class="height-value">-</span>';
                     } else {
                         heightCell += '-';
                     }
-                    heightCell += '</td>';
+                    heightCell += '</div></td>';
                     tr.append(heightCell);
                     
                     // ASN Service Page ID column
-                    let pageCell = '<td class="for_db_table_zen_services" style="padding: 8px; border: 1px solid #ddd;">';
+                    let pageCell = '<td class="for_db_table_zen_services" style="border: 1px solid #ddd;"><div class="cell_inner_wrapper_div for_db_table_zen_services">';
                     pageCell += '<button class="button button-small choose-page-btn" data-service-id="' + service.service_id + '" style="margin-right: 8px;">Choose Page</button>';
                     if (service.asn_service_page_id) {
                         pageCell += '<span class="page-info" data-page-id="' + service.asn_service_page_id + '">';
                         pageCell += '(' + service.asn_service_page_id + ') | <span class="page-title-text">Loading...</span>';
                         pageCell += '</span>';
                     }
-                    pageCell += '</td>';
+                    pageCell += '</div></td>';
                     tr.append(pageCell);
                     
-                    tr.append('<td class="for_db_table_zen_services" style="padding: 8px; border: 1px solid #ddd; text-align: center;">' + (service.is_pinned_service ? 'Yes' : 'No') + '</td>');
-                    tr.append('<td style="padding: 8px; border: 1px solid #ddd;"><button class="button button-small delete-btn" data-id="' + service.service_id + '">Delete</button></td>');
+                    tr.append('<td class="for_db_table_zen_services" style="border: 1px solid #ddd; text-align: center;"><div class="cell_inner_wrapper_div for_db_table_zen_services">' + (service.is_pinned_service ? 'Yes' : 'No') + '</div></td>');
+                    tr.append('<td style="border: 1px solid #ddd;"><div class="cell_inner_wrapper_div"><button class="button button-small delete-btn" data-id="' + service.service_id + '">Delete</button></div></td>');
                     
                     tbody.append(tr);
                 });

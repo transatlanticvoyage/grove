@@ -4,6 +4,10 @@
 
 tr.shenfur_db_table_name_tr th.for_db_table_zen_services {background-color:#f4e69f !important;}
 
+/* Cell Inner Wrapper Convention - Provides consistent padding for all table cells */
+.cell_inner_wrapper_div {
+    padding: 12px 8px;
+}
 
 
 /* 
