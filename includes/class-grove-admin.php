@@ -2152,6 +2152,9 @@ class Grove_Admin {
                             <div id="nebularis-export-sql" style="padding: 5px; cursor: pointer; border-radius: 3px; transition: background 0.2s;" onmouseover="this.style.background='#f0f0f0'" onmouseout="this.style.background='white'">export all in sql</div>
                         </div>
                     </div>
+                    <div style="margin-left: 10px;">
+                        <button id="test-button-3" style="padding: 8px 16px; border: 1px solid #ccc; border-radius: 4px; background: white; cursor: pointer; font-size: 14px;">test button 3</button>
+                    </div>
                 </div>
             </div>
             
