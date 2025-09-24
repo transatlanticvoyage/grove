@@ -23,6 +23,8 @@ class Grove_Admin {
         add_action('wp_ajax_grove_update_service_page', array($this, 'grove_update_service_page'));
         add_action('wp_ajax_grove_get_image_data', array($this, 'grove_get_image_data'));
         add_action('wp_ajax_grove_rename_image_file', array($this, 'grove_rename_image_file'));
+        add_action('wp_ajax_grove_update_image_title', array($this, 'grove_update_image_title'));
+        add_action('wp_ajax_grove_update_image_alt', array($this, 'grove_update_image_alt'));
         add_action('wp_ajax_grove_shortcode_update_mode', array($this, 'grove_shortcode_update_mode'));
         add_action('wp_ajax_grove_shortcode_test', array($this, 'grove_shortcode_test'));
         // Factory codes handlers
@@ -2326,6 +2328,8 @@ class Grove_Admin {
                                 <th style="border: 1px solid #ddd; font-weight: bold; text-transform: lowercase; background: #e0e0e0;"><div class="cell_inner_wrapper_div">(filler)</div></th>
                                 <th style="border: 1px solid #ddd; font-weight: bold; text-transform: lowercase; background: #e0e0e0;"><div class="cell_inner_wrapper_div">(filler)</div></th>
                                 <th style="border: 1px solid #ddd; font-weight: bold; text-transform: lowercase; background: #e0e0e0;"><div class="cell_inner_wrapper_div">(filler)</div></th>
+                                <th style="border: 1px solid #ddd; font-weight: bold; text-transform: lowercase; background: #e0e0e0;"><div class="cell_inner_wrapper_div">(filler)</div></th>
+                                <th style="border: 1px solid #ddd; font-weight: bold; text-transform: lowercase; background: #e0e0e0;"><div class="cell_inner_wrapper_div">(filler)</div></th>
                                 <th class="for_db_table_zen_services" style="border: 1px solid #ddd; font-weight: bold; text-transform: lowercase; background: #e0e0e0;"><div class="cell_inner_wrapper_div for_db_table_zen_services for_db_column_asn_service_page_id">wp_zen_services</div></th>
                                 <th style="border: 1px solid #ddd; font-weight: bold; background: #e0e0e0;"><div class="cell_inner_wrapper_div">(filler)</div></th>
                             </tr>
@@ -2348,6 +2352,8 @@ class Grove_Admin {
                                 <th style="border: 1px solid #ddd; font-weight: bold; text-transform: lowercase; background: #f8f9fa;"><div class="cell_inner_wrapper_div">width</div></th>
                                 <th style="border: 1px solid #ddd; font-weight: bold; text-transform: lowercase; background: #f8f9fa;"><div class="cell_inner_wrapper_div">height</div></th>
                                 <th style="border: 1px solid #ddd; font-weight: bold; text-transform: lowercase; background: #f8f9fa;"><div class="cell_inner_wrapper_div">file name</div></th>
+                                <th style="border: 1px solid #ddd; font-weight: bold; text-transform: lowercase; background: #f8f9fa;"><div class="cell_inner_wrapper_div">img title</div></th>
+                                <th style="border: 1px solid #ddd; font-weight: bold; text-transform: lowercase; background: #f8f9fa;"><div class="cell_inner_wrapper_div">alt text</div></th>
                                 <th class="for_db_table_zen_services" style="border: 1px solid #ddd; font-weight: bold; text-transform: lowercase; background: #f8f9fa;"><div class="cell_inner_wrapper_div for_db_table_zen_services for_db_column_asn_service_page_id">asn_service_page_id</div></th>
                                 <th style="border: 1px solid #ddd; font-weight: bold; background: #f8f9fa;"><div class="cell_inner_wrapper_div">Actions</div></th>
                             </tr>
@@ -2646,6 +2652,26 @@ class Grove_Admin {
                     fileNameCell += '</div></td>';
                     tr.append(fileNameCell);
                     
+                    // Image Title column
+                    let imgTitleCell = '<td style="border: 1px solid #ddd; text-align: left;" class="img-title-cell" data-attachment-id="' + (service.rel_image1_id || '') + '"><div class="cell_inner_wrapper_div">';
+                    if (service.rel_image1_id && service.rel_image1_id > 0) {
+                        imgTitleCell += '<input type="text" class="img-title-input" data-attachment-id="' + service.rel_image1_id + '" value="Loading..." style="width: 100%; padding: 4px; border: 1px solid #ddd; border-radius: 3px;">';
+                    } else {
+                        imgTitleCell += '<span style="color: #999;">-</span>';
+                    }
+                    imgTitleCell += '</div></td>';
+                    tr.append(imgTitleCell);
+                    
+                    // Alt Text column
+                    let altTextCell = '<td style="border: 1px solid #ddd; text-align: left;" class="alt-text-cell" data-attachment-id="' + (service.rel_image1_id || '') + '"><div class="cell_inner_wrapper_div">';
+                    if (service.rel_image1_id && service.rel_image1_id > 0) {
+                        altTextCell += '<input type="text" class="alt-text-input" data-attachment-id="' + service.rel_image1_id + '" value="Loading..." style="width: 100%; padding: 4px; border: 1px solid #ddd; border-radius: 3px;">';
+                    } else {
+                        altTextCell += '<span style="color: #999;">-</span>';
+                    }
+                    altTextCell += '</div></td>';
+                    tr.append(altTextCell);
+                    
                     // ASN Service Page ID column
                     let pageCell = '<td class="for_db_table_zen_services" style="border: 1px solid #ddd;"><div class="cell_inner_wrapper_div for_db_table_zen_services for_db_column_asn_service_page_id">';
                     pageCell += '<button class="button button-small choose-page-btn" data-service-id="' + service.service_id + '" style="margin-right: 8px;">Choose Page</button>';
@@ -2769,6 +2795,8 @@ class Grove_Admin {
                                     let width = response.data.width;
                                     let height = response.data.height;
                                     let filename = response.data.filename || 'unknown.jpg';
+                                    let title = response.data.title || '';
+                                    let altText = response.data.alt_text || '';
                                     
                                     // Calculate aspect ratio for 100px height
                                     let aspectRatio = width / height;
@@ -2783,6 +2811,12 @@ class Grove_Admin {
                                     
                                     // Update filename input with actual filename
                                     $('.filename-input[data-attachment-id="' + attachmentId + '"]').val(filename);
+                                    
+                                    // Update title input
+                                    $('.img-title-input[data-attachment-id="' + attachmentId + '"]').val(title).data('original-title', title);
+                                    
+                                    // Update alt text input
+                                    $('.alt-text-input[data-attachment-id="' + attachmentId + '"]').val(altText).data('original-alt', altText);
                                 } else {
                                     console.error('Image load failed for ID ' + attachmentId + ':', response);
                                     container.html('<span style="color: #dc3545; font-size: 12px;">No image found</span>');
@@ -4087,6 +4121,13 @@ class Grove_Admin {
             $filename = basename($metadata['file']);
         }
         
+        // Get image title from post_title
+        $attachment_post = get_post($attachment_id);
+        $image_title = $attachment_post ? $attachment_post->post_title : '';
+        
+        // Get alt text from postmeta
+        $alt_text = get_post_meta($attachment_id, '_wp_attachment_image_alt', true);
+        
         // Debug logging
         error_log("Grove Image Debug - ID: {$attachment_id}, URL: " . ($image_url ?: 'NULL') . ", Filename: {$filename}, Metadata: " . print_r($metadata, true));
         
@@ -4105,6 +4146,8 @@ class Grove_Admin {
             'width' => isset($metadata['width']) ? $metadata['width'] : 0,
             'height' => isset($metadata['height']) ? $metadata['height'] : 0,
             'filename' => $filename,
+            'title' => $image_title,
+            'alt_text' => $alt_text,
             'debug_info' => array(
                 'attachment_id' => $attachment_id,
                 'metadata_keys' => array_keys($metadata)
@@ -4222,6 +4265,68 @@ class Grove_Admin {
         }
         
         wp_send_json_success($response);
+    }
+    
+    /**
+     * AJAX: Update image title
+     */
+    public function grove_update_image_title() {
+        check_ajax_referer('grove_services_nonce', 'nonce');
+        
+        if (!current_user_can('manage_options')) {
+            wp_die('Unauthorized');
+        }
+        
+        $attachment_id = intval($_POST['attachment_id']);
+        $new_title = sanitize_text_field($_POST['title']);
+        
+        if (!$attachment_id) {
+            wp_send_json_error('Invalid attachment ID');
+            return;
+        }
+        
+        // Update the post title
+        $result = wp_update_post(array(
+            'ID' => $attachment_id,
+            'post_title' => $new_title
+        ));
+        
+        if (is_wp_error($result)) {
+            wp_send_json_error('Failed to update title');
+            return;
+        }
+        
+        wp_send_json_success(array(
+            'message' => 'Title updated successfully',
+            'title' => $new_title
+        ));
+    }
+    
+    /**
+     * AJAX: Update image alt text
+     */
+    public function grove_update_image_alt() {
+        check_ajax_referer('grove_services_nonce', 'nonce');
+        
+        if (!current_user_can('manage_options')) {
+            wp_die('Unauthorized');
+        }
+        
+        $attachment_id = intval($_POST['attachment_id']);
+        $new_alt = sanitize_text_field($_POST['alt_text']);
+        
+        if (!$attachment_id) {
+            wp_send_json_error('Invalid attachment ID');
+            return;
+        }
+        
+        // Update the alt text meta
+        update_post_meta($attachment_id, '_wp_attachment_image_alt', $new_alt);
+        
+        wp_send_json_success(array(
+            'message' => 'Alt text updated successfully',
+            'alt_text' => $new_alt
+        ));
     }
     
     /**
