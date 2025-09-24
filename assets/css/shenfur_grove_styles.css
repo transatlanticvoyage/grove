@@ -9,6 +9,11 @@ tr.shenfur_db_table_name_tr th.for_db_table_zen_services {background-color:#f4e6
     padding: 12px 8px;
 }
 
+/* Specific database column targeting example */
+div.cell_inner_wrapper_div.for_db_table_zen_services.for_db_column_description1_short {
+    /* Example styling for description1_short column */
+}
+
 
 /* 
  * Shenfur Grove Plugin Styles
