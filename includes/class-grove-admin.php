@@ -3336,8 +3336,32 @@ class Grove_Admin {
                         });
                     });
                 } else {
-                    // Show all columns
-                    $('#services-table th, #services-table td').show().removeClass('wolf-exclusion-band');
+                    // "All" option: Show all columns but maintain wolf exclusion band
+                    const wolfBandIndices = [0, 1, 2, 3]; // checkbox, service_id, service_name, suggested_url_slug
+                    
+                    // Apply to each header row separately
+                    $('#services-table thead tr').each(function() {
+                        $(this).find('th').each(function(index) {
+                            $(this).show(); // Show all columns
+                            if (wolfBandIndices.includes(index)) {
+                                $(this).addClass('wolf-exclusion-band'); // Maintain wolf band styling
+                            } else {
+                                $(this).removeClass('wolf-exclusion-band');
+                            }
+                        });
+                    });
+                    
+                    // Apply same logic to all data rows
+                    $('#services-table tbody tr').each(function() {
+                        $(this).find('td').each(function(index) {
+                            $(this).show(); // Show all columns
+                            if (wolfBandIndices.includes(index)) {
+                                $(this).addClass('wolf-exclusion-band'); // Maintain wolf band styling
+                            } else {
+                                $(this).removeClass('wolf-exclusion-band');
+                            }
+                        });
+                    });
                 }
             }
             
