@@ -1,14 +1,7 @@
 
 
 
-/* Text truncation rules for large text columns - DEBUG VERSION */
-#services-table {
-    border: 3px solid red !important;
-}
-
-div.cell_inner_wrapper_div {
-    background-color: yellow !important;
-}
+/* Text truncation rules for large text columns */
 #services-table td div.cell_inner_wrapper_div.for_db_table_zen_services.for_db_column_service_placard {
     width: 150px !important;
     overflow: hidden !important;
@@ -35,6 +28,31 @@ div.cell_inner_wrapper_div {
     overflow: hidden !important;
     text-overflow: ellipsis !important;
     white-space: nowrap !important;
+}
+
+/* Constrain input widths in truncated columns to match wrapper div width */
+#services-table td div.cell_inner_wrapper_div.for_db_table_zen_services.for_db_column_service_placard input,
+#services-table td div.cell_inner_wrapper_div.for_db_table_zen_services.for_db_column_service_placard textarea {
+    width: 140px !important;
+    max-width: 140px !important;
+}
+
+#services-table td div.cell_inner_wrapper_div.for_db_table_zen_services.for_db_column_service_moniker input,
+#services-table td div.cell_inner_wrapper_div.for_db_table_zen_services.for_db_column_service_moniker textarea {
+    width: 140px !important;
+    max-width: 140px !important;
+}
+
+#services-table td div.cell_inner_wrapper_div.for_db_table_zen_services.for_db_column_description1_short input,
+#services-table td div.cell_inner_wrapper_div.for_db_table_zen_services.for_db_column_description1_short textarea {
+    width: 140px !important;
+    max-width: 140px !important;
+}
+
+#services-table td div.cell_inner_wrapper_div.for_db_table_zen_services.for_db_column_description1_long input,
+#services-table td div.cell_inner_wrapper_div.for_db_table_zen_services.for_db_column_description1_long textarea {
+    width: 140px !important;
+    max-width: 140px !important;
 }
 
 tr.shenfur_db_table_name_tr th.for_db_table_zen_services {background-color:#f4e69f !important;}
