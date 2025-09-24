@@ -2145,7 +2145,7 @@ class Grove_Admin {
                         <button id="clear-search" style="position: absolute; right: 8px; top: 50%; transform: translateY(-50%); background: #ffeb3b; border: none; padding: 4px 8px; font-size: 12px; font-weight: bold; border-radius: 3px; cursor: pointer;">CL</button>
                     </div>
                     <div style="position: relative; margin-left: 10px;">
-                        <button id="nebularis-toggle" style="padding: 8px 16px; border: 1px solid #ccc; border-radius: 4px; background: white; cursor: pointer; font-size: 14px;">nebularis</button>
+                        <button id="nebularis-toggle" style="padding: 8px 16px; border: 1px solid #ccc; border-radius: 4px; background: white; cursor: pointer; font-size: 14px;">• nebularis</button>
                         <div id="nebularis-content" style="display: none; position: absolute; top: 100%; left: 0; background: white; border: 1px solid #ccc; border-radius: 4px; padding: 10px; min-width: 180px; z-index: 1000; margin-top: 2px;">
                             <div id="nebularis-export-markdown" style="margin-bottom: 8px; padding: 5px; cursor: pointer; border-radius: 3px; transition: background 0.2s;" onmouseover="this.style.background='#f0f0f0'" onmouseout="this.style.background='white'">export all in markdown</div>
                             <div id="nebularis-export-xls" style="margin-bottom: 8px; padding: 5px; cursor: pointer; border-radius: 3px; transition: background 0.2s;" onmouseover="this.style.background='#f0f0f0'" onmouseout="this.style.background='white'">export all in xls copy</div>
