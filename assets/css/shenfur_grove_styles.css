@@ -1,7 +1,14 @@
 
 
 
-/* Text truncation rules for large text columns */
+/* Text truncation rules for large text columns - DEBUG VERSION */
+#services-table {
+    border: 3px solid red !important;
+}
+
+div.cell_inner_wrapper_div {
+    background-color: yellow !important;
+}
 #services-table td div.cell_inner_wrapper_div.for_db_table_zen_services.for_db_column_service_placard {
     width: 150px !important;
     overflow: hidden !important;
