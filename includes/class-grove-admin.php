@@ -1958,8 +1958,8 @@ class Grove_Admin {
                 // Load image previews and dimensions after table is rendered
                 loadImagePreviews();
                 
-                // Inline editing for text fields only
-                $('[data-field]:not(.image-cell)').click(function() {
+                // Inline editing for text fields only (exclude filename cells)
+                $('[data-field]:not(.image-cell):not(.filename-cell)').click(function() {
                     let cell = $(this);
                     let field = cell.data('field');
                     let id = cell.data('id');
@@ -2324,6 +2324,7 @@ class Grove_Admin {
                                 <th style="border: 1px solid #ddd; font-weight: bold; text-transform: lowercase; background: #e0e0e0;"><div class="cell_inner_wrapper_div">(filler)</div></th>
                                 <th style="border: 1px solid #ddd; font-weight: bold; text-transform: lowercase; background: #e0e0e0;"><div class="cell_inner_wrapper_div">(filler)</div></th>
                                 <th style="border: 1px solid #ddd; font-weight: bold; text-transform: lowercase; background: #e0e0e0;"><div class="cell_inner_wrapper_div">(filler)</div></th>
+                                <th style="border: 1px solid #ddd; font-weight: bold; text-transform: lowercase; background: #e0e0e0;"><div class="cell_inner_wrapper_div">(filler)</div></th>
                                 <th class="for_db_table_zen_services" style="border: 1px solid #ddd; font-weight: bold; text-transform: lowercase; background: #e0e0e0;"><div class="cell_inner_wrapper_div for_db_table_zen_services for_db_column_asn_service_page_id">wp_zen_services</div></th>
                                 <th style="border: 1px solid #ddd; font-weight: bold; background: #e0e0e0;"><div class="cell_inner_wrapper_div">(filler)</div></th>
                             </tr>
@@ -2345,6 +2346,7 @@ class Grove_Admin {
                                 <th style="border: 1px solid #ddd; font-weight: bold; font-size: 16px; text-transform: lowercase; background: #f8f9fa;"><div class="cell_inner_wrapper_div">image-alternative-display-method</div></th>
                                 <th style="border: 1px solid #ddd; font-weight: bold; text-transform: lowercase; background: #f8f9fa;"><div class="cell_inner_wrapper_div">width</div></th>
                                 <th style="border: 1px solid #ddd; font-weight: bold; text-transform: lowercase; background: #f8f9fa;"><div class="cell_inner_wrapper_div">height</div></th>
+                                <th style="border: 1px solid #ddd; font-weight: bold; text-transform: lowercase; background: #f8f9fa;"><div class="cell_inner_wrapper_div">file name</div></th>
                                 <th class="for_db_table_zen_services" style="border: 1px solid #ddd; font-weight: bold; text-transform: lowercase; background: #f8f9fa;"><div class="cell_inner_wrapper_div for_db_table_zen_services for_db_column_asn_service_page_id">asn_service_page_id</div></th>
                                 <th style="border: 1px solid #ddd; font-weight: bold; background: #f8f9fa;"><div class="cell_inner_wrapper_div">Actions</div></th>
                             </tr>
@@ -2628,6 +2630,17 @@ class Grove_Admin {
                     }
                     heightCell += '</div></td>';
                     tr.append(heightCell);
+                    
+                    // File Name column with special editing
+                    let fileNameCell = '<td style="border: 1px solid #ddd; text-align: left;" class="filename-cell" data-attachment-id="' + (service.rel_image1_id || '') + '"><div class="cell_inner_wrapper_div">';
+                    fileNameCell += '<div class="filename-editor-container" style="display: flex; align-items: center; gap: 4px;">';
+                    fileNameCell += '<button class="button button-small filename-change-btn" style="font-size: 11px; padding: 2px 6px;">Change</button>';
+                    let filename = service.rel_image1_id ? 'image-' + service.rel_image1_id + '.jpg' : 'no-image.jpg';
+                    fileNameCell += '<input type="text" class="filename-input" value="' + filename + '" style="flex: 1; padding: 4px; border: 1px solid #ddd; border-radius: 3px; background: #f9f9f9;" readonly>';
+                    fileNameCell += '<button class="button button-small filename-save-btn" style="font-size: 11px; padding: 2px 6px; background: #ccc; color: #666; display: none;" disabled>Save</button>';
+                    fileNameCell += '</div>';
+                    fileNameCell += '</div></td>';
+                    tr.append(fileNameCell);
                     
                     // ASN Service Page ID column
                     let pageCell = '<td class="for_db_table_zen_services" style="border: 1px solid #ddd;"><div class="cell_inner_wrapper_div for_db_table_zen_services for_db_column_asn_service_page_id">';
@@ -3126,6 +3139,78 @@ class Grove_Admin {
                         }
                     }
                 });
+            });
+            
+            // FILENAME EDITING FUNCTIONALITY
+            $(document).on('click', '.filename-change-btn', function(e) {
+                e.preventDefault();
+                e.stopPropagation();
+                
+                let btn = $(this);
+                let container = btn.closest('.filename-editor-container');
+                let input = container.find('.filename-input');
+                let saveBtn = container.find('.filename-save-btn');
+                
+                // Make input editable
+                input.prop('readonly', false);
+                input.css('background', 'white');
+                input.focus();
+                
+                // Show and enable save button
+                saveBtn.show();
+                saveBtn.prop('disabled', false);
+                saveBtn.css({'background': '#0073aa', 'color': 'white'});
+                
+                // Hide change button
+                btn.hide();
+            });
+            
+            $(document).on('click', '.filename-save-btn', function(e) {
+                e.preventDefault();
+                e.stopPropagation();
+                
+                let btn = $(this);
+                let container = btn.closest('.filename-editor-container');
+                let input = container.find('.filename-input');
+                let changeBtn = container.find('.filename-change-btn');
+                
+                // TODO: Add actual save functionality here when needed
+                console.log('Filename save clicked:', input.val());
+                
+                // Reset to readonly state
+                input.prop('readonly', true);
+                input.css('background', '#f9f9f9');
+                
+                // Hide and disable save button
+                btn.hide();
+                btn.prop('disabled', true);
+                btn.css({'background': '#ccc', 'color': '#666'});
+                
+                // Show change button
+                changeBtn.show();
+            });
+            
+            // Handle escape key to cancel filename editing
+            $(document).on('keydown', '.filename-input', function(e) {
+                if (e.key === 'Escape') {
+                    let input = $(this);
+                    let container = input.closest('.filename-editor-container');
+                    let changeBtn = container.find('.filename-change-btn');
+                    let saveBtn = container.find('.filename-save-btn');
+                    
+                    // Reset to original value - get from data attribute or reconstruct
+                    let attachmentId = container.closest('.filename-cell').data('attachment-id');
+                    let originalFilename = attachmentId ? 'image-' + attachmentId + '.jpg' : 'no-image.jpg';
+                    input.val(originalFilename);
+                    
+                    // Reset to readonly state
+                    input.prop('readonly', true);
+                    input.css('background', '#f9f9f9');
+                    
+                    // Hide save button, show change button
+                    saveBtn.hide();
+                    changeBtn.show();
+                }
             });
             
             // PAGINATION FUNCTIONALITY FOR ROCKET CHAMBER
