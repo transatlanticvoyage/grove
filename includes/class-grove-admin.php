@@ -54,6 +54,8 @@ class Grove_Admin {
         add_action('wp_ajax_grove_generalshortcodes_delete', array($this, 'grove_generalshortcodes_delete'));
         // WordPress native settings handlers
         add_action('wp_ajax_grove_update_site_settings', array($this, 'grove_update_site_settings'));
+        // Cache manager handlers
+        add_action('wp_ajax_grove_run_wimbleton_clearing', array($this, 'grove_run_wimbleton_clearing'));
     }
     
     public function enqueue_admin_styles($hook) {
@@ -162,6 +164,15 @@ class Grove_Admin {
             'manage_options',
             'grove_generalshortcodes_mar',
             array($this, 'grove_generalshortcodes_mar_page')
+        );
+        
+        add_submenu_page(
+            'grovehub',
+            'Grove Cache Manager',
+            'grove_cache_manager',
+            'manage_options',
+            'grove_cache_manager',
+            array($this, 'grove_cache_manager_page')
         );
     }
     
@@ -6724,6 +6735,222 @@ class Grove_Admin {
             wp_send_json_success('Service page updated successfully');
         } else {
             wp_send_json_error('Failed to update service page');
+        }
+    }
+    
+    public function grove_cache_manager_page() {
+        // AGGRESSIVE NOTICE SUPPRESSION - Remove ALL WordPress admin notices
+        $this->suppress_all_admin_notices();
+        ?>
+        <div class="wrap">
+            <h1>Grove Cache Manager</h1>
+            
+            <div style="max-width: 1200px;">
+                <div style="background: white; padding: 20px; border: 1px solid #ccd0d4; border-radius: 4px; margin-bottom: 20px;">
+                    <h2>Wimbleton Clearing Functions</h2>
+                    <p>Use this tool to clear WordPress caches and force Grove plugin refresh after file synchronization.</p>
+                    
+                    <button id="run-wimbleton-clearing" class="button button-primary" style="padding: 10px 20px; font-size: 16px; margin-bottom: 20px;">
+                        Run Wimbleton Clearing Functions
+                    </button>
+                    
+                    <div id="clearing-status" style="display: none; margin-bottom: 20px;">
+                        <h3>Clearing Operations Status:</h3>
+                        <div id="status-log" style="background: #f8f9fa; padding: 15px; border: 1px solid #ddd; border-radius: 4px; font-family: monospace; font-size: 12px; max-height: 300px; overflow-y: auto;"></div>
+                    </div>
+                    
+                    <div style="background: #f0f6ff; padding: 15px; border: 1px solid #c3ddfd; border-radius: 4px; margin-bottom: 20px;">
+                        <h3>Functions Being Executed:</h3>
+                        <div id="functions-list" style="font-family: monospace; font-size: 12px; line-height: 1.6;">
+                            <div><strong>wp_cache_delete('plugins', 'plugins')</strong> - Clears WordPress plugin cache</div>
+                            <div><strong>wp_cache_delete('get_plugins', 'plugins')</strong> - Clears get_plugins() cache</div>
+                            <div><strong>delete_site_transient('update_plugins')</strong> - Clears plugin update transients</div>
+                            <div><strong>delete_transient('plugin_slugs')</strong> - Clears plugin slug cache</div>
+                            <div><strong>wp_cache_flush()</strong> - Flushes all WordPress object caches</div>
+                            <div><strong>unset($wp_plugins)</strong> - Clears global plugin variable</div>
+                            <div><strong>get_plugins() refresh</strong> - Forces plugin list reload from filesystem</div>
+                            <div><strong>Browser cache headers</strong> - Sends no-cache headers to browser</div>
+                        </div>
+                        
+                        <button id="copy-functions-list" class="button" style="margin-top: 15px;">
+                            📋 Copy Functions List to Clipboard
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <script type="text/javascript">
+        jQuery(document).ready(function($) {
+            $('#run-wimbleton-clearing').click(function() {
+                var $button = $(this);
+                var $status = $('#clearing-status');
+                var $log = $('#status-log');
+                
+                $button.prop('disabled', true).text('Running...');
+                $status.show();
+                $log.html('<div style="color: #666;">Starting Wimbleton clearing operations...</div>');
+                
+                $.post(ajaxurl, {
+                    action: 'grove_run_wimbleton_clearing',
+                    nonce: '<?php echo wp_create_nonce('grove_wimbleton_clearing'); ?>'
+                }).done(function(response) {
+                    if (response.success) {
+                        $log.html(response.data.log);
+                        $button.prop('disabled', false).text('Run Wimbleton Clearing Functions');
+                        
+                        // Show success message
+                        $log.append('<div style="color: #00a32a; font-weight: bold; margin-top: 10px;">✅ All clearing operations completed successfully!</div>');
+                        
+                        // Optional: Reload page after a delay to show fresh state
+                        setTimeout(function() {
+                            if (confirm('Clearing completed! Reload page to see fresh state?')) {
+                                location.reload();
+                            }
+                        }, 1000);
+                    } else {
+                        $log.html('<div style="color: #d63638;">❌ Error: ' + response.data + '</div>');
+                        $button.prop('disabled', false).text('Run Wimbleton Clearing Functions');
+                    }
+                }).fail(function() {
+                    $log.html('<div style="color: #d63638;">❌ AJAX request failed</div>');
+                    $button.prop('disabled', false).text('Run Wimbleton Clearing Functions');
+                });
+            });
+            
+            $('#copy-functions-list').click(function() {
+                var functionsList = [
+                    "wp_cache_delete('plugins', 'plugins') - Clears WordPress plugin cache",
+                    "wp_cache_delete('get_plugins', 'plugins') - Clears get_plugins() cache", 
+                    "delete_site_transient('update_plugins') - Clears plugin update transients",
+                    "delete_transient('plugin_slugs') - Clears plugin slug cache",
+                    "wp_cache_flush() - Flushes all WordPress object caches",
+                    "unset($wp_plugins) - Clears global plugin variable",
+                    "get_plugins() refresh - Forces plugin list reload from filesystem",
+                    "Browser cache headers - Sends no-cache headers to browser"
+                ].join('\n');
+                
+                navigator.clipboard.writeText(functionsList).then(function() {
+                    alert('Functions list copied to clipboard!');
+                }).catch(function() {
+                    // Fallback for older browsers
+                    var textArea = document.createElement("textarea");
+                    textArea.value = functionsList;
+                    document.body.appendChild(textArea);
+                    textArea.select();
+                    document.execCommand('copy');
+                    document.body.removeChild(textArea);
+                    alert('Functions list copied to clipboard!');
+                });
+            });
+        });
+        </script>
+        
+        <style>
+        #status-log div {
+            margin-bottom: 5px;
+        }
+        #functions-list div {
+            margin-bottom: 8px;
+            padding: 4px 0;
+            border-bottom: 1px solid #e2e8f0;
+        }
+        #functions-list div:last-child {
+            border-bottom: none;
+        }
+        </style>
+        <?php
+    }
+    
+    public function grove_run_wimbleton_clearing() {
+        check_ajax_referer('grove_wimbleton_clearing', 'nonce');
+        
+        if (!current_user_can('manage_options')) {
+            wp_send_json_error('Insufficient permissions');
+        }
+        
+        $log = array();
+        
+        try {
+            $log[] = '<div style="color: #0073aa;">🔄 Starting cache clearing operations...</div>';
+            
+            // Clear WordPress plugin caches
+            if (function_exists('wp_cache_delete')) {
+                wp_cache_delete('plugins', 'plugins');
+                $log[] = '<div style="color: #00a32a;">✅ wp_cache_delete(\'plugins\', \'plugins\') - Plugin cache cleared</div>';
+                
+                wp_cache_delete('get_plugins', 'plugins');
+                $log[] = '<div style="color: #00a32a;">✅ wp_cache_delete(\'get_plugins\', \'plugins\') - Get plugins cache cleared</div>';
+            } else {
+                $log[] = '<div style="color: #f56565;">⚠️  wp_cache_delete not available</div>';
+            }
+            
+            // Clear global plugin variable
+            global $wp_plugins;
+            if (isset($wp_plugins)) {
+                unset($wp_plugins);
+                $log[] = '<div style="color: #00a32a;">✅ unset($wp_plugins) - Global plugin variable cleared</div>';
+            } else {
+                $log[] = '<div style="color: #666;">ℹ️  $wp_plugins not set</div>';
+            }
+            
+            // Clear transients
+            delete_site_transient('update_plugins');
+            $log[] = '<div style="color: #00a32a;">✅ delete_site_transient(\'update_plugins\') - Update plugins transient cleared</div>';
+            
+            delete_transient('plugin_slugs');
+            $log[] = '<div style="color: #00a32a;">✅ delete_transient(\'plugin_slugs\') - Plugin slugs transient cleared</div>';
+            
+            // Clear object cache
+            if (function_exists('wp_cache_flush')) {
+                wp_cache_flush();
+                $log[] = '<div style="color: #00a32a;">✅ wp_cache_flush() - All WordPress object caches flushed</div>';
+            } else {
+                $log[] = '<div style="color: #f56565;">⚠️  wp_cache_flush not available</div>';
+            }
+            
+            // Force get_plugins() to re-read from filesystem
+            if (!function_exists('get_plugins')) {
+                require_once ABSPATH . 'wp-admin/includes/plugin.php';
+            }
+            $plugins_before = count(get_plugins());
+            $log[] = '<div style="color: #00a32a;">✅ get_plugins() refresh - Forced plugin list reload (' . $plugins_before . ' plugins found)</div>';
+            
+            // Clear opcache if available
+            if (function_exists('opcache_reset')) {
+                opcache_reset();
+                $log[] = '<div style="color: #00a32a;">✅ opcache_reset() - PHP opcache cleared</div>';
+            } else {
+                $log[] = '<div style="color: #666;">ℹ️  opcache_reset not available</div>';
+            }
+            
+            if (function_exists('opcache_invalidate')) {
+                // Clear specific Grove files from opcache
+                $grove_files = array(
+                    __FILE__,
+                    dirname(__FILE__) . '/../grove.php'
+                );
+                foreach ($grove_files as $file) {
+                    if (file_exists($file)) {
+                        opcache_invalidate($file, true);
+                        $log[] = '<div style="color: #00a32a;">✅ opcache_invalidate() - Cleared: ' . basename($file) . '</div>';
+                    }
+                }
+            } else {
+                $log[] = '<div style="color: #666;">ℹ️  opcache_invalidate not available</div>';
+            }
+            
+            // Send no-cache headers
+            nocache_headers();
+            $log[] = '<div style="color: #00a32a;">✅ nocache_headers() - Browser cache headers sent</div>';
+            
+            $log[] = '<div style="color: #0073aa; margin-top: 10px;">🎯 Cache clearing operations completed</div>';
+            
+            wp_send_json_success(array('log' => implode('', $log)));
+            
+        } catch (Exception $e) {
+            $log[] = '<div style="color: #d63638;">❌ Error: ' . $e->getMessage() . '</div>';
+            wp_send_json_error(implode('', $log));
         }
     }
 }
