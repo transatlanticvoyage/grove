@@ -2318,13 +2318,13 @@ class Grove_Admin {
                                 <th class="for_db_table_zen_services" style="border: 1px solid #ddd; font-weight: bold; text-transform: lowercase; background: #e0e0e0;"><div class="cell_inner_wrapper_div for_db_table_zen_services for_db_column_service_slug_id">wp_zen_services</div></th>
                                 <th class="for_db_table_zen_services" style="border: 1px solid #ddd; font-weight: bold; text-transform: lowercase; background: #e0e0e0;"><div class="cell_inner_wrapper_div for_db_table_zen_services for_db_column_description1_short">wp_zen_services</div></th>
                                 <th class="for_db_table_zen_services" style="border: 1px solid #ddd; font-weight: bold; text-transform: lowercase; background: #e0e0e0;"><div class="cell_inner_wrapper_div for_db_table_zen_services for_db_column_description1_long">wp_zen_services</div></th>
+                                <th class="for_db_table_zen_services" style="border: 1px solid #ddd; font-weight: bold; text-transform: lowercase; background: #e0e0e0;"><div class="cell_inner_wrapper_div for_db_table_zen_services for_db_column_is_pinned_service">wp_zen_services</div></th>
                                 <th class="for_db_table_zen_services" style="border: 1px solid #ddd; font-weight: bold; text-transform: lowercase; background: #e0e0e0;"><div class="cell_inner_wrapper_div for_db_table_zen_services for_db_column_rel_image1_id">wp_zen_services</div></th>
                                 <th style="border: 1px solid #ddd; font-weight: bold; text-transform: lowercase; background: #e0e0e0;"><div class="cell_inner_wrapper_div">(filler)</div></th>
                                 <th style="border: 1px solid #ddd; font-weight: bold; text-transform: lowercase; background: #e0e0e0;"><div class="cell_inner_wrapper_div">(filler)</div></th>
                                 <th style="border: 1px solid #ddd; font-weight: bold; text-transform: lowercase; background: #e0e0e0;"><div class="cell_inner_wrapper_div">(filler)</div></th>
                                 <th style="border: 1px solid #ddd; font-weight: bold; text-transform: lowercase; background: #e0e0e0;"><div class="cell_inner_wrapper_div">(filler)</div></th>
                                 <th class="for_db_table_zen_services" style="border: 1px solid #ddd; font-weight: bold; text-transform: lowercase; background: #e0e0e0;"><div class="cell_inner_wrapper_div for_db_table_zen_services for_db_column_asn_service_page_id">wp_zen_services</div></th>
-                                <th class="for_db_table_zen_services" style="border: 1px solid #ddd; font-weight: bold; text-transform: lowercase; background: #e0e0e0;"><div class="cell_inner_wrapper_div for_db_table_zen_services for_db_column_is_pinned_service">wp_zen_services</div></th>
                                 <th style="border: 1px solid #ddd; font-weight: bold; background: #e0e0e0;"><div class="cell_inner_wrapper_div">(filler)</div></th>
                             </tr>
                             <tr>
@@ -2339,13 +2339,13 @@ class Grove_Admin {
                                 <th class="for_db_table_zen_services" data-sort="service_slug_id" style="border: 1px solid #ddd; font-weight: bold; text-transform: lowercase; cursor: pointer; background: #f8f9fa;"><div class="cell_inner_wrapper_div for_db_table_zen_services for_db_column_service_slug_id">service_slug_id</div></th>
                                 <th class="for_db_table_zen_services" data-sort="description1_short" style="border: 1px solid #ddd; font-weight: bold; text-transform: lowercase; cursor: pointer; background: #f8f9fa;"><div class="cell_inner_wrapper_div for_db_table_zen_services for_db_column_description1_short">description1_short</div></th>
                                 <th class="for_db_table_zen_services" data-sort="description1_long" style="border: 1px solid #ddd; font-weight: bold; text-transform: lowercase; cursor: pointer; background: #f8f9fa;"><div class="cell_inner_wrapper_div for_db_table_zen_services for_db_column_description1_long">description1_long</div></th>
+                                <th class="for_db_table_zen_services" data-sort="is_pinned_service" style="border: 1px solid #ddd; font-weight: bold; text-transform: lowercase; cursor: pointer; background: #f8f9fa;"><div class="cell_inner_wrapper_div for_db_table_zen_services for_db_column_is_pinned_service">is_pinned_service</div></th>
                                 <th class="for_db_table_zen_services" data-sort="rel_image1_id" style="border: 1px solid #ddd; font-weight: bold; text-transform: lowercase; cursor: pointer; background: #f8f9fa;"><div class="cell_inner_wrapper_div for_db_table_zen_services for_db_column_rel_image1_id">rel_image1_id</div></th>
                                 <th style="border: 1px solid #ddd; font-weight: bold; text-transform: lowercase; background: #f8f9fa; text-align: left; white-space: nowrap;"><div class="cell_inner_wrapper_div">image-main-display</div></th>
                                 <th style="border: 1px solid #ddd; font-weight: bold; font-size: 16px; text-transform: lowercase; background: #f8f9fa;"><div class="cell_inner_wrapper_div">image-alternative-display-method</div></th>
                                 <th style="border: 1px solid #ddd; font-weight: bold; text-transform: lowercase; background: #f8f9fa;"><div class="cell_inner_wrapper_div">width</div></th>
                                 <th style="border: 1px solid #ddd; font-weight: bold; text-transform: lowercase; background: #f8f9fa;"><div class="cell_inner_wrapper_div">height</div></th>
                                 <th class="for_db_table_zen_services" style="border: 1px solid #ddd; font-weight: bold; text-transform: lowercase; background: #f8f9fa;"><div class="cell_inner_wrapper_div for_db_table_zen_services for_db_column_asn_service_page_id">asn_service_page_id</div></th>
-                                <th class="for_db_table_zen_services" data-sort="is_pinned_service" style="border: 1px solid #ddd; font-weight: bold; text-transform: lowercase; cursor: pointer; background: #f8f9fa;"><div class="cell_inner_wrapper_div for_db_table_zen_services for_db_column_is_pinned_service">is_pinned_service</div></th>
                                 <th style="border: 1px solid #ddd; font-weight: bold; background: #f8f9fa;"><div class="cell_inner_wrapper_div">Actions</div></th>
                             </tr>
                         </thead>
@@ -2563,6 +2563,7 @@ class Grove_Admin {
                     tr.append('<td class="for_db_table_zen_services" style="border: 1px solid #ddd; cursor: pointer;" data-field="service_slug_id" data-id="' + service.service_id + '"><div class="cell_inner_wrapper_div for_db_table_zen_services for_db_column_service_slug_id">' + (service.service_slug_id || '') + '</div></td>');
                     tr.append('<td class="for_db_table_zen_services" style="border: 1px solid #ddd; cursor: pointer;" data-field="description1_short" data-id="' + service.service_id + '"><div class="cell_inner_wrapper_div for_db_table_zen_services for_db_column_description1_short">' + (service.description1_short || '') + '</div></td>');
                     tr.append('<td class="for_db_table_zen_services" style="border: 1px solid #ddd; cursor: pointer;" data-field="description1_long" data-id="' + service.service_id + '"><div class="cell_inner_wrapper_div for_db_table_zen_services for_db_column_description1_long">' + (service.description1_long || '') + '</div></td>');
+                    tr.append('<td class="for_db_table_zen_services" style="border: 1px solid #ddd; text-align: center;"><div class="cell_inner_wrapper_div for_db_table_zen_services for_db_column_is_pinned_service">' + (service.is_pinned_service ? 'Yes' : 'No') + '</div></td>');
                     
                     // Image column with only buttons and ID
                     let imageCell = '<td class="for_db_table_zen_services image-cell" style="border: 1px solid #ddd; text-align: center;" data-id="' + service.service_id + '"><div class="cell_inner_wrapper_div for_db_table_zen_services for_db_column_rel_image1_id">';
@@ -2638,8 +2639,6 @@ class Grove_Admin {
                     }
                     pageCell += '</div></td>';
                     tr.append(pageCell);
-                    
-                    tr.append('<td class="for_db_table_zen_services" style="border: 1px solid #ddd; text-align: center;"><div class="cell_inner_wrapper_div for_db_table_zen_services for_db_column_is_pinned_service">' + (service.is_pinned_service ? 'Yes' : 'No') + '</div></td>');
                     tr.append('<td style="border: 1px solid #ddd;"><div class="cell_inner_wrapper_div"><button class="button button-small delete-btn" data-id="' + service.service_id + '">Delete</button></div></td>');
                     
                     tbody.append(tr);
