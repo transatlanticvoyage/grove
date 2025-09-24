@@ -2165,6 +2165,7 @@ class Grove_Admin {
                     </div>
                     <div style="margin-left: 10px;">
                         <button id="test-button-3" style="padding: 8px 16px; border: 1px solid #ccc; border-radius: 4px; background: white; cursor: pointer; font-size: 14px;">test button 3</button>
+                        <button id="test-button-4" style="padding: 8px 16px; border: 1px solid #ccc; border-radius: 4px; background: white; cursor: pointer; font-size: 14px;">test button 4</button>
                     </div>
                 </div>
             </div>
