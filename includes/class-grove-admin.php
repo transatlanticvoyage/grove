@@ -2633,12 +2633,15 @@ class Grove_Admin {
                     
                     // File Name column with special editing
                     let fileNameCell = '<td style="border: 1px solid #ddd; text-align: left;" class="filename-cell" data-attachment-id="' + (service.rel_image1_id || '') + '"><div class="cell_inner_wrapper_div">';
-                    fileNameCell += '<div class="filename-editor-container" style="display: flex; align-items: center; gap: 4px;">';
-                    fileNameCell += '<button class="button button-small filename-change-btn" style="font-size: 11px; padding: 2px 6px;">Change</button>';
-                    let filename = service.rel_image1_id ? 'image-' + service.rel_image1_id + '.jpg' : 'no-image.jpg';
-                    fileNameCell += '<input type="text" class="filename-input" value="' + filename + '" style="flex: 1; padding: 4px; border: 1px solid #ddd; border-radius: 3px; background: #f9f9f9;" readonly>';
-                    fileNameCell += '<button class="button button-small filename-save-btn" style="font-size: 11px; padding: 2px 6px; background: #ccc; color: #666; display: none;" disabled>Save</button>';
-                    fileNameCell += '</div>';
+                    if (service.rel_image1_id && service.rel_image1_id > 0) {
+                        fileNameCell += '<div class="filename-editor-container" style="display: flex; align-items: center; gap: 4px;">';
+                        fileNameCell += '<button class="button button-small filename-change-btn" style="font-size: 11px; padding: 2px 6px;">Change</button>';
+                        fileNameCell += '<input type="text" class="filename-input" data-attachment-id="' + service.rel_image1_id + '" value="Loading..." style="flex: 1; padding: 4px; border: 1px solid #ddd; border-radius: 3px; background: #f9f9f9;" readonly>';
+                        fileNameCell += '<button class="button button-small filename-save-btn" style="font-size: 11px; padding: 2px 6px; background: #ccc; color: #666; display: none;" disabled>Save</button>';
+                        fileNameCell += '</div>';
+                    } else {
+                        fileNameCell += '<span style="color: #999;">-</span>';
+                    }
                     fileNameCell += '</div></td>';
                     tr.append(fileNameCell);
                     
@@ -2764,6 +2767,7 @@ class Grove_Admin {
                                     let imageUrl = response.data.url;
                                     let width = response.data.width;
                                     let height = response.data.height;
+                                    let filename = response.data.filename || 'unknown.jpg';
                                     
                                     // Calculate aspect ratio for 100px height
                                     let aspectRatio = width / height;
@@ -2775,6 +2779,9 @@ class Grove_Admin {
                                     // Update width and height columns
                                     $('.image-width-cell[data-attachment-id="' + attachmentId + '"] .width-value').text(width + 'px');
                                     $('.image-height-cell[data-attachment-id="' + attachmentId + '"] .height-value').text(height + 'px');
+                                    
+                                    // Update filename input with actual filename
+                                    $('.filename-input[data-attachment-id="' + attachmentId + '"]').val(filename);
                                 } else {
                                     console.error('Image load failed for ID ' + attachmentId + ':', response);
                                     container.html('<span style="color: #dc3545; font-size: 12px;">No image found</span>');
@@ -3151,6 +3158,9 @@ class Grove_Admin {
                 let input = container.find('.filename-input');
                 let saveBtn = container.find('.filename-save-btn');
                 
+                // Store original value before editing
+                input.data('original-filename', input.val());
+                
                 // Make input editable
                 input.prop('readonly', false);
                 input.css('background', 'white');
@@ -3198,9 +3208,8 @@ class Grove_Admin {
                     let changeBtn = container.find('.filename-change-btn');
                     let saveBtn = container.find('.filename-save-btn');
                     
-                    // Reset to original value - get from data attribute or reconstruct
-                    let attachmentId = container.closest('.filename-cell').data('attachment-id');
-                    let originalFilename = attachmentId ? 'image-' + attachmentId + '.jpg' : 'no-image.jpg';
+                    // Reset to original value - stored as data attribute when made editable
+                    let originalFilename = input.data('original-filename') || input.val();
                     input.val(originalFilename);
                     
                     // Reset to readonly state
@@ -4006,8 +4015,20 @@ class Grove_Admin {
         $image_url = wp_get_attachment_image_url($attachment_id, 'full');
         $metadata = wp_get_attachment_metadata($attachment_id);
         
+        // Get the filename from the metadata or wp_postmeta
+        $attached_file = get_post_meta($attachment_id, '_wp_attached_file', true);
+        $filename = '';
+        
+        if ($attached_file) {
+            // Extract just the filename from the full path
+            $filename = basename($attached_file);
+        } elseif (isset($metadata['file'])) {
+            // Fallback to metadata file field
+            $filename = basename($metadata['file']);
+        }
+        
         // Debug logging
-        error_log("Grove Image Debug - ID: {$attachment_id}, URL: " . ($image_url ?: 'NULL') . ", Metadata: " . print_r($metadata, true));
+        error_log("Grove Image Debug - ID: {$attachment_id}, URL: " . ($image_url ?: 'NULL') . ", Filename: {$filename}, Metadata: " . print_r($metadata, true));
         
         if (!$image_url) {
             wp_send_json_error('Image URL not found for attachment ID: ' . $attachment_id);
@@ -4023,6 +4044,7 @@ class Grove_Admin {
             'url' => $image_url,
             'width' => isset($metadata['width']) ? $metadata['width'] : 0,
             'height' => isset($metadata['height']) ? $metadata['height'] : 0,
+            'filename' => $filename,
             'debug_info' => array(
                 'attachment_id' => $attachment_id,
                 'metadata_keys' => array_keys($metadata)
