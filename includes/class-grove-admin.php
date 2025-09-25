@@ -3738,13 +3738,13 @@ class Grove_Admin {
                 
                 // Update button states
                 $('#grove-first-row-page').prop('disabled', currentRowPage <= 1);
-                $('#grove-prev-row-page').prop('disabled', currentRowPage <= 1);
-                $('#grove-next-row-page').prop('disabled', currentRowPage >= totalRowPages);
+                $('#grove-prev-row-page').prop('disabled', false);
+                $('#grove-next-row-page').prop('disabled', false);
                 $('#grove-last-row-page').prop('disabled', currentRowPage >= totalRowPages);
                 
                 $('#grove-first-col-page').prop('disabled', currentColPage <= 1);
-                $('#grove-prev-col-page').prop('disabled', currentColPage <= 1);
-                $('#grove-next-col-page').prop('disabled', currentColPage >= totalColPages);
+                $('#grove-prev-col-page').prop('disabled', false);
+                $('#grove-next-col-page').prop('disabled', false);
                 $('#grove-last-col-page').prop('disabled', currentColPage >= totalColPages);
             }
             
