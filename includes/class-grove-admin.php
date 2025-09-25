@@ -6973,6 +6973,71 @@ class Grove_Admin {
         ));
     }
     
+    /**
+     * Get page name (post_name) by ID
+     */
+    public function grove_get_page_name() {
+        // Check nonce
+        if (!wp_verify_nonce($_POST['nonce'], 'grove_services_nonce')) {
+            wp_send_json_error('Invalid nonce');
+            return;
+        }
+        
+        $page_id = intval($_POST['page_id']);
+        $post = get_post($page_id);
+        
+        if ($post) {
+            wp_send_json_success(array('name' => $post->post_name));
+        } else {
+            wp_send_json_error('Page not found');
+        }
+    }
+    
+    /**
+     * Update post name (post_name)
+     */
+    public function grove_update_post_name() {
+        // Check nonce
+        if (!wp_verify_nonce($_POST['nonce'], 'grove_services_nonce')) {
+            wp_send_json_error('Invalid nonce');
+            return;
+        }
+        
+        if (!current_user_can('edit_pages')) {
+            wp_send_json_error('Insufficient permissions');
+            return;
+        }
+        
+        $page_id = intval($_POST['page_id']);
+        $new_name = sanitize_title($_POST['name']);
+        
+        if (!$page_id) {
+            wp_send_json_error('Invalid page ID');
+            return;
+        }
+        
+        // Update the post name
+        $result = wp_update_post(array(
+            'ID' => $page_id,
+            'post_name' => $new_name
+        ));
+        
+        if (is_wp_error($result)) {
+            wp_send_json_error('Failed to update post name: ' . $result->get_error_message());
+            return;
+        }
+        
+        if ($result === 0) {
+            wp_send_json_error('No changes made');
+            return;
+        }
+        
+        wp_send_json_success(array(
+            'message' => 'Post name updated successfully',
+            'name' => $new_name
+        ));
+    }
+    
     public function grove_cache_manager_page() {
         // AGGRESSIVE NOTICE SUPPRESSION - Remove ALL WordPress admin notices
         $this->suppress_all_admin_notices();
