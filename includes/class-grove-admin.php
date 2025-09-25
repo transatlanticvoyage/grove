@@ -2252,8 +2252,11 @@ class Grove_Admin {
                                                 <div style="display: flex; align-items: center;">
                                                     <span style="font-size: 12px; color: #4B5563; margin-right: 8px;">Rows/page:</span>
                                                     <div style="display: inline-flex; border-radius: 6px; box-shadow: 0 1px 2px 0 rgba(0, 0, 0, 0.05);">
-                                                        <button type="button" data-rows="10" class="grove-rows-per-page-btn" style="padding: 10px 8px; font-size: 14px; border: 1px solid #D1D5DB; border-radius: 6px 0 0 6px; margin-right: -1px; cursor: pointer; background: white;">10</button>
-                                                        <button type="button" data-rows="25" class="grove-rows-per-page-btn active" style="padding: 10px 8px; font-size: 14px; border: 1px solid #3B82F6; background: #3B82F6; color: white; margin-right: -1px; cursor: pointer;">25</button>
+                                                        <button type="button" data-rows="3" class="grove-rows-per-page-btn" style="padding: 10px 8px; font-size: 14px; border: 1px solid #D1D5DB; border-radius: 6px 0 0 6px; margin-right: -1px; cursor: pointer; background: white;">3</button>
+                                                        <button type="button" data-rows="4" class="grove-rows-per-page-btn" style="padding: 10px 8px; font-size: 14px; border: 1px solid #D1D5DB; margin-right: -1px; cursor: pointer; background: white;">4</button>
+                                                        <button type="button" data-rows="5" class="grove-rows-per-page-btn active" style="padding: 10px 8px; font-size: 14px; border: 1px solid #3B82F6; background: #3B82F6; color: white; margin-right: -1px; cursor: pointer;">5</button>
+                                                        <button type="button" data-rows="10" class="grove-rows-per-page-btn" style="padding: 10px 8px; font-size: 14px; border: 1px solid #D1D5DB; margin-right: -1px; cursor: pointer; background: white;">10</button>
+                                                        <button type="button" data-rows="25" class="grove-rows-per-page-btn" style="padding: 10px 8px; font-size: 14px; border: 1px solid #D1D5DB; margin-right: -1px; cursor: pointer; background: white;">25</button>
                                                         <button type="button" data-rows="50" class="grove-rows-per-page-btn" style="padding: 10px 8px; font-size: 14px; border: 1px solid #D1D5DB; margin-right: -1px; cursor: pointer; background: white;">50</button>
                                                         <button type="button" data-rows="100" class="grove-rows-per-page-btn" style="padding: 10px 8px; font-size: 14px; border: 1px solid #D1D5DB; margin-right: -1px; cursor: pointer; background: white;">100</button>
                                                         <button type="button" data-rows="200" class="grove-rows-per-page-btn" style="padding: 10px 8px; font-size: 14px; border: 1px solid #D1D5DB; margin-right: -1px; cursor: pointer; background: white;">200</button>
@@ -2727,21 +2730,25 @@ class Grove_Admin {
                     tr.append(pageCell);
                     
                     // wp_posts post_title column
-                    let postTitleCell = '<td class="for_db_table_wp_posts_according_to_asn_service_page_id" style="border: 1px solid #ddd;"><div class="cell_inner_wrapper_div for_db_table_wp_posts_according_to_asn_service_page_id">';
+                    let postTitleCell = '<td class="for_db_table_wp_posts_according_to_asn_service_page_id" style="border: 1px solid #ddd; white-space: nowrap;"><div class="cell_inner_wrapper_div for_db_table_wp_posts_according_to_asn_service_page_id" style="display: flex; align-items: stretch;">';
                     if (service.asn_service_page_id) {
-                        postTitleCell += '<input type="text" class="post-title-input" data-service-id="' + service.service_id + '" data-page-id="' + service.asn_service_page_id + '" style="width: 100%; padding: 4px; border: 1px solid #ccc;" placeholder="Loading..." />';
+                        postTitleCell += '<input type="text" class="post-title-input" data-service-id="' + service.service_id + '" data-page-id="' + service.asn_service_page_id + '" style="flex: 1; min-width: 200px; padding: 4px; border: 1px solid #ccc; border-right: none;" placeholder="Loading..." />';
+                        postTitleCell += '<button class="copy-btn" data-copy-target="post-title" data-service-id="' + service.service_id + '" style="width: 20px; padding: 0; border: 1px solid #999; background: #f9f9f9; cursor: pointer; font-size: 16px; line-height: 1;">•</button>';
                     } else {
-                        postTitleCell += '<input type="text" class="post-title-input" data-service-id="' + service.service_id + '" style="width: 100%; padding: 4px; border: 1px solid #ccc;" placeholder="No page assigned" disabled />';
+                        postTitleCell += '<input type="text" class="post-title-input" data-service-id="' + service.service_id + '" style="flex: 1; min-width: 200px; padding: 4px; border: 1px solid #ccc; border-right: none;" placeholder="No page assigned" disabled />';
+                        postTitleCell += '<button class="copy-btn" disabled style="width: 20px; padding: 0; border: 1px solid #999; background: #f9f9f9; cursor: not-allowed; font-size: 16px; line-height: 1;">•</button>';
                     }
                     postTitleCell += '</div></td>';
                     tr.append(postTitleCell);
                     
                     // wp_posts post_name column
-                    let postNameCell = '<td class="for_db_table_wp_posts_according_to_asn_service_page_id" style="border: 1px solid #ddd;"><div class="cell_inner_wrapper_div for_db_table_wp_posts_according_to_asn_service_page_id">';
+                    let postNameCell = '<td class="for_db_table_wp_posts_according_to_asn_service_page_id" style="border: 1px solid #ddd; white-space: nowrap;"><div class="cell_inner_wrapper_div for_db_table_wp_posts_according_to_asn_service_page_id" style="display: flex; align-items: stretch;">';
                     if (service.asn_service_page_id) {
-                        postNameCell += '<input type="text" class="post-name-input" data-service-id="' + service.service_id + '" data-page-id="' + service.asn_service_page_id + '" style="width: 100%; padding: 4px; border: 1px solid #ccc;" placeholder="Loading..." />';
+                        postNameCell += '<input type="text" class="post-name-input" data-service-id="' + service.service_id + '" data-page-id="' + service.asn_service_page_id + '" style="flex: 1; min-width: 200px; padding: 4px; border: 1px solid #ccc; border-right: none;" placeholder="Loading..." />';
+                        postNameCell += '<button class="copy-btn" data-copy-target="post-name" data-service-id="' + service.service_id + '" style="width: 20px; padding: 0; border: 1px solid #999; background: #f9f9f9; cursor: pointer; font-size: 16px; line-height: 1;">•</button>';
                     } else {
-                        postNameCell += '<input type="text" class="post-name-input" data-service-id="' + service.service_id + '" style="width: 100%; padding: 4px; border: 1px solid #ccc;" placeholder="No page assigned" disabled />';
+                        postNameCell += '<input type="text" class="post-name-input" data-service-id="' + service.service_id + '" style="flex: 1; min-width: 200px; padding: 4px; border: 1px solid #ccc; border-right: none;" placeholder="No page assigned" disabled />';
+                        postNameCell += '<button class="copy-btn" disabled style="width: 20px; padding: 0; border: 1px solid #999; background: #f9f9f9; cursor: not-allowed; font-size: 16px; line-height: 1;">•</button>';
                     }
                     postNameCell += '</div></td>';
                     tr.append(postNameCell);
@@ -3682,7 +3689,7 @@ class Grove_Admin {
             // PAGINATION FUNCTIONALITY FOR ROCKET CHAMBER
             
             // Global pagination state
-            let currentRowsPerPage = 25;
+            let currentRowsPerPage = 5;
             let currentColsPerPage = 15;
             let currentRowPage = 1;
             let currentColPage = 1;
@@ -3890,15 +3897,19 @@ class Grove_Admin {
             $('#grove-prev-row-page').click(function() {
                 if (currentRowPage > 1) {
                     currentRowPage--;
-                    applyPagination();
+                } else {
+                    currentRowPage = totalRowPages;
                 }
+                applyPagination();
             });
             
             $('#grove-next-row-page').click(function() {
                 if (currentRowPage < totalRowPages) {
                     currentRowPage++;
-                    applyPagination();
+                } else {
+                    currentRowPage = 1;
                 }
+                applyPagination();
             });
             
             $('#grove-last-row-page').click(function() {
@@ -3915,15 +3926,19 @@ class Grove_Admin {
             $('#grove-prev-col-page').click(function() {
                 if (currentColPage > 1) {
                     currentColPage--;
-                    applyPagination();
+                } else {
+                    currentColPage = totalColPages;
                 }
+                applyPagination();
             });
             
             $('#grove-next-col-page').click(function() {
                 if (currentColPage < totalColPages) {
                     currentColPage++;
-                    applyPagination();
+                } else {
+                    currentColPage = 1;
                 }
+                applyPagination();
             });
             
             $('#grove-last-col-page').click(function() {
@@ -4005,8 +4020,45 @@ class Grove_Admin {
                     }
                 });
             });
+            
+            // Copy button functionality
+            $(document).on('click', '.copy-btn', function(e) {
+                e.preventDefault();
+                let $btn = $(this);
+                let serviceId = $btn.data('service-id');
+                let copyTarget = $btn.data('copy-target');
+                
+                // Find the corresponding input field
+                let $input;
+                if (copyTarget === 'post-title') {
+                    $input = $('.post-title-input[data-service-id="' + serviceId + '"]');
+                } else if (copyTarget === 'post-name') {
+                    $input = $('.post-name-input[data-service-id="' + serviceId + '"]');
+                }
+                
+                if ($input && $input.length > 0) {
+                    let textToCopy = $input.val();
+                    
+                    // Copy to clipboard
+                    navigator.clipboard.writeText(textToCopy).then(function() {
+                        // Visual feedback
+                        let originalBg = $btn.css('background-color');
+                        $btn.css('background-color', '#90EE90');
+                        setTimeout(function() {
+                            $btn.css('background-color', originalBg);
+                        }, 200);
+                    }).catch(function(err) {
+                        console.error('Failed to copy text: ', err);
+                    });
+                }
+            });
         });
         </script>
+        <style>
+        .copy-btn:hover:not(:disabled) {
+            background-color: #ffff00 !important;
+        }
+        </style>
         <?php
     }
     

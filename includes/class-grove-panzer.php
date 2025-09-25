@@ -261,8 +261,8 @@ class Grove_Panzer {
             'source_page_title' => $source_post->post_title,
             'duplicated_page_id' => $target_id,
             'duplicated_page_title' => $new_post->post_title,
-            'assigned_service_id' => null, // Panzer method doesn't assign to services
-            'assigned_service_name' => null,
+            'assigned_service_id' => isset($args['service_id']) ? $args['service_id'] : null,
+            'assigned_service_name' => isset($args['service_name']) ? $args['service_name'] : null,
             'operation_type' => isset($args['operation_type']) ? $args['operation_type'] : 'panzer_method',
             'method' => isset($args['method']) ? $args['method'] : 'Panzer Method',
             'is_elementor_page' => $is_elementor,

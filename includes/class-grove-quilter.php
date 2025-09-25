@@ -393,7 +393,7 @@ class Grove_Quilter {
                 continue;
             }
             
-            // Duplicate the oshabi page
+            // Duplicate the oshabi page using Panzer Method
             $service_name_clean = sanitize_title($service->service_name);
             $duplicate_args = array(
                 'post_title_suffix' => " - {$service->service_name} Service",
@@ -402,10 +402,12 @@ class Grove_Quilter {
                 'service_id' => $service_id,
                 'service_name' => $service->service_name,
                 'operation_type' => 'oshabi_duplication',
-                'method' => 'Main Quilter Method 1'
+                'method' => 'Panzer Method'
             );
             
-            $new_page_id = $this->QuilterDuplicatePage($oshabi_page_id, $duplicate_args);
+            // Use Panzer method for duplication
+            $panzer = new Grove_Panzer();
+            $new_page_id = $panzer->PanzerDuplicatePage($oshabi_page_id, $duplicate_args);
             
             if (!$new_page_id) {
                 $results[] = "Service '{$service->service_name}': Failed to duplicate page";
