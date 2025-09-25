@@ -8,6 +8,10 @@ class Grove_Admin {
     public function __construct() {
         add_action('admin_menu', array($this, 'add_admin_menu'));
         add_action('admin_enqueue_scripts', array($this, 'enqueue_admin_styles'));
+        
+        // Initialize PageBender
+        $this->pagebender = new Grove_PageBender();
+        
         add_action('wp_ajax_grove_driggs_get_data', array($this, 'grove_driggs_get_data'));
         add_action('wp_ajax_grove_driggs_update_field', array($this, 'grove_driggs_update_field'));
         add_action('wp_ajax_grove_locations_get_data', array($this, 'grove_locations_get_data'));
@@ -123,6 +127,15 @@ class Grove_Admin {
             'manage_options',
             'grove_services_mar',
             array($this, 'grove_services_mar_page')
+        );
+        
+        add_submenu_page(
+            'grovehub',
+            'Grove Page Bender',
+            'grove_pagebender',
+            'manage_options',
+            'grove_pagebender',
+            array($this, 'grove_pagebender_page')
         );
         
         add_submenu_page(
@@ -7093,6 +7106,160 @@ class Grove_Admin {
         } else {
             wp_send_json_error('Page not found or no permalink');
         }
+    }
+    
+    /**
+     * Grove Page Bender Page
+     */
+    public function grove_pagebender_page() {
+        // AGGRESSIVE NOTICE SUPPRESSION - Remove ALL WordPress admin notices
+        $this->suppress_all_admin_notices();
+        ?>
+        <div class="wrap" style="margin: 0; padding: 0;">
+            <!-- Allow space for WordPress notices -->
+            <div style="height: 20px;"></div>
+            
+            <div style="padding: 20px;">
+                <h1 style="margin-bottom: 20px;">🌳📄 Grove Page Bender</h1>
+                
+                <!-- Page Template Management -->
+                <div style="background: white; border: 1px solid #ddd; padding: 20px; margin-bottom: 20px; border-radius: 5px;">
+                    <h2 style="margin-top: 0; margin-bottom: 20px;">Page Template Management</h2>
+                    
+                    <!-- Oshabi Template -->
+                    <div style="margin-bottom: 30px; padding: 15px; border: 1px solid #e0e0e0; border-radius: 4px; background: #f9f9f9;">
+                        <div style="margin-bottom: 15px;">
+                            <strong style="font-size: 16px;">Select Oshabi Page</strong>
+                        </div>
+                        <button id="select-oshabi-page-btn" class="button button-primary" style="padding: 8px 16px;">Select</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Page Selector Modal -->
+        <div id="oshabi-page-selector-modal" style="display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.5); z-index: 1000;">
+            <div style="position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); background: white; padding: 30px; border-radius: 8px; width: 80%; max-width: 1200px; max-height: 80vh; overflow-y: auto;">
+                <h2 style="margin-top: 0;">Select Oshabi Page</h2>
+                
+                <!-- Search Box -->
+                <div style="margin-bottom: 20px;">
+                    <input type="text" id="oshabi-page-search" placeholder="Search pages and posts..." style="width: 300px; padding: 8px; border: 1px solid #ddd; border-radius: 4px;">
+                    <button id="clear-oshabi-page-search" class="button button-small" style="margin-left: 10px;">Clear Search</button>
+                </div>
+                
+                <!-- Pages Table -->
+                <div style="border: 1px solid #ddd; border-radius: 4px; overflow: hidden; max-height: 400px; overflow-y: auto;">
+                    <table style="width: 100%; border-collapse: collapse;">
+                        <thead style="background: #f0f0f0; position: sticky; top: 0;">
+                            <tr>
+                                <th style="padding: 10px; text-align: left; border-bottom: 1px solid #ddd;">Select</th>
+                                <th style="padding: 10px; text-align: left; border-bottom: 1px solid #ddd;">ID</th>
+                                <th style="padding: 10px; text-align: left; border-bottom: 1px solid #ddd;">Title</th>
+                                <th style="padding: 10px; text-align: left; border-bottom: 1px solid #ddd;">Type</th>
+                                <th style="padding: 10px; text-align: left; border-bottom: 1px solid #ddd;">Status</th>
+                                <th style="padding: 10px; text-align: left; border-bottom: 1px solid #ddd;">Date</th>
+                            </tr>
+                        </thead>
+                        <tbody id="oshabi-pages-tbody">
+                            <!-- Data will be loaded here via AJAX -->
+                        </tbody>
+                    </table>
+                </div>
+                
+                <!-- Modal Actions -->
+                <div style="text-align: right; margin-top: 20px;">
+                    <button id="cancel-oshabi-page-select" class="button button-secondary" style="margin-right: 10px;">Cancel</button>
+                    <button id="confirm-oshabi-page-select" class="button button-primary">Confirm Selection</button>
+                </div>
+            </div>
+        </div>
+        
+        <script type="text/javascript">
+        jQuery(document).ready(function($) {
+            let allOshabiPagesData = [];
+            let selectedOshabiPageId = null;
+            
+            // Open Oshabi page selector modal
+            $('#select-oshabi-page-btn').click(function() {
+                selectedOshabiPageId = null;
+                
+                // Load all pages and posts
+                $.ajax({
+                    url: ajaxurl,
+                    type: 'POST',
+                    data: {
+                        action: 'grove_pagebender_get_all_pages',
+                        nonce: '<?php echo wp_create_nonce('grove_pagebender_nonce'); ?>'
+                    },
+                    success: function(response) {
+                        if (response.success) {
+                            allOshabiPagesData = response.data;
+                            displayOshabiPages(allOshabiPagesData);
+                            $('#oshabi-page-selector-modal').show();
+                        }
+                    }
+                });
+            });
+            
+            // Display pages in the modal table
+            function displayOshabiPages(pages) {
+                let tbody = $('#oshabi-pages-tbody');
+                tbody.empty();
+                
+                pages.forEach(function(page) {
+                    let row = $('<tr>');
+                    row.append('<td style="padding: 8px; border: 1px solid #ddd;"><input type="radio" name="oshabi-page-select" value="' + page.ID + '" data-title="' + page.post_title + '"></td>');
+                    row.append('<td style="padding: 8px; border: 1px solid #ddd;">' + page.ID + '</td>');
+                    row.append('<td style="padding: 8px; border: 1px solid #ddd;">' + page.post_title + '</td>');
+                    row.append('<td style="padding: 8px; border: 1px solid #ddd;">' + page.post_type + '</td>');
+                    row.append('<td style="padding: 8px; border: 1px solid #ddd;">' + page.post_status + '</td>');
+                    row.append('<td style="padding: 8px; border: 1px solid #ddd;">' + page.post_date + '</td>');
+                    tbody.append(row);
+                });
+            }
+            
+            // Handle page selection
+            $(document).on('change', 'input[name="oshabi-page-select"]', function() {
+                selectedOshabiPageId = $(this).val();
+            });
+            
+            // Search pages
+            $('#oshabi-page-search').on('input', function() {
+                let searchTerm = $(this).val().toLowerCase();
+                let filtered = allOshabiPagesData.filter(function(page) {
+                    return page.post_title.toLowerCase().includes(searchTerm) ||
+                           page.ID.toString().includes(searchTerm);
+                });
+                displayOshabiPages(filtered);
+            });
+            
+            // Clear page search
+            $('#clear-oshabi-page-search').click(function() {
+                $('#oshabi-page-search').val('');
+                displayOshabiPages(allOshabiPagesData);
+            });
+            
+            // Confirm page selection
+            $('#confirm-oshabi-page-select').click(function() {
+                if (!selectedOshabiPageId) {
+                    alert('Please select a page');
+                    return;
+                }
+                
+                // TODO: Here we would save the selection to database
+                // For now, just close the modal
+                alert('Oshabi page selected (ID: ' + selectedOshabiPageId + '). Functionality will be implemented in future updates.');
+                $('#oshabi-page-selector-modal').hide();
+            });
+            
+            // Cancel page selection
+            $('#cancel-oshabi-page-select').click(function() {
+                $('#oshabi-page-selector-modal').hide();
+            });
+        });
+        </script>
+        <?php
     }
     
     public function grove_cache_manager_page() {
