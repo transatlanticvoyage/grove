@@ -40,6 +40,7 @@ class GrovePlugin {
         require_once GROVE_PLUGIN_PATH . 'includes/class-grove-admin.php';
         require_once GROVE_PLUGIN_PATH . 'includes/class-grove-pagebender.php';
         require_once GROVE_PLUGIN_PATH . 'includes/class-grove-quilter.php';
+        require_once GROVE_PLUGIN_PATH . 'includes/class-grove-panzer.php';
         require_once GROVE_PLUGIN_PATH . 'includes/class-grove-tax-exports.php';
         require_once GROVE_PLUGIN_PATH . 'includes/class-grove-zen-shortcodes.php';
         require_once GROVE_PLUGIN_PATH . 'includes/class-grove-database.php';
@@ -51,6 +52,7 @@ class GrovePlugin {
         new Grove_Zen_Shortcodes();
         new Grove_Database();
         new Grove_Quilter();
+        new Grove_Panzer();
     }
     
     public function activate() {

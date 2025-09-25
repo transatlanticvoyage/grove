@@ -7203,6 +7203,25 @@ class Grove_Admin {
                         <button id="select-oshabi-page-btn" class="button button-primary" style="padding: 8px 16px;">Select</button>
                     </div>
                     
+                    <!-- Duplicate Pages With Various Methods -->
+                    <div style="margin-bottom: 30px; padding: 15px; border: 1px solid #e0e0e0; border-radius: 4px; background: #f9f9f9;">
+                        <div style="margin-bottom: 15px;">
+                            <strong style="font-size: 16px;">Duplicate Pages With Various Methods</strong>
+                            <div style="margin-top: 10px; font-size: 14px; color: #666;">
+                                Quick duplication options for the selected oshabi page
+                            </div>
+                        </div>
+                        
+                        <div style="display: flex; gap: 10px; flex-wrap: wrap;">
+                            <button id="main-quilter-method-1-btn" class="button button-secondary" style="padding: 8px 16px; background: #6c757d; color: white; border: none;">
+                                Main Quilter Method 1
+                            </button>
+                            <button id="panzer-method-btn" class="button button-secondary" style="padding: 8px 16px; background: #17a2b8; color: white; border: none;">
+                                Panzer Method
+                            </button>
+                        </div>
+                    </div>
+                    
                     <!-- Duplicated Oshabi Pages History -->
                     <div style="margin-bottom: 30px; padding: 15px; border: 1px solid #e0e0e0; border-radius: 4px; background: #f9f9f9;">
                         <div style="margin-bottom: 15px;">
@@ -7216,6 +7235,7 @@ class Grove_Admin {
                             <table style="width: 100%; border-collapse: collapse;">
                                 <thead style="background: #f0f0f0; position: sticky; top: 0;">
                                     <tr>
+                                        <th style="padding: 10px; text-align: left; border-bottom: 1px solid #ddd; font-weight: bold;">Method</th>
                                         <th style="padding: 10px; text-align: left; border-bottom: 1px solid #ddd; font-weight: bold;">Page Title</th>
                                         <th style="padding: 10px; text-align: left; border-bottom: 1px solid #ddd; font-weight: bold;">Service</th>
                                         <th style="padding: 10px; text-align: left; border-bottom: 1px solid #ddd; font-weight: bold;">Type</th>
@@ -7443,12 +7463,15 @@ class Grove_Admin {
                 tbody.empty();
                 
                 if (historyData.length === 0) {
-                    tbody.append('<tr><td colspan="5" style="padding: 20px; text-align: center; color: #666; font-style: italic;">No duplication history found</td></tr>');
+                    tbody.append('<tr><td colspan="6" style="padding: 20px; text-align: center; color: #666; font-style: italic;">No duplication history found</td></tr>');
                     return;
                 }
                 
                 historyData.forEach(function(record) {
                     let row = $('<tr>');
+                    
+                    // Method
+                    row.append('<td style="padding: 8px; border: 1px solid #ddd; font-weight: bold; color: #0073aa;">' + record.method + '</td>');
                     
                     // Page Title
                     row.append('<td style="padding: 8px; border: 1px solid #ddd;">' + record.duplicated_page_title + '</td>');
@@ -7494,6 +7517,58 @@ class Grove_Admin {
             // Refresh history button
             $('#refresh-history-btn').click(function() {
                 loadDuplicationHistory();
+            });
+            
+            // Main Quilter Method 1 button
+            $('#main-quilter-method-1-btn').click(function() {
+                let confirmMessage = 'This will duplicate the current oshabi page using Main Quilter Method 1.\n\n';
+                confirmMessage += 'The duplicated page will be created as a draft.\n\n';
+                confirmMessage += 'Are you sure you want to proceed?';
+                
+                if (!confirm(confirmMessage)) {
+                    return;
+                }
+                
+                // Disable button and show loading state
+                let $btn = $(this);
+                let originalText = $btn.text();
+                $btn.prop('disabled', true).text('Duplicating...');
+                
+                $.ajax({
+                    url: ajaxurl,
+                    type: 'POST',
+                    data: {
+                        action: 'grove_quilter_simple_duplicate',
+                        nonce: '<?php echo wp_create_nonce('grove_pagebender_nonce'); ?>'
+                    },
+                    success: function(response) {
+                        if (response.success) {
+                            let message = response.data.message;
+                            if (response.data.details && response.data.details.length > 0) {
+                                message += '\n\nDetails:\n' + response.data.details.join('\n');
+                            }
+                            
+                            alert('✅ Success!\n\n' + message);
+                            
+                            // Refresh the duplication history to show the new entry
+                            loadDuplicationHistory();
+                        } else {
+                            alert('❌ Error: ' + response.data);
+                        }
+                    },
+                    error: function() {
+                        alert('❌ Error: Failed to duplicate page');
+                    },
+                    complete: function() {
+                        // Re-enable button
+                        $btn.prop('disabled', false).text(originalText);
+                    }
+                });
+            });
+            
+            // Panzer Method button (placeholder)
+            $('#panzer-method-btn').click(function() {
+                alert('🚧 Panzer Method is not yet implemented.\n\nThis advanced duplication method will be available soon with proven Elementor compatibility.\n\nPlease use "Main Quilter Method 1" for now.');
             });
         });
         </script>

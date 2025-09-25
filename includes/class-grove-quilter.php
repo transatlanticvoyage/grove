@@ -12,6 +12,7 @@ class Grove_Quilter {
         // Add AJAX handlers
         add_action('wp_ajax_grove_quilter_duplicate_oshabi_for_services', array($this, 'ajax_duplicate_oshabi_for_services'));
         add_action('wp_ajax_grove_quilter_get_duplication_history', array($this, 'ajax_get_duplication_history'));
+        add_action('wp_ajax_grove_quilter_simple_duplicate', array($this, 'ajax_simple_duplicate'));
     }
     
     /**
@@ -296,6 +297,7 @@ class Grove_Quilter {
             'assigned_service_id' => isset($args['service_id']) ? $args['service_id'] : null,
             'assigned_service_name' => isset($args['service_name']) ? $args['service_name'] : null,
             'operation_type' => isset($args['operation_type']) ? $args['operation_type'] : 'oshabi_duplication',
+            'method' => isset($args['method']) ? $args['method'] : 'Main Quilter Method 1',
             'is_elementor_page' => $is_elementor,
             'duplication_args' => wp_json_encode($args),
             'user_id' => get_current_user_id()
@@ -393,7 +395,8 @@ class Grove_Quilter {
                 'log_history' => true,
                 'service_id' => $service_id,
                 'service_name' => $service->service_name,
-                'operation_type' => 'oshabi_duplication'
+                'operation_type' => 'oshabi_duplication',
+                'method' => 'Main Quilter Method 1'
             );
             
             $new_page_id = $this->QuilterDuplicatePage($oshabi_page_id, $duplicate_args);
@@ -471,6 +474,7 @@ class Grove_Quilter {
                 'assigned_service_id' => $record->assigned_service_id,
                 'assigned_service_name' => $record->assigned_service_name,
                 'operation_type' => $record->operation_type,
+                'method' => isset($record->method) ? $record->method : 'Main Quilter Method 1',
                 'is_elementor_page' => $record->is_elementor_page,
                 'user_id' => $record->user_id,
                 'created_at' => $record->created_at
@@ -478,6 +482,74 @@ class Grove_Quilter {
         }
         
         wp_send_json_success($formatted_records);
+    }
+    
+    /**
+     * AJAX: Simple page duplication (Main Quilter Method 1)
+     */
+    public function ajax_simple_duplicate() {
+        // Check nonce
+        if (!wp_verify_nonce($_POST['nonce'], 'grove_pagebender_nonce')) {
+            wp_send_json_error('Invalid nonce');
+            return;
+        }
+        
+        if (!current_user_can('manage_options')) {
+            wp_send_json_error('Insufficient permissions');
+            return;
+        }
+        
+        // Get the current oshabi page assignment
+        $oshabi_page_id = $this->get_current_oshabi_page();
+        
+        if (!$oshabi_page_id) {
+            wp_send_json_error('No oshabi page assigned. Please assign an oshabi page first using the Select button above.');
+            return;
+        }
+        
+        // Get the source page title for naming
+        $source_page = get_post($oshabi_page_id);
+        if (!$source_page) {
+            wp_send_json_error('Source oshabi page not found.');
+            return;
+        }
+        
+        // Duplicate the oshabi page with simple naming
+        $duplicate_args = array(
+            'post_title_suffix' => ' - Copy',
+            'post_status' => 'draft',
+            'log_history' => true,
+            'operation_type' => 'main_quilter_method_1',
+            'method' => 'Main Quilter Method 1'
+        );
+        
+        $new_page_id = $this->QuilterDuplicatePage($oshabi_page_id, $duplicate_args);
+        
+        if (!$new_page_id) {
+            wp_send_json_error('Failed to duplicate the oshabi page. Please try again.');
+            return;
+        }
+        
+        // Get details about the new page
+        $new_page_title = get_the_title($new_page_id);
+        $is_elementor = get_post_meta($new_page_id, '_elementor_edit_mode', true) === 'builder';
+        $elementor_note = $is_elementor ? ' (Elementor page - CSS regenerated)' : '';
+        
+        // Prepare success response
+        $message = "✅ Page duplicated successfully!";
+        $details = array(
+            "Source: {$source_page->post_title}",
+            "New Page: {$new_page_title} (ID: {$new_page_id})",
+            "Status: Draft{$elementor_note}",
+            "Method: Main Quilter Method 1"
+        );
+        
+        wp_send_json_success(array(
+            'message' => $message,
+            'new_page_id' => $new_page_id,
+            'new_page_title' => $new_page_title,
+            'details' => $details
+        ));
     }
     
     /**
