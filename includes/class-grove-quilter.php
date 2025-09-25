@@ -11,6 +11,7 @@ class Grove_Quilter {
     public function __construct() {
         // Add AJAX handlers
         add_action('wp_ajax_grove_quilter_duplicate_oshabi_for_services', array($this, 'ajax_duplicate_oshabi_for_services'));
+        add_action('wp_ajax_grove_quilter_get_duplication_history', array($this, 'ajax_get_duplication_history'));
     }
     
     /**
@@ -71,6 +72,11 @@ class Grove_Quilter {
         
         // Handle Elementor post-duplication tasks (CSS regeneration, cache clearing)
         $this->handle_elementor_post_duplication($new_post_id);
+        
+        // Log duplication history if context is provided
+        if (isset($args['log_history']) && $args['log_history']) {
+            $this->log_duplication_history($source_page_id, $new_post_id, $args);
+        }
         
         // Clear any caches
         clean_post_cache($new_post_id);
@@ -139,8 +145,7 @@ class Grove_Quilter {
     
     /**
      * Handle Elementor-specific post-duplication tasks
-     * Note: Elementor meta data is now automatically captured by duplicate_all_post_meta()
-     * This method handles any post-duplication cleanup tasks
+     * This method handles critical Elementor processing after page duplication
      * 
      * @param int $target_id Target post ID
      */
@@ -150,19 +155,182 @@ class Grove_Quilter {
             return;
         }
         
-        // Regenerate Elementor CSS for the new page
-        if (class_exists('\Elementor\Core\Files\CSS\Post')) {
-            $css_file = new \Elementor\Core\Files\CSS\Post($target_id);
-            $css_file->update();
+        // Verify that this post has Elementor data
+        $elementor_data = get_post_meta($target_id, '_elementor_data', true);
+        if (empty($elementor_data)) {
+            return;
         }
         
-        // Clear Elementor cache for this post
-        if (method_exists('\Elementor\Plugin', 'instance')) {
-            $elementor = \Elementor\Plugin::instance();
-            if (isset($elementor->files_manager)) {
-                $elementor->files_manager->clear_cache();
-            }
+        // Set the page to be edited with Elementor
+        update_post_meta($target_id, '_elementor_edit_mode', 'builder');
+        
+        // Ensure Elementor version meta is set
+        if (!get_post_meta($target_id, '_elementor_version', true)) {
+            update_post_meta($target_id, '_elementor_version', ELEMENTOR_VERSION);
         }
+        
+        // Clear and regenerate Elementor CSS files for this post
+        $this->regenerate_elementor_css($target_id);
+        
+        // Clear global Elementor cache
+        $this->clear_elementor_global_cache();
+        
+        // Add hook to regenerate CSS after the page is fully processed
+        add_action('wp_loaded', function() use ($target_id) {
+            $this->delayed_elementor_css_regeneration($target_id);
+        });
+    }
+    
+    /**
+     * Regenerate Elementor CSS for a specific post
+     * 
+     * @param int $post_id Post ID
+     */
+    private function regenerate_elementor_css($post_id) {
+        if (!class_exists('\Elementor\Core\Files\CSS\Post')) {
+            return;
+        }
+        
+        try {
+            // Delete existing CSS files
+            $css_file = new \Elementor\Core\Files\CSS\Post($post_id);
+            $css_file->delete();
+            
+            // Regenerate CSS files
+            $css_file->update();
+            
+        } catch (Exception $e) {
+            error_log('Grove Quilter: Elementor CSS regeneration failed for post ' . $post_id . ': ' . $e->getMessage());
+        }
+    }
+    
+    /**
+     * Clear global Elementor cache
+     */
+    private function clear_elementor_global_cache() {
+        try {
+            if (method_exists('\Elementor\Plugin', 'instance')) {
+                $elementor = \Elementor\Plugin::instance();
+                
+                // Clear files manager cache
+                if (isset($elementor->files_manager)) {
+                    $elementor->files_manager->clear_cache();
+                }
+                
+                // Clear general cache
+                if (method_exists($elementor, 'clear_cache')) {
+                    $elementor->clear_cache();
+                }
+                
+                // Clear CSS cache specifically
+                if (isset($elementor->frontend)) {
+                    $elementor->frontend->print_css = true;
+                }
+            }
+            
+        } catch (Exception $e) {
+            error_log('Grove Quilter: Elementor global cache clearing failed: ' . $e->getMessage());
+        }
+    }
+    
+    /**
+     * Delayed Elementor CSS regeneration (runs after wp_loaded)
+     * This ensures all Elementor systems are fully initialized
+     * 
+     * @param int $post_id Post ID
+     */
+    private function delayed_elementor_css_regeneration($post_id) {
+        if (!class_exists('\Elementor\Plugin')) {
+            return;
+        }
+        
+        try {
+            // Force regenerate CSS and data
+            if (class_exists('\Elementor\Core\Base\Document')) {
+                $document = \Elementor\Plugin::$instance->documents->get($post_id);
+                if ($document) {
+                    $document->save_template_type();
+                }
+            }
+            
+            // Final CSS regeneration
+            $this->regenerate_elementor_css($post_id);
+            
+        } catch (Exception $e) {
+            error_log('Grove Quilter: Delayed Elementor CSS regeneration failed for post ' . $post_id . ': ' . $e->getMessage());
+        }
+    }
+    
+    /**
+     * Log duplication history to database
+     * 
+     * @param int $source_page_id Source page ID
+     * @param int $new_page_id New page ID  
+     * @param array $args Duplication arguments
+     */
+    private function log_duplication_history($source_page_id, $new_page_id, $args) {
+        global $wpdb;
+        
+        $table_name = $wpdb->prefix . 'zen_quilter_page_duplication_history';
+        
+        // Check if history table exists
+        if ($wpdb->get_var("SHOW TABLES LIKE '{$table_name}'") != $table_name) {
+            error_log('Grove Quilter: History table does not exist - ' . $table_name);
+            return;
+        }
+        
+        $source_post = get_post($source_page_id);
+        $new_post = get_post($new_page_id);
+        
+        if (!$source_post || !$new_post) {
+            return;
+        }
+        
+        $is_elementor = get_post_meta($new_page_id, '_elementor_edit_mode', true) === 'builder';
+        
+        $history_data = array(
+            'source_page_id' => $source_page_id,
+            'source_page_title' => $source_post->post_title,
+            'duplicated_page_id' => $new_page_id,
+            'duplicated_page_title' => $new_post->post_title,
+            'assigned_service_id' => isset($args['service_id']) ? $args['service_id'] : null,
+            'assigned_service_name' => isset($args['service_name']) ? $args['service_name'] : null,
+            'operation_type' => isset($args['operation_type']) ? $args['operation_type'] : 'oshabi_duplication',
+            'is_elementor_page' => $is_elementor,
+            'duplication_args' => wp_json_encode($args),
+            'user_id' => get_current_user_id()
+        );
+        
+        $wpdb->insert($table_name, $history_data);
+    }
+    
+    /**
+     * Get duplication history records
+     * 
+     * @param array $args Query arguments
+     * @return array History records
+     */
+    public function get_duplication_history($args = array()) {
+        global $wpdb;
+        
+        $defaults = array(
+            'limit' => 50,
+            'offset' => 0,
+            'order_by' => 'created_at',
+            'order' => 'DESC'
+        );
+        
+        $args = wp_parse_args($args, $defaults);
+        $table_name = $wpdb->prefix . 'zen_quilter_page_duplication_history';
+        
+        // Check if table exists
+        if ($wpdb->get_var("SHOW TABLES LIKE '{$table_name}'") != $table_name) {
+            return array();
+        }
+        
+        $sql = "SELECT * FROM {$table_name} ORDER BY {$args['order_by']} {$args['order']} LIMIT {$args['limit']} OFFSET {$args['offset']}";
+        
+        return $wpdb->get_results($sql);
     }
     
     /**
@@ -221,7 +389,11 @@ class Grove_Quilter {
             $service_name_clean = sanitize_title($service->service_name);
             $duplicate_args = array(
                 'post_title_suffix' => " - {$service->service_name} Service",
-                'post_status' => 'publish'
+                'post_status' => 'publish',
+                'log_history' => true,
+                'service_id' => $service_id,
+                'service_name' => $service->service_name,
+                'operation_type' => 'oshabi_duplication'
             );
             
             $new_page_id = $this->QuilterDuplicatePage($oshabi_page_id, $duplicate_args);
@@ -242,7 +414,10 @@ class Grove_Quilter {
             );
             
             if ($update_result !== false) {
-                $results[] = "Service '{$service->service_name}': Successfully created page (ID: {$new_page_id})";
+                $page_title = get_the_title($new_page_id);
+                $is_elementor = get_post_meta($new_page_id, '_elementor_edit_mode', true) === 'builder';
+                $elementor_note = $is_elementor ? ' (Elementor page - CSS regenerated)' : '';
+                $results[] = "Service '{$service->service_name}': Successfully created page '{$page_title}' (ID: {$new_page_id}){$elementor_note}";
                 $successful_count++;
             } else {
                 $results[] = "Service '{$service->service_name}': Page created but failed to update service assignment";
@@ -265,6 +440,44 @@ class Grove_Quilter {
                 'results' => $results
             ));
         }
+    }
+    
+    /**
+     * AJAX: Get duplication history data
+     */
+    public function ajax_get_duplication_history() {
+        // Check nonce
+        if (!wp_verify_nonce($_POST['nonce'], 'grove_pagebender_nonce')) {
+            wp_send_json_error('Invalid nonce');
+            return;
+        }
+        
+        if (!current_user_can('manage_options')) {
+            wp_send_json_error('Insufficient permissions');
+            return;
+        }
+        
+        $history_records = $this->get_duplication_history();
+        
+        // Format the data for display
+        $formatted_records = array();
+        foreach ($history_records as $record) {
+            $formatted_records[] = array(
+                'history_id' => $record->history_id,
+                'source_page_id' => $record->source_page_id,
+                'source_page_title' => $record->source_page_title,
+                'duplicated_page_id' => $record->duplicated_page_id,
+                'duplicated_page_title' => $record->duplicated_page_title,
+                'assigned_service_id' => $record->assigned_service_id,
+                'assigned_service_name' => $record->assigned_service_name,
+                'operation_type' => $record->operation_type,
+                'is_elementor_page' => $record->is_elementor_page,
+                'user_id' => $record->user_id,
+                'created_at' => $record->created_at
+            );
+        }
+        
+        wp_send_json_success($formatted_records);
     }
     
     /**

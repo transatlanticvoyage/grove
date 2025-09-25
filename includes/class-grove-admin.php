@@ -7202,6 +7202,38 @@ class Grove_Admin {
                         </div>
                         <button id="select-oshabi-page-btn" class="button button-primary" style="padding: 8px 16px;">Select</button>
                     </div>
+                    
+                    <!-- Duplicated Oshabi Pages History -->
+                    <div style="margin-bottom: 30px; padding: 15px; border: 1px solid #e0e0e0; border-radius: 4px; background: #f9f9f9;">
+                        <div style="margin-bottom: 15px;">
+                            <strong style="font-size: 16px;">Duplicated Oshabi Pages</strong>
+                            <div style="margin-top: 10px; font-size: 14px; color: #666;">
+                                History of pages duplicated from the oshabi template
+                            </div>
+                        </div>
+                        
+                        <div style="border: 1px solid #ddd; border-radius: 4px; overflow: hidden; max-height: 400px; overflow-y: auto; background: white;">
+                            <table style="width: 100%; border-collapse: collapse;">
+                                <thead style="background: #f0f0f0; position: sticky; top: 0;">
+                                    <tr>
+                                        <th style="padding: 10px; text-align: left; border-bottom: 1px solid #ddd; font-weight: bold;">Page Title</th>
+                                        <th style="padding: 10px; text-align: left; border-bottom: 1px solid #ddd; font-weight: bold;">Service</th>
+                                        <th style="padding: 10px; text-align: left; border-bottom: 1px solid #ddd; font-weight: bold;">Type</th>
+                                        <th style="padding: 10px; text-align: left; border-bottom: 1px solid #ddd; font-weight: bold;">Created</th>
+                                        <th style="padding: 10px; text-align: left; border-bottom: 1px solid #ddd; font-weight: bold;">Actions</th>
+                                    </tr>
+                                </thead>
+                                <tbody id="duplication-history-tbody">
+                                    <!-- History data will be loaded here via AJAX -->
+                                </tbody>
+                            </table>
+                        </div>
+                        
+                        <div style="margin-top: 15px; text-align: right;">
+                            <button id="refresh-history-btn" class="button button-secondary" style="margin-right: 10px;">Refresh History</button>
+                            <span id="history-loading" style="display: none; color: #666;">Loading...</span>
+                        </div>
+                    </div>
                 </div>
             </div>
         </div>
@@ -7277,6 +7309,9 @@ class Grove_Admin {
             
             // Load current assignments when page loads
             loadCurrentAssignments();
+            
+            // Load duplication history when page loads
+            loadDuplicationHistory();
             
             // Open Oshabi page selector modal
             $('#select-oshabi-page-btn').click(function() {
@@ -7373,6 +7408,92 @@ class Grove_Admin {
             // Cancel page selection
             $('#cancel-oshabi-page-select').click(function() {
                 $('#oshabi-page-selector-modal').hide();
+            });
+            
+            // Load duplication history data
+            function loadDuplicationHistory() {
+                $('#history-loading').show();
+                
+                $.ajax({
+                    url: ajaxurl,
+                    type: 'POST',
+                    data: {
+                        action: 'grove_quilter_get_duplication_history',
+                        nonce: '<?php echo wp_create_nonce('grove_pagebender_nonce'); ?>'
+                    },
+                    success: function(response) {
+                        if (response.success) {
+                            displayDuplicationHistory(response.data);
+                        } else {
+                            console.error('Failed to load duplication history:', response.data);
+                        }
+                    },
+                    error: function() {
+                        console.error('Error loading duplication history');
+                    },
+                    complete: function() {
+                        $('#history-loading').hide();
+                    }
+                });
+            }
+            
+            // Display duplication history in table
+            function displayDuplicationHistory(historyData) {
+                let tbody = $('#duplication-history-tbody');
+                tbody.empty();
+                
+                if (historyData.length === 0) {
+                    tbody.append('<tr><td colspan="5" style="padding: 20px; text-align: center; color: #666; font-style: italic;">No duplication history found</td></tr>');
+                    return;
+                }
+                
+                historyData.forEach(function(record) {
+                    let row = $('<tr>');
+                    
+                    // Page Title
+                    row.append('<td style="padding: 8px; border: 1px solid #ddd;">' + record.duplicated_page_title + '</td>');
+                    
+                    // Service Name
+                    let serviceName = record.assigned_service_name || 'N/A';
+                    row.append('<td style="padding: 8px; border: 1px solid #ddd;">' + serviceName + '</td>');
+                    
+                    // Type (Elementor or Regular)
+                    let pageType = record.is_elementor_page ? 'Elementor' : 'Regular';
+                    let typeIcon = record.is_elementor_page ? '🎨 ' : '📄 ';
+                    row.append('<td style="padding: 8px; border: 1px solid #ddd;">' + typeIcon + pageType + '</td>');
+                    
+                    // Created Date
+                    let createdDate = new Date(record.created_at).toLocaleString();
+                    row.append('<td style="padding: 8px; border: 1px solid #ddd;">' + createdDate + '</td>');
+                    
+                    // Action Buttons (pendulum, elementor, frontend)
+                    let actionsHtml = '<div style="display: flex; gap: 5px;">';
+                    
+                    // Pendulum (Edit) Button
+                    actionsHtml += '<a href="' + ajaxurl.replace('/admin-ajax.php', '/post.php?post=' + record.duplicated_page_id + '&action=edit') + '" ';
+                    actionsHtml += 'style="background: #0073aa; color: white; padding: 4px 8px; text-decoration: none; border-radius: 3px; font-size: 11px;">pendulum</a>';
+                    
+                    // Elementor Button (if Elementor page)
+                    if (record.is_elementor_page) {
+                        actionsHtml += '<a href="' + ajaxurl.replace('/admin-ajax.php', '/post.php?post=' + record.duplicated_page_id + '&action=elementor') + '" ';
+                        actionsHtml += 'style="background: #e91e63; color: white; padding: 4px 8px; text-decoration: none; border-radius: 3px; font-size: 11px;">elementor</a>';
+                    }
+                    
+                    // Frontend Button
+                    actionsHtml += '<a href="' + ajaxurl.replace('/wp-admin/admin-ajax.php', '/?p=' + record.duplicated_page_id) + '" target="_blank" ';
+                    actionsHtml += 'style="background: #46b450; color: white; padding: 4px 8px; text-decoration: none; border-radius: 3px; font-size: 11px;">frontend</a>';
+                    
+                    actionsHtml += '</div>';
+                    
+                    row.append('<td style="padding: 8px; border: 1px solid #ddd;">' + actionsHtml + '</td>');
+                    
+                    tbody.append(row);
+                });
+            }
+            
+            // Refresh history button
+            $('#refresh-history-btn').click(function() {
+                loadDuplicationHistory();
             });
         });
         </script>
