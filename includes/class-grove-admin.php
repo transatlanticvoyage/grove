@@ -7130,6 +7130,9 @@ class Grove_Admin {
                     <div style="margin-bottom: 30px; padding: 15px; border: 1px solid #e0e0e0; border-radius: 4px; background: #f9f9f9;">
                         <div style="margin-bottom: 15px;">
                             <strong style="font-size: 16px;">Select Oshabi Page</strong>
+                            <div id="current-oshabi-assignment" style="margin-top: 10px; font-size: 14px; color: #666;">
+                                <!-- Current assignment will be displayed here -->
+                            </div>
                         </div>
                         <button id="select-oshabi-page-btn" class="button button-primary" style="padding: 8px 16px;">Select</button>
                     </div>
@@ -7179,6 +7182,35 @@ class Grove_Admin {
         jQuery(document).ready(function($) {
             let allOshabiPagesData = [];
             let selectedOshabiPageId = null;
+            
+            // Load current assignments on page load
+            function loadCurrentAssignments() {
+                $.ajax({
+                    url: ajaxurl,
+                    type: 'POST',
+                    data: {
+                        action: 'grove_pagebender_get_current_assignments',
+                        nonce: '<?php echo wp_create_nonce('grove_pagebender_nonce'); ?>'
+                    },
+                    success: function(response) {
+                        if (response.success) {
+                            const assignments = response.data;
+                            const oshabiDiv = $('#current-oshabi-assignment');
+                            
+                            if (assignments.oshabi && assignments.oshabi_title) {
+                                oshabiDiv.html('<strong>Current Oshabi page:</strong> ' + assignments.oshabi_title + ' (ID: ' + assignments.oshabi + ')');
+                                oshabiDiv.css('color', '#28a745');
+                            } else {
+                                oshabiDiv.html('<em>No Oshabi page assigned</em>');
+                                oshabiDiv.css('color', '#666');
+                            }
+                        }
+                    }
+                });
+            }
+            
+            // Load current assignments when page loads
+            loadCurrentAssignments();
             
             // Open Oshabi page selector modal
             $('#select-oshabi-page-btn').click(function() {
@@ -7247,10 +7279,29 @@ class Grove_Admin {
                     return;
                 }
                 
-                // TODO: Here we would save the selection to database
-                // For now, just close the modal
-                alert('Oshabi page selected (ID: ' + selectedOshabiPageId + '). Functionality will be implemented in future updates.');
-                $('#oshabi-page-selector-modal').hide();
+                // Save the selection to database
+                $.ajax({
+                    url: ajaxurl,
+                    type: 'POST',
+                    data: {
+                        action: 'grove_pagebender_save_oshabi',
+                        nonce: '<?php echo wp_create_nonce('grove_pagebender_nonce'); ?>',
+                        page_id: selectedOshabiPageId
+                    },
+                    success: function(response) {
+                        if (response.success) {
+                            alert('✅ Success: ' + response.data.message);
+                            $('#oshabi-page-selector-modal').hide();
+                            // Reload current assignments to show the update
+                            loadCurrentAssignments();
+                        } else {
+                            alert('❌ Error: ' + response.data);
+                        }
+                    },
+                    error: function() {
+                        alert('❌ Error: Failed to save oshabi assignment');
+                    }
+                });
             });
             
             // Cancel page selection
