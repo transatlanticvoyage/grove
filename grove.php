@@ -1,7 +1,7 @@
 <?php
 /**
  * Plugin Name: Grove
- * Plugin URI: https://github.com/transatlanticvoyage/grove-wp-plugin
+ * Plugin URI: https://github.com/transatlanticvoyage/grove
  * Description: Grove - WordPress plugin for zen data fallback and shortcode management
  * Version: 1.1.0
  * Author: Grove Team
