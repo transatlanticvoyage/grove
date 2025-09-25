@@ -330,7 +330,13 @@ class Grove_Quilter {
             return array();
         }
         
-        $sql = "SELECT * FROM {$table_name} ORDER BY {$args['order_by']} {$args['order']} LIMIT {$args['limit']} OFFSET {$args['offset']}";
+        $posts_table = $wpdb->prefix . 'posts';
+        
+        $sql = "SELECT h.*, p.post_status 
+                FROM {$table_name} h 
+                LEFT JOIN {$posts_table} p ON h.duplicated_page_id = p.ID 
+                ORDER BY h.{$args['order_by']} {$args['order']} 
+                LIMIT {$args['limit']} OFFSET {$args['offset']}";
         
         return $wpdb->get_results($sql);
     }
@@ -476,6 +482,7 @@ class Grove_Quilter {
                 'operation_type' => $record->operation_type,
                 'method' => isset($record->method) ? $record->method : 'Main Quilter Method 1',
                 'is_elementor_page' => $record->is_elementor_page,
+                'post_status' => $record->post_status,
                 'user_id' => $record->user_id,
                 'created_at' => $record->created_at
             );
@@ -514,10 +521,14 @@ class Grove_Quilter {
             return;
         }
         
+        // Check if user wants to publish the page
+        $publish_page = isset($_POST['publish_page']) && $_POST['publish_page'] === 'true';
+        $post_status = $publish_page ? 'publish' : 'draft';
+        
         // Duplicate the oshabi page with simple naming
         $duplicate_args = array(
             'post_title_suffix' => ' - Copy',
-            'post_status' => 'draft',
+            'post_status' => $post_status,
             'log_history' => true,
             'operation_type' => 'main_quilter_method_1',
             'method' => 'Main Quilter Method 1'

@@ -7212,6 +7212,33 @@ class Grove_Admin {
                             </div>
                         </div>
                         
+                        <!-- Publish Toggle Switch -->
+                        <div style="margin-bottom: 15px; padding: 10px; background: #fff; border: 1px solid #ddd; border-radius: 4px;">
+                            <label style="display: flex; align-items: center; cursor: pointer;">
+                                <input type="checkbox" id="grove-publish-toggle" checked style="display: none;">
+                                <div id="grove-toggle-slider" style="
+                                    width: 50px; 
+                                    height: 24px; 
+                                    background: #4CAF50; 
+                                    border-radius: 12px; 
+                                    position: relative; 
+                                    transition: background 0.3s;
+                                    margin-right: 10px;">
+                                    <div style="
+                                        width: 20px; 
+                                        height: 20px; 
+                                        background: white; 
+                                        border-radius: 50%; 
+                                        position: absolute; 
+                                        top: 2px; 
+                                        right: 2px; 
+                                        transition: transform 0.3s;">
+                                    </div>
+                                </div>
+                                <span style="font-weight: 500;">Publish page upon duplication (not 'draft')</span>
+                            </label>
+                        </div>
+                        
                         <div style="display: flex; gap: 10px; flex-wrap: wrap;">
                             <button id="main-quilter-method-1-btn" class="button button-secondary" style="padding: 8px 16px; background: #6c757d; color: white; border: none;">
                                 Main Quilter Method 1
@@ -7239,6 +7266,7 @@ class Grove_Admin {
                                         <th style="padding: 10px; text-align: left; border-bottom: 1px solid #ddd; font-weight: bold;">Page Title</th>
                                         <th style="padding: 10px; text-align: left; border-bottom: 1px solid #ddd; font-weight: bold;">Service</th>
                                         <th style="padding: 10px; text-align: left; border-bottom: 1px solid #ddd; font-weight: bold;">Type</th>
+                                        <th style="padding: 10px; text-align: left; border-bottom: 1px solid #ddd; font-weight: bold;">Status</th>
                                         <th style="padding: 10px; text-align: left; border-bottom: 1px solid #ddd; font-weight: bold;">Created</th>
                                         <th style="padding: 10px; text-align: left; border-bottom: 1px solid #ddd; font-weight: bold;">Actions</th>
                                     </tr>
@@ -7300,6 +7328,25 @@ class Grove_Admin {
         jQuery(document).ready(function($) {
             let allOshabiPagesData = [];
             let selectedOshabiPageId = null;
+            
+            // Toggle Switch Functionality
+            $('#grove-toggle-slider').click(function() {
+                var checkbox = $('#grove-publish-toggle');
+                var slider = $(this);
+                var knob = slider.find('div');
+                
+                checkbox.prop('checked', !checkbox.prop('checked'));
+                
+                if (checkbox.prop('checked')) {
+                    // ON state - green, knob to right
+                    slider.css('background', '#4CAF50');
+                    knob.css('transform', 'translateX(0px)');
+                } else {
+                    // OFF state - gray, knob to left
+                    slider.css('background', '#ccc');
+                    knob.css('transform', 'translateX(-26px)');
+                }
+            });
             
             // Load current assignments on page load
             function loadCurrentAssignments() {
@@ -7463,7 +7510,7 @@ class Grove_Admin {
                 tbody.empty();
                 
                 if (historyData.length === 0) {
-                    tbody.append('<tr><td colspan="6" style="padding: 20px; text-align: center; color: #666; font-style: italic;">No duplication history found</td></tr>');
+                    tbody.append('<tr><td colspan="7" style="padding: 20px; text-align: center; color: #666; font-style: italic;">No duplication history found</td></tr>');
                     return;
                 }
                 
@@ -7485,6 +7532,13 @@ class Grove_Admin {
                     let typeIcon = record.is_elementor_page ? '🎨 ' : '📄 ';
                     row.append('<td style="padding: 8px; border: 1px solid #ddd;">' + typeIcon + pageType + '</td>');
                     
+                    // Status (Published or Draft) - dynamically fetched from wp_posts
+                    let status = record.post_status || 'draft';
+                    let statusIcon = status === 'publish' ? '✅ ' : '📝 ';
+                    let statusColor = status === 'publish' ? '#46b450' : '#f56565';
+                    let statusText = status === 'publish' ? 'Published' : 'Draft';
+                    row.append('<td style="padding: 8px; border: 1px solid #ddd; color: ' + statusColor + '; font-weight: 500;">' + statusIcon + statusText + '</td>');
+                    
                     // Created Date
                     let createdDate = new Date(record.created_at).toLocaleString();
                     row.append('<td style="padding: 8px; border: 1px solid #ddd;">' + createdDate + '</td>');
@@ -7503,7 +7557,7 @@ class Grove_Admin {
                     }
                     
                     // Frontend Button
-                    actionsHtml += '<a href="' + ajaxurl.replace('/wp-admin/admin-ajax.php', '/?p=' + record.duplicated_page_id) + '" target="_blank" ';
+                    actionsHtml += '<a href="' + ajaxurl.replace('/wp-admin/admin-ajax.php', '/?page_id=' + record.duplicated_page_id) + '" target="_blank" ';
                     actionsHtml += 'style="background: #46b450; color: white; padding: 4px 8px; text-decoration: none; border-radius: 3px; font-size: 11px;">frontend</a>';
                     
                     actionsHtml += '</div>';
@@ -7521,8 +7575,11 @@ class Grove_Admin {
             
             // Main Quilter Method 1 button
             $('#main-quilter-method-1-btn').click(function() {
+                let publishPage = $('#grove-publish-toggle').prop('checked');
+                let statusText = publishPage ? 'published' : 'draft';
+                
                 let confirmMessage = 'This will duplicate the current oshabi page using Main Quilter Method 1.\n\n';
-                confirmMessage += 'The duplicated page will be created as a draft.\n\n';
+                confirmMessage += 'The duplicated page will be created as ' + statusText + '.\n\n';
                 confirmMessage += 'Are you sure you want to proceed?';
                 
                 if (!confirm(confirmMessage)) {
@@ -7539,7 +7596,8 @@ class Grove_Admin {
                     type: 'POST',
                     data: {
                         action: 'grove_quilter_simple_duplicate',
-                        nonce: '<?php echo wp_create_nonce('grove_pagebender_nonce'); ?>'
+                        nonce: '<?php echo wp_create_nonce('grove_pagebender_nonce'); ?>',
+                        publish_page: publishPage
                     },
                     success: function(response) {
                         if (response.success) {
@@ -7566,9 +7624,56 @@ class Grove_Admin {
                 });
             });
             
-            // Panzer Method button (placeholder)
+            // Panzer Method button (functional)
             $('#panzer-method-btn').click(function() {
-                alert('🚧 Panzer Method is not yet implemented.\n\nThis advanced duplication method will be available soon with proven Elementor compatibility.\n\nPlease use "Main Quilter Method 1" for now.');
+                let publishPage = $('#grove-publish-toggle').prop('checked');
+                let statusText = publishPage ? 'published' : 'draft';
+                
+                let confirmMessage = 'This will duplicate the current oshabi page using the Panzer Method.\n\n';
+                confirmMessage += 'Panzer Method uses proven logic from a working WordPress.org plugin.\n\n';
+                confirmMessage += 'The duplicated page will be created as ' + statusText + '.\n\n';
+                confirmMessage += 'Are you sure you want to proceed?';
+                
+                if (!confirm(confirmMessage)) {
+                    return;
+                }
+                
+                // Disable button and show loading state
+                let $btn = $(this);
+                let originalText = $btn.text();
+                $btn.prop('disabled', true).text('Processing...');
+                
+                $.ajax({
+                    url: ajaxurl,
+                    type: 'POST',
+                    data: {
+                        action: 'grove_panzer_duplicate_page',
+                        nonce: '<?php echo wp_create_nonce('grove_pagebender_nonce'); ?>',
+                        publish_page: publishPage
+                    },
+                    success: function(response) {
+                        if (response.success) {
+                            let message = response.data.message;
+                            if (response.data.details && response.data.details.length > 0) {
+                                message += '\n\nDetails:\n' + response.data.details.join('\n');
+                            }
+                            
+                            alert('✅ Success!\n\n' + message);
+                            
+                            // Refresh the duplication history to show the new entry
+                            loadDuplicationHistory();
+                        } else {
+                            alert('❌ Error: ' + response.data);
+                        }
+                    },
+                    error: function() {
+                        alert('❌ Error: Failed to duplicate page using Panzer method');
+                    },
+                    complete: function() {
+                        // Re-enable button
+                        $btn.prop('disabled', false).text(originalText);
+                    }
+                });
             });
         });
         </script>
