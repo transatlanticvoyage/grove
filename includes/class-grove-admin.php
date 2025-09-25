@@ -2168,9 +2168,8 @@ class Grove_Admin {
                         </div>
                     </div>
                     <div style="margin-left: 10px;">
-                        <button id="test-button-3" style="padding: 8px 16px; border: 1px solid #ccc; border-radius: 4px; background: white; cursor: pointer; font-size: 14px;">test button 3</button>
-                        <button id="test-button-4" style="padding: 8px 16px; border: 1px solid #ccc; border-radius: 4px; background: white; cursor: pointer; font-size: 14px;">test button 4</button>
                         <button id="test-button-5" style="padding: 8px 16px; border: 1px solid #ccc; border-radius: 4px; background: white; cursor: pointer; font-size: 14px;">test button 5</button>
+                        <button id="duplicate-oshabi-page-btn" style="padding: 8px 16px; border: 1px solid #ccc; border-radius: 4px; background: white; cursor: pointer; font-size: 14px;">duplicate oshabi page and assign to selected service</button>
                     </div>
                 </div>
             </div>
@@ -2343,13 +2342,13 @@ class Grove_Admin {
                                 <th class="for_db_table_zen_services" style="border: 1px solid #ddd; font-weight: bold; text-transform: lowercase; background: #e0e0e0;"><div class="cell_inner_wrapper_div for_db_table_zen_services for_db_column_description1_long">wp_zen_services</div></th>
                                 <th class="for_db_table_zen_services" style="border: 1px solid #ddd; font-weight: bold; text-transform: lowercase; background: #e0e0e0;"><div class="cell_inner_wrapper_div for_db_table_zen_services for_db_column_is_pinned_service">wp_zen_services</div></th>
                                 <th class="for_db_table_zen_services" style="border: 1px solid #ddd; font-weight: bold; text-transform: lowercase; background: #e0e0e0;"><div class="cell_inner_wrapper_div for_db_table_zen_services for_db_column_rel_image1_id">wp_zen_services</div></th>
-                                <th style="border: 1px solid #ddd; font-weight: bold; text-transform: lowercase; background: #e0e0e0;"><div class="cell_inner_wrapper_div">(filler)</div></th>
-                                <th style="border: 1px solid #ddd; font-weight: bold; text-transform: lowercase; background: #e0e0e0;"><div class="cell_inner_wrapper_div">(filler)</div></th>
-                                <th style="border: 1px solid #ddd; font-weight: bold; text-transform: lowercase; background: #e0e0e0;"><div class="cell_inner_wrapper_div">(filler)</div></th>
-                                <th style="border: 1px solid #ddd; font-weight: bold; text-transform: lowercase; background: #e0e0e0;"><div class="cell_inner_wrapper_div">(filler)</div></th>
-                                <th style="border: 1px solid #ddd; font-weight: bold; text-transform: lowercase; background: #e0e0e0;"><div class="cell_inner_wrapper_div">(filler)</div></th>
-                                <th style="border: 1px solid #ddd; font-weight: bold; text-transform: lowercase; background: #e0e0e0;"><div class="cell_inner_wrapper_div">(filler)</div></th>
-                                <th style="border: 1px solid #ddd; font-weight: bold; text-transform: lowercase; background: #e0e0e0;"><div class="cell_inner_wrapper_div">(filler)</div></th>
+                                <th class="for_db_table_abstract_images_according_to_rel_image1_id" style="border: 1px solid #ddd; font-weight: bold; text-transform: lowercase; background: #e0e0e0;"><div class="cell_inner_wrapper_div for_db_table_abstract_images_according_to_rel_image1_id">media</div></th>
+                                <th class="for_db_table_abstract_images_according_to_rel_image1_id" style="border: 1px solid #ddd; font-weight: bold; text-transform: lowercase; background: #e0e0e0;"><div class="cell_inner_wrapper_div for_db_table_abstract_images_according_to_rel_image1_id">media</div></th>
+                                <th class="for_db_table_abstract_images_according_to_rel_image1_id" style="border: 1px solid #ddd; font-weight: bold; text-transform: lowercase; background: #e0e0e0;"><div class="cell_inner_wrapper_div for_db_table_abstract_images_according_to_rel_image1_id">media</div></th>
+                                <th class="for_db_table_abstract_images_according_to_rel_image1_id" style="border: 1px solid #ddd; font-weight: bold; text-transform: lowercase; background: #e0e0e0;"><div class="cell_inner_wrapper_div for_db_table_abstract_images_according_to_rel_image1_id">media</div></th>
+                                <th class="for_db_table_abstract_images_according_to_rel_image1_id" style="border: 1px solid #ddd; font-weight: bold; text-transform: lowercase; background: #e0e0e0;"><div class="cell_inner_wrapper_div for_db_table_abstract_images_according_to_rel_image1_id">media</div></th>
+                                <th class="for_db_table_abstract_images_according_to_rel_image1_id" style="border: 1px solid #ddd; font-weight: bold; text-transform: lowercase; background: #e0e0e0;"><div class="cell_inner_wrapper_div for_db_table_abstract_images_according_to_rel_image1_id">media</div></th>
+                                <th class="for_db_table_abstract_images_according_to_rel_image1_id" style="border: 1px solid #ddd; font-weight: bold; text-transform: lowercase; background: #e0e0e0;"><div class="cell_inner_wrapper_div for_db_table_abstract_images_according_to_rel_image1_id">media</div></th>
                                 <th class="for_db_table_zen_services" style="border: 1px solid #ddd; font-weight: bold; text-transform: lowercase; background: #e0e0e0;"><div class="cell_inner_wrapper_div for_db_table_zen_services for_db_column_asn_service_page_id">wp_zen_services</div></th>
                                 <th class="for_db_table_wp_posts_according_to_asn_service_page_id" style="border: 1px solid #ddd; font-weight: bold; text-transform: lowercase; background: #e0e0e0;"><div class="cell_inner_wrapper_div for_db_table_wp_posts_according_to_asn_service_page_id">wp_posts</div></th>
                                 <th class="for_db_table_wp_posts_according_to_asn_service_page_id" style="border: 1px solid #ddd; font-weight: bold; text-transform: lowercase; background: #e0e0e0;"><div class="cell_inner_wrapper_div for_db_table_wp_posts_according_to_asn_service_page_id">wp_posts</div></th>
@@ -2369,13 +2368,13 @@ class Grove_Admin {
                                 <th class="for_db_table_zen_services" data-sort="description1_long" style="border: 1px solid #ddd; font-weight: bold; text-transform: lowercase; cursor: pointer; background: #f8f9fa;"><div class="cell_inner_wrapper_div for_db_table_zen_services for_db_column_description1_long">description1_long</div></th>
                                 <th class="for_db_table_zen_services" data-sort="is_pinned_service" style="border: 1px solid #ddd; font-weight: bold; text-transform: lowercase; cursor: pointer; background: #f8f9fa;"><div class="cell_inner_wrapper_div for_db_table_zen_services for_db_column_is_pinned_service">is_pinned_service</div></th>
                                 <th class="for_db_table_zen_services" data-sort="rel_image1_id" style="border: 1px solid #ddd; font-weight: bold; text-transform: lowercase; cursor: pointer; background: #f8f9fa;"><div class="cell_inner_wrapper_div for_db_table_zen_services for_db_column_rel_image1_id">rel_image1_id</div></th>
-                                <th style="border: 1px solid #ddd; font-weight: bold; text-transform: lowercase; background: #f8f9fa; text-align: left; white-space: nowrap;"><div class="cell_inner_wrapper_div">image-main-display</div></th>
-                                <th style="border: 1px solid #ddd; font-weight: bold; font-size: 16px; text-transform: lowercase; background: #f8f9fa;"><div class="cell_inner_wrapper_div">image-alternative-display-method</div></th>
-                                <th style="border: 1px solid #ddd; font-weight: bold; text-transform: lowercase; background: #f8f9fa;"><div class="cell_inner_wrapper_div">width</div></th>
-                                <th style="border: 1px solid #ddd; font-weight: bold; text-transform: lowercase; background: #f8f9fa;"><div class="cell_inner_wrapper_div">height</div></th>
-                                <th style="border: 1px solid #ddd; font-weight: bold; text-transform: lowercase; background: #f8f9fa;"><div class="cell_inner_wrapper_div">file name</div></th>
-                                <th style="border: 1px solid #ddd; font-weight: bold; text-transform: lowercase; background: #f8f9fa;"><div class="cell_inner_wrapper_div">img title</div></th>
-                                <th style="border: 1px solid #ddd; font-weight: bold; text-transform: lowercase; background: #f8f9fa;"><div class="cell_inner_wrapper_div">alt text</div></th>
+                                <th class="for_db_table_abstract_images_according_to_rel_image1_id" style="border: 1px solid #ddd; font-weight: bold; text-transform: lowercase; background: #f8f9fa; text-align: left; white-space: nowrap;"><div class="cell_inner_wrapper_div for_db_table_abstract_images_according_to_rel_image1_id">image-main-display</div></th>
+                                <th class="for_db_table_abstract_images_according_to_rel_image1_id" style="border: 1px solid #ddd; font-weight: bold; font-size: 16px; text-transform: lowercase; background: #f8f9fa;"><div class="cell_inner_wrapper_div for_db_table_abstract_images_according_to_rel_image1_id">image-alternative-display-method</div></th>
+                                <th class="for_db_table_abstract_images_according_to_rel_image1_id" style="border: 1px solid #ddd; font-weight: bold; text-transform: lowercase; background: #f8f9fa;"><div class="cell_inner_wrapper_div for_db_table_abstract_images_according_to_rel_image1_id">width</div></th>
+                                <th class="for_db_table_abstract_images_according_to_rel_image1_id" style="border: 1px solid #ddd; font-weight: bold; text-transform: lowercase; background: #f8f9fa;"><div class="cell_inner_wrapper_div for_db_table_abstract_images_according_to_rel_image1_id">height</div></th>
+                                <th class="for_db_table_abstract_images_according_to_rel_image1_id" style="border: 1px solid #ddd; font-weight: bold; text-transform: lowercase; background: #f8f9fa;"><div class="cell_inner_wrapper_div for_db_table_abstract_images_according_to_rel_image1_id">file name</div></th>
+                                <th class="for_db_table_abstract_images_according_to_rel_image1_id" style="border: 1px solid #ddd; font-weight: bold; text-transform: lowercase; background: #f8f9fa;"><div class="cell_inner_wrapper_div for_db_table_abstract_images_according_to_rel_image1_id">img title</div></th>
+                                <th class="for_db_table_abstract_images_according_to_rel_image1_id" style="border: 1px solid #ddd; font-weight: bold; text-transform: lowercase; background: #f8f9fa;"><div class="cell_inner_wrapper_div for_db_table_abstract_images_according_to_rel_image1_id">alt text</div></th>
                                 <th class="for_db_table_zen_services" style="border: 1px solid #ddd; font-weight: bold; text-transform: lowercase; background: #f8f9fa;"><div class="cell_inner_wrapper_div for_db_table_zen_services for_db_column_asn_service_page_id">asn_service_page_id</div></th>
                                 <th class="for_db_table_wp_posts_according_to_asn_service_page_id" style="border: 1px solid #ddd; font-weight: bold; text-transform: lowercase; background: #f8f9fa;"><div class="cell_inner_wrapper_div for_db_table_wp_posts_according_to_asn_service_page_id">post_title</div></th>
                                 <th class="for_db_table_wp_posts_according_to_asn_service_page_id" style="border: 1px solid #ddd; font-weight: bold; text-transform: lowercase; background: #f8f9fa;"><div class="cell_inner_wrapper_div for_db_table_wp_posts_according_to_asn_service_page_id">post_name</div></th>
@@ -2619,7 +2618,7 @@ class Grove_Admin {
                     tr.append(imageCell);
                     
                     // Image main display column
-                    let mainImageCell = '<td style="border: 1px solid #ddd; text-align: left; white-space: nowrap;"><div class="cell_inner_wrapper_div">';
+                    let mainImageCell = '<td class="for_db_table_abstract_images_according_to_rel_image1_id" style="border: 1px solid #ddd; text-align: left; white-space: nowrap;"><div class="cell_inner_wrapper_div for_db_table_abstract_images_according_to_rel_image1_id">';
                     if (service.rel_image1_id && service.rel_image1_id > 0) {
                         mainImageCell += '<div class="image-preview-container" data-attachment-id="' + service.rel_image1_id + '" style="height: 60px; min-width: 80px; display: inline-flex; align-items: center; justify-content: flex-start; border: 1px solid #ddd; background: #f9f9f9;">';
                         mainImageCell += '<span style="color: #666; font-size: 12px; padding: 0 8px;">Loading...</span>';
@@ -2633,7 +2632,7 @@ class Grove_Admin {
                     tr.append(mainImageCell);
                     
                     // Image alternative display method column
-                    let altImageCell = '<td style="border: 1px solid #ddd; text-align: center;"><div class="cell_inner_wrapper_div">';
+                    let altImageCell = '<td class="for_db_table_abstract_images_according_to_rel_image1_id" style="border: 1px solid #ddd; text-align: center;"><div class="cell_inner_wrapper_div for_db_table_abstract_images_according_to_rel_image1_id">';
                     if (service.rel_image1_id && service.rel_image1_id > 0) {
                         altImageCell += '<img src="/wp-content/uploads/' + service.rel_image1_id + '.jpg" style="height: 60px; max-width: 100px; object-fit: contain;" onerror="this.src=\'/wp-admin/admin-ajax.php?action=wp_get_attachment_image&attachment_id=' + service.rel_image1_id + '&size=thumbnail\';">';
                     } else {
@@ -2643,7 +2642,7 @@ class Grove_Admin {
                     tr.append(altImageCell);
                     
                     // Width column
-                    let widthCell = '<td style="border: 1px solid #ddd; text-align: center;" class="image-width-cell" data-attachment-id="' + (service.rel_image1_id || '') + '"><div class="cell_inner_wrapper_div">';
+                    let widthCell = '<td class="for_db_table_abstract_images_according_to_rel_image1_id image-width-cell" style="border: 1px solid #ddd; text-align: center;" data-attachment-id="' + (service.rel_image1_id || '') + '"><div class="cell_inner_wrapper_div for_db_table_abstract_images_according_to_rel_image1_id">';
                     if (service.rel_image1_id && service.rel_image1_id > 0) {
                         widthCell += '<span class="width-value">-</span>';
                     } else {
@@ -2653,7 +2652,7 @@ class Grove_Admin {
                     tr.append(widthCell);
                     
                     // Height column  
-                    let heightCell = '<td style="border: 1px solid #ddd; text-align: center;" class="image-height-cell" data-attachment-id="' + (service.rel_image1_id || '') + '"><div class="cell_inner_wrapper_div">';
+                    let heightCell = '<td class="for_db_table_abstract_images_according_to_rel_image1_id image-height-cell" style="border: 1px solid #ddd; text-align: center;" data-attachment-id="' + (service.rel_image1_id || '') + '"><div class="cell_inner_wrapper_div for_db_table_abstract_images_according_to_rel_image1_id">';
                     if (service.rel_image1_id && service.rel_image1_id > 0) {
                         heightCell += '<span class="height-value">-</span>';
                     } else {
@@ -2663,7 +2662,7 @@ class Grove_Admin {
                     tr.append(heightCell);
                     
                     // File Name column with special editing
-                    let fileNameCell = '<td style="border: 1px solid #ddd; text-align: left;" class="filename-cell" data-attachment-id="' + (service.rel_image1_id || '') + '"><div class="cell_inner_wrapper_div">';
+                    let fileNameCell = '<td class="for_db_table_abstract_images_according_to_rel_image1_id filename-cell" style="border: 1px solid #ddd; text-align: left;" data-attachment-id="' + (service.rel_image1_id || '') + '"><div class="cell_inner_wrapper_div for_db_table_abstract_images_according_to_rel_image1_id">';
                     if (service.rel_image1_id && service.rel_image1_id > 0) {
                         fileNameCell += '<div class="filename-editor-container" style="display: flex; align-items: center; gap: 4px;">';
                         fileNameCell += '<button class="button button-small filename-change-btn" style="font-size: 11px; padding: 2px 6px;">Change</button>';
@@ -2677,7 +2676,7 @@ class Grove_Admin {
                     tr.append(fileNameCell);
                     
                     // Image Title column
-                    let imgTitleCell = '<td style="border: 1px solid #ddd; text-align: left;" class="img-title-cell" data-attachment-id="' + (service.rel_image1_id || '') + '"><div class="cell_inner_wrapper_div">';
+                    let imgTitleCell = '<td class="for_db_table_abstract_images_according_to_rel_image1_id img-title-cell" style="border: 1px solid #ddd; text-align: left;" data-attachment-id="' + (service.rel_image1_id || '') + '"><div class="cell_inner_wrapper_div for_db_table_abstract_images_according_to_rel_image1_id">';
                     if (service.rel_image1_id && service.rel_image1_id > 0) {
                         imgTitleCell += '<input type="text" class="img-title-input" data-attachment-id="' + service.rel_image1_id + '" value="Loading..." style="width: 100%; padding: 4px; border: 1px solid #ddd; border-radius: 3px;">';
                     } else {
@@ -2687,7 +2686,7 @@ class Grove_Admin {
                     tr.append(imgTitleCell);
                     
                     // Alt Text column
-                    let altTextCell = '<td style="border: 1px solid #ddd; text-align: left;" class="alt-text-cell" data-attachment-id="' + (service.rel_image1_id || '') + '"><div class="cell_inner_wrapper_div">';
+                    let altTextCell = '<td class="for_db_table_abstract_images_according_to_rel_image1_id alt-text-cell" style="border: 1px solid #ddd; text-align: left;" data-attachment-id="' + (service.rel_image1_id || '') + '"><div class="cell_inner_wrapper_div for_db_table_abstract_images_according_to_rel_image1_id">';
                     if (service.rel_image1_id && service.rel_image1_id > 0) {
                         altTextCell += '<input type="text" class="alt-text-input" data-attachment-id="' + service.rel_image1_id + '" value="Loading..." style="width: 100%; padding: 4px; border: 1px solid #ddd; border-radius: 3px;">';
                     } else {

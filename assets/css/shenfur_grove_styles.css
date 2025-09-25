@@ -1,6 +1,28 @@
 
 
 
+tr.shenfur_db_table_name_tr th.for_db_table_abstract_images_according_to_rel_image1_id {background-color:#f1c9f4 !important;}
+
+tr.shenfur_db_table_name_tr th.for_db_table_wp_posts_according_to_asn_service_page_id {background-color:#b2c6f0 !important;}
+
+tr.shenfur_db_table_name_tr th.for_db_table_zen_services {background-color:#bdf1da !important;}
+
+/* Cell Inner Wrapper Convention - Provides consistent padding for all table cells */
+.cell_inner_wrapper_div {
+    padding: 12px 8px;
+}
+
+/* Specific database column targeting example */
+div.cell_inner_wrapper_div.for_db_table_zen_services.for_db_column_description1_short {
+    /* Example styling for description1_short column */
+}
+
+
+
+/*=================================================================*/
+/*=================================================================*/
+/*-----------------------------------------------------------------*/
+
 /* Text truncation rules for large text columns */
 #services-table td div.cell_inner_wrapper_div.for_db_table_zen_services.for_db_column_service_placard {
     width: 150px !important;
@@ -55,17 +77,7 @@
     max-width: 140px !important;
 }
 
-tr.shenfur_db_table_name_tr th.for_db_table_zen_services {background-color:#f4e69f !important;}
 
-/* Cell Inner Wrapper Convention - Provides consistent padding for all table cells */
-.cell_inner_wrapper_div {
-    padding: 12px 8px;
-}
-
-/* Specific database column targeting example */
-div.cell_inner_wrapper_div.for_db_table_zen_services.for_db_column_description1_short {
-    /* Example styling for description1_short column */
-}
 
 
 /* 
