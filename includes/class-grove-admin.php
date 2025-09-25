@@ -21,6 +21,9 @@ class Grove_Admin {
         add_action('wp_ajax_grove_get_all_pages', array($this, 'grove_get_all_pages'));
         add_action('wp_ajax_grove_get_page_title', array($this, 'grove_get_page_title'));
         add_action('wp_ajax_grove_update_service_page', array($this, 'grove_update_service_page'));
+        add_action('wp_ajax_grove_update_post_title', array($this, 'grove_update_post_title'));
+        add_action('wp_ajax_grove_get_page_name', array($this, 'grove_get_page_name'));
+        add_action('wp_ajax_grove_update_post_name', array($this, 'grove_update_post_name'));
         add_action('wp_ajax_grove_get_image_data', array($this, 'grove_get_image_data'));
         add_action('wp_ajax_grove_rename_image_file', array($this, 'grove_rename_image_file'));
         add_action('wp_ajax_grove_update_image_title', array($this, 'grove_update_image_title'));
@@ -2347,6 +2350,8 @@ class Grove_Admin {
                                 <th style="border: 1px solid #ddd; font-weight: bold; text-transform: lowercase; background: #e0e0e0;"><div class="cell_inner_wrapper_div">(filler)</div></th>
                                 <th style="border: 1px solid #ddd; font-weight: bold; text-transform: lowercase; background: #e0e0e0;"><div class="cell_inner_wrapper_div">(filler)</div></th>
                                 <th class="for_db_table_zen_services" style="border: 1px solid #ddd; font-weight: bold; text-transform: lowercase; background: #e0e0e0;"><div class="cell_inner_wrapper_div for_db_table_zen_services for_db_column_asn_service_page_id">wp_zen_services</div></th>
+                                <th class="for_db_table_wp_posts_according_to_asn_service_page_id" style="border: 1px solid #ddd; font-weight: bold; text-transform: lowercase; background: #e0e0e0;"><div class="cell_inner_wrapper_div for_db_table_wp_posts_according_to_asn_service_page_id">wp_posts</div></th>
+                                <th class="for_db_table_wp_posts_according_to_asn_service_page_id" style="border: 1px solid #ddd; font-weight: bold; text-transform: lowercase; background: #e0e0e0;"><div class="cell_inner_wrapper_div for_db_table_wp_posts_according_to_asn_service_page_id">wp_posts</div></th>
                                 <th style="border: 1px solid #ddd; font-weight: bold; background: #e0e0e0;"><div class="cell_inner_wrapper_div">(filler)</div></th>
                             </tr>
                             <tr>
@@ -2371,6 +2376,8 @@ class Grove_Admin {
                                 <th style="border: 1px solid #ddd; font-weight: bold; text-transform: lowercase; background: #f8f9fa;"><div class="cell_inner_wrapper_div">img title</div></th>
                                 <th style="border: 1px solid #ddd; font-weight: bold; text-transform: lowercase; background: #f8f9fa;"><div class="cell_inner_wrapper_div">alt text</div></th>
                                 <th class="for_db_table_zen_services" style="border: 1px solid #ddd; font-weight: bold; text-transform: lowercase; background: #f8f9fa;"><div class="cell_inner_wrapper_div for_db_table_zen_services for_db_column_asn_service_page_id">asn_service_page_id</div></th>
+                                <th class="for_db_table_wp_posts_according_to_asn_service_page_id" style="border: 1px solid #ddd; font-weight: bold; text-transform: lowercase; background: #f8f9fa;"><div class="cell_inner_wrapper_div for_db_table_wp_posts_according_to_asn_service_page_id">post_title</div></th>
+                                <th class="for_db_table_wp_posts_according_to_asn_service_page_id" style="border: 1px solid #ddd; font-weight: bold; text-transform: lowercase; background: #f8f9fa;"><div class="cell_inner_wrapper_div for_db_table_wp_posts_according_to_asn_service_page_id">post_name</div></th>
                                 <th style="border: 1px solid #ddd; font-weight: bold; background: #f8f9fa;"><div class="cell_inner_wrapper_div">Actions</div></th>
                             </tr>
                         </thead>
@@ -2698,6 +2705,27 @@ class Grove_Admin {
                     }
                     pageCell += '</div></td>';
                     tr.append(pageCell);
+                    
+                    // wp_posts post_title column
+                    let postTitleCell = '<td class="for_db_table_wp_posts_according_to_asn_service_page_id" style="border: 1px solid #ddd;"><div class="cell_inner_wrapper_div for_db_table_wp_posts_according_to_asn_service_page_id">';
+                    if (service.asn_service_page_id) {
+                        postTitleCell += '<input type="text" class="post-title-input" data-service-id="' + service.service_id + '" data-page-id="' + service.asn_service_page_id + '" style="width: 100%; padding: 4px; border: 1px solid #ccc;" placeholder="Loading..." />';
+                    } else {
+                        postTitleCell += '<input type="text" class="post-title-input" data-service-id="' + service.service_id + '" style="width: 100%; padding: 4px; border: 1px solid #ccc;" placeholder="No page assigned" disabled />';
+                    }
+                    postTitleCell += '</div></td>';
+                    tr.append(postTitleCell);
+                    
+                    // wp_posts post_name column
+                    let postNameCell = '<td class="for_db_table_wp_posts_according_to_asn_service_page_id" style="border: 1px solid #ddd;"><div class="cell_inner_wrapper_div for_db_table_wp_posts_according_to_asn_service_page_id">';
+                    if (service.asn_service_page_id) {
+                        postNameCell += '<input type="text" class="post-name-input" data-service-id="' + service.service_id + '" data-page-id="' + service.asn_service_page_id + '" style="width: 100%; padding: 4px; border: 1px solid #ccc;" placeholder="Loading..." />';
+                    } else {
+                        postNameCell += '<input type="text" class="post-name-input" data-service-id="' + service.service_id + '" style="width: 100%; padding: 4px; border: 1px solid #ccc;" placeholder="No page assigned" disabled />';
+                    }
+                    postNameCell += '</div></td>';
+                    tr.append(postNameCell);
+                    
                     tr.append('<td style="border: 1px solid #ddd;"><div class="cell_inner_wrapper_div"><button class="button button-small delete-btn" data-id="' + service.service_id + '">Delete</button></div></td>');
                     
                     tbody.append(tr);
@@ -3078,11 +3106,171 @@ class Grove_Admin {
                 });
             }
             
-            // Call loadPageTitles after displaying data
+            // Load post titles for input fields
+            function loadPostTitles() {
+                $('.post-title-input:not([disabled])').each(function() {
+                    let input = $(this);
+                    let pageId = input.data('page-id');
+                    
+                    if (pageId) {
+                        $.ajax({
+                            url: ajaxurl,
+                            type: 'POST',
+                            data: {
+                                action: 'grove_get_page_title',
+                                nonce: '<?php echo wp_create_nonce('grove_services_nonce'); ?>',
+                                page_id: pageId
+                            },
+                            success: function(response) {
+                                if (response.success) {
+                                    input.val(response.data.title);
+                                    input.attr('placeholder', '');
+                                } else {
+                                    input.val('');
+                                    input.attr('placeholder', 'Page not found');
+                                }
+                            }
+                        });
+                    }
+                });
+            }
+            
+            // Load post names for input fields
+            function loadPostNames() {
+                $('.post-name-input:not([disabled])').each(function() {
+                    let input = $(this);
+                    let pageId = input.data('page-id');
+                    
+                    if (pageId) {
+                        $.ajax({
+                            url: ajaxurl,
+                            type: 'POST',
+                            data: {
+                                action: 'grove_get_page_name',
+                                nonce: '<?php echo wp_create_nonce('grove_services_nonce'); ?>',
+                                page_id: pageId
+                            },
+                            success: function(response) {
+                                if (response.success) {
+                                    input.val(response.data.name);
+                                    input.attr('placeholder', '');
+                                } else {
+                                    input.val('');
+                                    input.attr('placeholder', 'Page not found');
+                                }
+                            }
+                        });
+                    }
+                });
+            }
+            
+            // Handle post title input changes
+            $(document).on('change', '.post-title-input:not([disabled])', function() {
+                let input = $(this);
+                let pageId = input.data('page-id');
+                let newTitle = input.val();
+                
+                if (!pageId) return;
+                
+                // Show saving indicator
+                input.css('background-color', '#fffacd');
+                
+                $.ajax({
+                    url: ajaxurl,
+                    type: 'POST',
+                    data: {
+                        action: 'grove_update_post_title',
+                        nonce: '<?php echo wp_create_nonce('grove_services_nonce'); ?>',
+                        page_id: pageId,
+                        title: newTitle
+                    },
+                    success: function(response) {
+                        if (response.success) {
+                            // Show success
+                            input.css('background-color', '#d4edda');
+                            setTimeout(function() {
+                                input.css('background-color', '');
+                            }, 1000);
+                            
+                            // Update the page title text in the ASN column if it exists
+                            let pageTitleText = $('.page-info[data-page-id="' + pageId + '"] .page-title-text');
+                            if (pageTitleText.length) {
+                                pageTitleText.text(newTitle);
+                            }
+                        } else {
+                            // Show error
+                            input.css('background-color', '#f8d7da');
+                            alert('Error updating post title: ' + response.data);
+                            setTimeout(function() {
+                                input.css('background-color', '');
+                            }, 2000);
+                        }
+                    },
+                    error: function() {
+                        input.css('background-color', '#f8d7da');
+                        alert('Error updating post title');
+                        setTimeout(function() {
+                            input.css('background-color', '');
+                        }, 2000);
+                    }
+                });
+            });
+            
+            // Handle post name input changes
+            $(document).on('change', '.post-name-input:not([disabled])', function() {
+                let input = $(this);
+                let pageId = input.data('page-id');
+                let newName = input.val();
+                
+                if (!pageId) return;
+                
+                // Show saving indicator
+                input.css('background-color', '#fffacd');
+                
+                $.ajax({
+                    url: ajaxurl,
+                    type: 'POST',
+                    data: {
+                        action: 'grove_update_post_name',
+                        nonce: '<?php echo wp_create_nonce('grove_services_nonce'); ?>',
+                        page_id: pageId,
+                        name: newName
+                    },
+                    success: function(response) {
+                        if (response.success) {
+                            // Show success
+                            input.css('background-color', '#d4edda');
+                            setTimeout(function() {
+                                input.css('background-color', '');
+                            }, 1000);
+                        } else {
+                            // Show error
+                            input.css('background-color', '#f8d7da');
+                            alert('Error updating post name: ' + response.data);
+                            setTimeout(function() {
+                                input.css('background-color', '');
+                            }, 2000);
+                        }
+                    },
+                    error: function() {
+                        input.css('background-color', '#f8d7da');
+                        alert('Error updating post name');
+                        setTimeout(function() {
+                            input.css('background-color', '');
+                        }, 2000);
+                    }
+                });
+            });
+            
+            // Call loadPageTitles, loadPostTitles, and loadPostNames after displaying data
             let originalDisplayData = displayData;
             displayData = function() {
                 originalDisplayData();
-                setTimeout(loadPageTitles, 100);
+                setTimeout(function() {
+                    loadPageTitles();
+                    loadPostTitles();
+                    loadPostNames();
+                }, 100);
             };
             
             // Open page selector modal
@@ -6738,6 +6926,51 @@ class Grove_Admin {
         } else {
             wp_send_json_error('Failed to update service page');
         }
+    }
+    
+    /**
+     * Update post title
+     */
+    public function grove_update_post_title() {
+        // Check nonce
+        if (!wp_verify_nonce($_POST['nonce'], 'grove_services_nonce')) {
+            wp_send_json_error('Invalid nonce');
+            return;
+        }
+        
+        if (!current_user_can('edit_pages')) {
+            wp_send_json_error('Insufficient permissions');
+            return;
+        }
+        
+        $page_id = intval($_POST['page_id']);
+        $new_title = sanitize_text_field($_POST['title']);
+        
+        if (!$page_id) {
+            wp_send_json_error('Invalid page ID');
+            return;
+        }
+        
+        // Update the post title
+        $result = wp_update_post(array(
+            'ID' => $page_id,
+            'post_title' => $new_title
+        ));
+        
+        if (is_wp_error($result)) {
+            wp_send_json_error('Failed to update title: ' . $result->get_error_message());
+            return;
+        }
+        
+        if ($result === 0) {
+            wp_send_json_error('No changes made');
+            return;
+        }
+        
+        wp_send_json_success(array(
+            'message' => 'Post title updated successfully',
+            'title' => $new_title
+        ));
     }
     
     public function grove_cache_manager_page() {
