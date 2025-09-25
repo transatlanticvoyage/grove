@@ -24,6 +24,7 @@ class Grove_Admin {
         add_action('wp_ajax_grove_update_post_title', array($this, 'grove_update_post_title'));
         add_action('wp_ajax_grove_get_page_name', array($this, 'grove_get_page_name'));
         add_action('wp_ajax_grove_update_post_name', array($this, 'grove_update_post_name'));
+        add_action('wp_ajax_grove_get_page_permalink', array($this, 'grove_get_page_permalink'));
         add_action('wp_ajax_grove_get_image_data', array($this, 'grove_get_image_data'));
         add_action('wp_ajax_grove_rename_image_file', array($this, 'grove_rename_image_file'));
         add_action('wp_ajax_grove_update_image_title', array($this, 'grove_update_image_title'));
@@ -2702,6 +2703,13 @@ class Grove_Admin {
                         pageCell += '<span class="page-info" data-page-id="' + service.asn_service_page_id + '">';
                         pageCell += '(' + service.asn_service_page_id + ') | <span class="page-title-text">Loading...</span>';
                         pageCell += '</span>';
+                        
+                        // Add navigation buttons row
+                        pageCell += '<div style="margin-top: 8px; display: flex; gap: 4px;">';
+                        pageCell += '<a href="http://saltwater.local/wp-admin/post.php?post=' + service.asn_service_page_id + '&action=edit" target="_blank" class="button" style="font-size: 14px; padding: 3px; text-decoration: none;">pendulum</a>';
+                        pageCell += '<a href="http://saltwater.local/wp-admin/post.php?post=' + service.asn_service_page_id + '&action=elementor" target="_blank" class="button" style="font-size: 14px; padding: 3px; text-decoration: none;">elementor</a>';
+                        pageCell += '<a href="#" class="button frontend-link" data-page-id="' + service.asn_service_page_id + '" target="_blank" style="font-size: 14px; padding: 3px; text-decoration: none;">frontend</a>';
+                        pageCell += '</div>';
                     }
                     pageCell += '</div></td>';
                     tr.append(pageCell);
@@ -2733,6 +2741,9 @@ class Grove_Admin {
                 
                 // Load image previews after table is rendered
                 loadImagePreviews();
+                
+                // Load frontend links for navigation buttons
+                loadFrontendLinks();
                 
                 // Inline editing
                 $('[data-field]').click(function() {
@@ -3157,6 +3168,33 @@ class Grove_Admin {
                                 } else {
                                     input.val('');
                                     input.attr('placeholder', 'Page not found');
+                                }
+                            }
+                        });
+                    }
+                });
+            }
+            
+            // Load frontend links for navigation buttons
+            function loadFrontendLinks() {
+                $('.frontend-link').each(function() {
+                    let link = $(this);
+                    let pageId = link.data('page-id');
+                    
+                    if (pageId) {
+                        $.ajax({
+                            url: ajaxurl,
+                            type: 'POST',
+                            data: {
+                                action: 'grove_get_page_permalink',
+                                nonce: '<?php echo wp_create_nonce('grove_services_nonce'); ?>',
+                                page_id: pageId
+                            },
+                            success: function(response) {
+                                if (response.success) {
+                                    link.attr('href', response.data.permalink);
+                                } else {
+                                    link.attr('href', '#').css('opacity', '0.5');
                                 }
                             }
                         });
@@ -7036,6 +7074,26 @@ class Grove_Admin {
             'message' => 'Post name updated successfully',
             'name' => $new_name
         ));
+    }
+    
+    /**
+     * Get page permalink by ID
+     */
+    public function grove_get_page_permalink() {
+        // Check nonce
+        if (!wp_verify_nonce($_POST['nonce'], 'grove_services_nonce')) {
+            wp_send_json_error('Invalid nonce');
+            return;
+        }
+        
+        $page_id = intval($_POST['page_id']);
+        $permalink = get_permalink($page_id);
+        
+        if ($permalink && $permalink !== '') {
+            wp_send_json_success(array('permalink' => $permalink));
+        } else {
+            wp_send_json_error('Page not found or no permalink');
+        }
     }
     
     public function grove_cache_manager_page() {
