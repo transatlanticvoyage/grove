@@ -3939,6 +3939,72 @@ class Grove_Admin {
             $('#cancel-page-select').click(function() {
                 $('#page-selector-modal').hide();
             });
+            
+            // Duplicate oshabi page and assign to selected services
+            $('#duplicate-oshabi-page-btn').click(function() {
+                // Get selected service checkboxes
+                let selectedServices = [];
+                $('.row-select:checked').each(function() {
+                    selectedServices.push($(this).data('id'));
+                });
+                
+                if (selectedServices.length === 0) {
+                    alert('Please select one or more services from the table first.');
+                    return;
+                }
+                
+                let confirmMessage = 'This will duplicate the oshabi page ' + selectedServices.length + ' times and assign each copy to a selected service.\n\n';
+                confirmMessage += 'Selected services: ' + selectedServices.length + '\n\n';
+                confirmMessage += 'Are you sure you want to proceed?';
+                
+                if (!confirm(confirmMessage)) {
+                    return;
+                }
+                
+                // Disable button and show loading state
+                let $btn = $(this);
+                let originalText = $btn.text();
+                $btn.prop('disabled', true).text('Processing...');
+                
+                $.ajax({
+                    url: ajaxurl,
+                    type: 'POST',
+                    data: {
+                        action: 'grove_quilter_duplicate_oshabi_for_services',
+                        nonce: '<?php echo wp_create_nonce('grove_services_nonce'); ?>',
+                        selected_services: selectedServices
+                    },
+                    success: function(response) {
+                        if (response.success) {
+                            let message = response.data.message;
+                            if (response.data.results && response.data.results.length > 0) {
+                                message += '\n\nDetails:\n' + response.data.results.join('\n');
+                            }
+                            
+                            if (response.data.has_errors) {
+                                alert('⚠️ Operation completed with some errors:\n\n' + message);
+                            } else {
+                                alert('✅ Operation completed successfully!\n\n' + message);
+                            }
+                            
+                            // Refresh the data to show updated asn_service_page_id values
+                            loadServicesData();
+                            
+                            // Clear checkbox selections
+                            $('.row-select:checked').prop('checked', false);
+                        } else {
+                            alert('❌ Error: ' + response.data);
+                        }
+                    },
+                    error: function() {
+                        alert('❌ Error: Failed to process duplicate request');
+                    },
+                    complete: function() {
+                        // Re-enable button
+                        $btn.prop('disabled', false).text(originalText);
+                    }
+                });
+            });
         });
         </script>
         <?php
