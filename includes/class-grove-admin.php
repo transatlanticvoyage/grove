@@ -2160,7 +2160,7 @@ class Grove_Admin {
             <div style="height: 20px;"></div>
             
             <div style="padding: 20px;">
-                <h1 style="margin-bottom: 20px;">🌳🔧 Grove Services Manager</h1>
+                <h1 style="margin-bottom: 20px; display: flex; align-items: center; gap: 10px;"><img src="<?php echo plugin_dir_url(__FILE__) . '../grove-shenzi-asset-mirror/grove-logo-1.png'; ?>" alt="Grove Logo" style="height: 40px; width: auto;">🌳🔧 Grove Services Manager</h1>
             
             <!-- Control Bar -->
             <div style="background: white; border: 1px solid #ddd; padding: 15px; margin-bottom: 20px; border-radius: 5px;">
