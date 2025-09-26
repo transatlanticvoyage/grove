@@ -87,7 +87,7 @@ class Grove_Admin {
             'grovehub',
             '', // No callback - makes it non-clickable
             'dashicons-palmtree',
-            30
+            3.3
         );
         
         // Remove the auto-generated submenu link to the parent page
