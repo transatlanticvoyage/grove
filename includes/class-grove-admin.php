@@ -71,7 +71,7 @@ class Grove_Admin {
         if (strpos($hook, 'grove') !== false) {
             wp_enqueue_style(
                 'shenfur-grove-styles',
-                plugin_dir_url(dirname(__FILE__)) . 'assets/css/shenfur_grove_styles.css',
+                plugin_dir_url(dirname(__FILE__)) . 'grove-shenzi-asset-mirror/shenfur_grove_styles.css',
                 array(),
                 time()
             );
