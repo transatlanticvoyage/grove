@@ -2160,7 +2160,19 @@ class Grove_Admin {
             <div style="height: 20px;"></div>
             
             <div style="padding: 20px;">
-                <h1 style="margin-bottom: 20px; display: flex; align-items: center; gap: 10px;"><img src="<?php echo plugin_dir_url(__FILE__) . '../grove-shenzi-asset-mirror/grove-logo-1.png'; ?>" alt="Grove Logo" style="height: 40px; width: auto;">🌳🔧 Grove Services Manager</h1>
+                <div style="display: flex; align-items: flex-start; gap: 20px; margin-bottom: 20px;">
+                    <h1 style="margin: 0; display: flex; align-items: center; gap: 10px;"><img src="<?php echo plugin_dir_url(__FILE__) . '../grove-shenzi-asset-mirror/grove-logo-1.png'; ?>" alt="Grove Logo" style="height: 40px; width: auto;">Grove Services Manager</h1>
+                    <div style="border: 1px solid gray; padding: 10px;">
+                        <span style="font-size: 16px; font-weight: bold;">ventricle_chamber</span>
+                        <div style="margin-top: 10px;">
+                            <span>With selected:</span>
+                            <select style="margin-left: 10px;">
+                                <option>run chimp function</option>
+                            </select>
+                            <button style="margin-left: 10px;">Submit</button>
+                        </div>
+                    </div>
+                </div>
             
             <!-- Control Bar -->
             <div style="background: white; border: 1px solid #ddd; padding: 15px; margin-bottom: 20px; border-radius: 5px;">
@@ -2168,6 +2180,7 @@ class Grove_Admin {
                     <span style="font-size: 16px; font-weight: bold;">mandible_chamber</span>
                     <button id="create-popup-btn" class="button button-primary">Create New Service</button>
                     <button id="delete-selected-btn" class="button" style="background: #dc3545; color: white; border-color: #dc3545;">Delete Selected</button>
+                    <a href="<?php echo admin_url('admin.php?page=klyrabeamraymar'); ?>" class="button button-secondary" style="text-decoration: none;">/klyrabeamraymar</a>
                     <div style="position: relative; margin-left: 18px;">
                         <input type="text" id="search-box" placeholder="Search services..." style="padding: 8px 40px 8px 12px; border: 1px solid #ccc; border-radius: 4px; width: 250px; font-size: 14px;">
                         <button id="clear-search" style="position: absolute; right: 8px; top: 50%; transform: translateY(-50%); background: #ffeb3b; border: none; padding: 4px 8px; font-size: 12px; font-weight: bold; border-radius: 3px; cursor: pointer;">CL</button>
