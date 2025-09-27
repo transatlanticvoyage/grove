@@ -2166,10 +2166,11 @@ class Grove_Admin {
                         <span style="font-size: 16px; font-weight: bold;">ventricle_chamber</span>
                         <div style="margin-top: 10px;">
                             <span>With selected:</span>
-                            <select style="margin-left: 10px;">
-                                <option>run chimp function</option>
+                            <select id="ventricle-chamber-action" style="margin-left: 10px;">
+                                <option value="">Choose action...</option>
+                                <option value="chimp">run chimp function</option>
                             </select>
-                            <button style="margin-left: 10px;">Submit</button>
+                            <button id="ventricle-chamber-submit" class="button button-primary" style="margin-left: 10px;">Submit</button>
                         </div>
                     </div>
                 </div>
@@ -4065,6 +4066,166 @@ class Grove_Admin {
                     });
                 }
             });
+            
+            // Ventricle Chamber - Chimp Function Handler
+            $('#ventricle-chamber-submit').on('click', function() {
+                const action = $('#ventricle-chamber-action').val();
+                if (!action) {
+                    alert('Please select an action from the dropdown.');
+                    return;
+                }
+                
+                if (action !== 'chimp') {
+                    alert('Only chimp function is currently available.');
+                    return;
+                }
+                
+                const selectedServices = [];
+                $('.row-select:checked').each(function() {
+                    selectedServices.push($(this).val());
+                });
+                
+                if (selectedServices.length === 0) {
+                    alert('Please select at least one service before running the chimp function.');
+                    return;
+                }
+                
+                const confirmMessage = `Run chimp function on ${selectedServices.length} selected service(s)?\n\nThis will update post titles to format: "(service_name) in (city), (state)"`;
+                if (!confirm(confirmMessage)) {
+                    return;
+                }
+                
+                // Disable submit button during processing
+                const $submitBtn = $('#ventricle-chamber-submit');
+                $submitBtn.prop('disabled', true).text('Processing...');
+                
+                $.ajax({
+                    url: ajaxurl,
+                    type: 'POST',
+                    data: {
+                        action: 'grove_run_chimp_function',
+                        nonce: '<?php echo wp_create_nonce('grove_services_nonce'); ?>',
+                        service_ids: selectedServices
+                    },
+                    success: function(response) {
+                        if (response.success) {
+                            showChimpResultsModal(response.data);
+                            // Optionally reload the table data
+                            loadServicesData();
+                        } else {
+                            alert('Error running chimp function: ' + response.data);
+                        }
+                    },
+                    error: function() {
+                        alert('Error running chimp function');
+                    },
+                    complete: function() {
+                        // Re-enable submit button
+                        $submitBtn.prop('disabled', false).text('Submit');
+                    }
+                });
+            });
+            
+            // Function to show detailed chimp results modal
+            function showChimpResultsModal(data) {
+                // Create modal HTML
+                const modalHtml = `
+                    <div id="chimp-results-modal" style="position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.7); z-index: 10000; display: flex; align-items: center; justify-content: center;">
+                        <div style="background: white; padding: 30px; border-radius: 10px; max-width: 90%; max-height: 90%; overflow: auto; box-shadow: 0 10px 30px rgba(0,0,0,0.3);">
+                            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px; border-bottom: 2px solid #eee; padding-bottom: 15px;">
+                                <h2 style="margin: 0; color: #333;">🐒 Chimp Function Results</h2>
+                                <button id="close-chimp-modal" style="background: #dc3232; color: white; border: none; border-radius: 50%; width: 30px; height: 30px; cursor: pointer; font-size: 16px; font-weight: bold;">×</button>
+                            </div>
+                            
+                            <div style="margin-bottom: 20px;">
+                                <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(120px, 1fr)); gap: 15px; margin-bottom: 20px;">
+                                    <div style="text-align: center; padding: 15px; background: #d4edda; border: 1px solid #c3e6cb; border-radius: 5px;">
+                                        <div style="font-size: 24px; font-weight: bold; color: #155724;">${data.success_count}</div>
+                                        <div style="color: #155724; font-size: 12px;">SUCCESS</div>
+                                    </div>
+                                    <div style="text-align: center; padding: 15px; background: #f8d7da; border: 1px solid #f5c6cb; border-radius: 5px;">
+                                        <div style="font-size: 24px; font-weight: bold; color: #721c24;">${data.error_count}</div>
+                                        <div style="color: #721c24; font-size: 12px;">ERRORS</div>
+                                    </div>
+                                    <div style="text-align: center; padding: 15px; background: #fff3cd; border: 1px solid #ffeaa7; border-radius: 5px;">
+                                        <div style="font-size: 24px; font-weight: bold; color: #856404;">${data.skipped_count}</div>
+                                        <div style="color: #856404; font-size: 12px;">SKIPPED</div>
+                                    </div>
+                                    <div style="text-align: center; padding: 15px; background: #e2e3e5; border: 1px solid #d3d3d4; border-radius: 5px;">
+                                        <div style="font-size: 24px; font-weight: bold; color: #383d41;">${data.total_count}</div>
+                                        <div style="color: #383d41; font-size: 12px;">TOTAL</div>
+                                    </div>
+                                </div>
+                                
+                                <div style="background: #f8f9fa; padding: 15px; border-radius: 5px; border-left: 4px solid #007cba;">
+                                    <strong>Summary:</strong> ${data.message}
+                                </div>
+                            </div>
+                            
+                            <div style="max-height: 400px; overflow-y: auto;">
+                                <h3 style="margin-top: 0; color: #333;">Detailed Results:</h3>
+                                <div id="detailed-results"></div>
+                            </div>
+                            
+                            <div style="text-align: center; margin-top: 20px; padding-top: 15px; border-top: 1px solid #eee;">
+                                <button id="close-chimp-modal-btn" style="background: #007cba; color: white; border: none; padding: 10px 20px; border-radius: 5px; cursor: pointer; font-size: 14px;">Close</button>
+                            </div>
+                        </div>
+                    </div>
+                `;
+                
+                // Add modal to body
+                $('body').append(modalHtml);
+                
+                // Populate detailed results
+                const detailsContainer = $('#detailed-results');
+                data.results.forEach(function(result, index) {
+                    let statusColor, statusIcon, statusBg;
+                    
+                    if (result.status === 'success') {
+                        statusColor = '#155724';
+                        statusIcon = '✅';
+                        statusBg = '#d4edda';
+                    } else if (result.status === 'error') {
+                        statusColor = '#721c24';
+                        statusIcon = '❌';
+                        statusBg = '#f8d7da';
+                    } else {
+                        statusColor = '#856404';
+                        statusIcon = '⚠️';
+                        statusBg = '#fff3cd';
+                    }
+                    
+                    const resultHtml = `
+                        <div style="margin-bottom: 15px; padding: 15px; border: 1px solid #ddd; border-radius: 5px; background: ${statusBg};">
+                            <div style="display: flex; align-items: center; margin-bottom: 10px;">
+                                <span style="font-size: 18px; margin-right: 10px;">${statusIcon}</span>
+                                <strong style="color: ${statusColor};">${result.status.toUpperCase()}</strong>
+                                <span style="margin-left: 10px; color: #666;">Service ID: ${result.service_id}</span>
+                                ${result.service_name ? '<span style="margin-left: 10px; color: #666;">| ' + result.service_name + '</span>' : ''}
+                            </div>
+                            <div style="color: #333; font-size: 14px; line-height: 1.4;">
+                                ${result.message}
+                            </div>
+                            ${result.post_id ? '<div style="margin-top: 8px; font-size: 12px; color: #666;">Post ID: ' + result.post_id + '</div>' : ''}
+                        </div>
+                    `;
+                    
+                    detailsContainer.append(resultHtml);
+                });
+                
+                // Close modal handlers
+                $('#close-chimp-modal, #close-chimp-modal-btn').on('click', function() {
+                    $('#chimp-results-modal').remove();
+                });
+                
+                // Close on background click
+                $('#chimp-results-modal').on('click', function(e) {
+                    if (e.target.id === 'chimp-results-modal') {
+                        $('#chimp-results-modal').remove();
+                    }
+                });
+            }
         });
         </script>
         <style>
