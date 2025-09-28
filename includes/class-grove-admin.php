@@ -4082,7 +4082,7 @@ class Grove_Admin {
                 
                 const selectedServices = [];
                 $('.row-select:checked').each(function() {
-                    selectedServices.push($(this).val());
+                    selectedServices.push($(this).data('id'));
                 });
                 
                 if (selectedServices.length === 0) {

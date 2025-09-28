@@ -82,9 +82,9 @@ class Grove_Chimp {
         // Get service data from zen_services table
         $service_table = $wpdb->prefix . 'zen_services';
         $service = $wpdb->get_row($wpdb->prepare(
-            "SELECT id, service_name, asn_service_page_id, driggs_city, driggs_state_code 
+            "SELECT service_id, service_name, asn_service_page_id 
              FROM {$service_table} 
-             WHERE id = %d",
+             WHERE service_id = %d",
             $service_id
         ));
         
@@ -117,19 +117,24 @@ class Grove_Chimp {
             );
         }
         
-        // Get driggs data for city and state
-        $driggs_city = $service->driggs_city ?: '';
-        $driggs_state_code = $service->driggs_state_code ?: '';
+        // Get driggs data from zen_sitespren table
+        $sitespren_table = $wpdb->prefix . 'zen_sitespren';
+        $sitespren = $wpdb->get_row("SELECT driggs_city, driggs_state_code FROM {$sitespren_table} WHERE wppma_id = 1");
         
-        // If driggs fields are empty, try to get from driggs table
-        if (empty($driggs_city) || empty($driggs_state_code)) {
-            $driggs_table = $wpdb->prefix . 'zen_driggs';
-            $driggs = $wpdb->get_row("SELECT city, state_code FROM {$driggs_table} WHERE id = 1");
-            
-            if ($driggs) {
-                $driggs_city = $driggs_city ?: $driggs->city;
-                $driggs_state_code = $driggs_state_code ?: $driggs->state_code;
-            }
+        $driggs_city = '';
+        $driggs_state_code = '';
+        
+        if ($sitespren) {
+            $driggs_city = $sitespren->driggs_city ?: '';
+            $driggs_state_code = $sitespren->driggs_state_code ?: '';
+        }
+        
+        // Fallback values if still empty
+        if (empty($driggs_city)) {
+            $driggs_city = 'City';
+        }
+        if (empty($driggs_state_code)) {
+            $driggs_state_code = 'ST';
         }
         
         // Build the new post title
