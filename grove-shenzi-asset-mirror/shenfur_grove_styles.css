@@ -1,0 +1,189 @@
+
+
+
+tr.shenfur_db_table_name_tr th.for_db_table_abstract_images_according_to_rel_image1_id {background-color:#f1c9f4 !important;}
+
+tr.shenfur_db_table_name_tr th.for_db_table_wp_posts_according_to_asn_service_page_id {background-color:#b2c6f0 !important;}
+
+tr.shenfur_db_table_name_tr th.for_db_table_zen_services {background-color:#bdf1da !important;}
+
+/* Cell Inner Wrapper Convention - Provides consistent padding for all table cells */
+.cell_inner_wrapper_div {
+    padding: 12px 8px;
+}
+
+/* Specific database column targeting example */
+div.cell_inner_wrapper_div.for_db_table_zen_services.for_db_column_description1_short {
+    /* Example styling for description1_short column */
+}
+
+
+
+/*=================================================================*/
+/*=================================================================*/
+/*-----------------------------------------------------------------*/
+
+/* Text truncation rules for large text columns */
+#services-table td div.cell_inner_wrapper_div.for_db_table_zen_services.for_db_column_service_placard {
+    width: 150px !important;
+    overflow: hidden !important;
+    text-overflow: ellipsis !important;
+    white-space: nowrap !important;
+}
+
+#services-table td div.cell_inner_wrapper_div.for_db_table_zen_services.for_db_column_service_moniker {
+    width: 150px !important;
+    overflow: hidden !important;
+    text-overflow: ellipsis !important;
+    white-space: nowrap !important;
+}
+
+#services-table td div.cell_inner_wrapper_div.for_db_table_zen_services.for_db_column_description1_short {
+    width: 150px !important;
+    overflow: hidden !important;
+    text-overflow: ellipsis !important;
+    white-space: nowrap !important;
+}
+
+#services-table td div.cell_inner_wrapper_div.for_db_table_zen_services.for_db_column_description1_long {
+    width: 150px !important;
+    overflow: hidden !important;
+    text-overflow: ellipsis !important;
+    white-space: nowrap !important;
+}
+
+/* Constrain input widths in truncated columns to match wrapper div width */
+#services-table td div.cell_inner_wrapper_div.for_db_table_zen_services.for_db_column_service_placard input,
+#services-table td div.cell_inner_wrapper_div.for_db_table_zen_services.for_db_column_service_placard textarea {
+    width: 140px !important;
+    max-width: 140px !important;
+}
+
+#services-table td div.cell_inner_wrapper_div.for_db_table_zen_services.for_db_column_service_moniker input,
+#services-table td div.cell_inner_wrapper_div.for_db_table_zen_services.for_db_column_service_moniker textarea {
+    width: 140px !important;
+    max-width: 140px !important;
+}
+
+#services-table td div.cell_inner_wrapper_div.for_db_table_zen_services.for_db_column_description1_short input,
+#services-table td div.cell_inner_wrapper_div.for_db_table_zen_services.for_db_column_description1_short textarea {
+    width: 140px !important;
+    max-width: 140px !important;
+}
+
+#services-table td div.cell_inner_wrapper_div.for_db_table_zen_services.for_db_column_description1_long input,
+#services-table td div.cell_inner_wrapper_div.for_db_table_zen_services.for_db_column_description1_long textarea {
+    width: 140px !important;
+    max-width: 140px !important;
+}
+
+
+
+
+/* 
+ * Shenfur Grove Plugin Styles
+ * Central CSS file for all Grove admin pages
+ */
+
+/* Wolf Exclusion Band - Sticky columns that remain visible during pagination */
+.wolf-exclusion-band {
+    position: sticky !important;
+    background: #f0f8ff !important;
+    border-right: 2px solid #4a90e2 !important;
+    z-index: 10 !important;
+}
+
+/* Wolf exclusion band sticky positioning - simplified for content-fitting */
+.wolf-exclusion-band:nth-child(1) {
+    left: 0px !important;
+    width: 50px !important;
+}
+
+.wolf-exclusion-band:nth-child(2) {
+    left: 50px !important;
+    min-width: 80px !important;
+}
+
+.wolf-exclusion-band:nth-child(3) {
+    left: 130px !important;
+    min-width: 120px !important;
+}
+
+.wolf-exclusion-band:nth-child(4) {
+    left: 250px !important;
+    min-width: 140px !important;
+}
+
+/* Override for content-fitting: allow wolf band columns to size naturally while staying sticky */
+.wolf-exclusion-band {
+    width: auto !important;
+    max-width: none !important;
+}
+
+/* Wolf exclusion band visual separator */
+.wolf-exclusion-band:last-of-type::after {
+    content: '';
+    position: absolute;
+    top: 0;
+    right: -1px;
+    bottom: 0;
+    width: 3px;
+    background: linear-gradient(to bottom, #4a90e2, #357abd);
+    z-index: 11;
+}
+
+/* Ensure table has proper styling for sticky columns and content-fitting */
+#services-table {
+    position: relative;
+    overflow-x: auto;
+    width: auto !important;
+    table-layout: auto !important;
+}
+
+/* Make all table cells fit their content */
+#services-table th,
+#services-table td {
+    white-space: nowrap !important;
+    width: auto !important;
+    padding: 8px 12px !important;
+}
+
+/* Special width handling for specific columns */
+#services-table th:first-child,
+#services-table td:first-child {
+    width: 50px !important;
+    text-align: center !important;
+}
+
+/* Allow longer text columns to wrap if needed, but still fit content */
+#services-table th[data-sort="description1_long"],
+#services-table td[data-field="description1_long"] {
+    white-space: normal !important;
+    max-width: 200px !important;
+    word-wrap: break-word !important;
+}
+
+/* Wolf exclusion band header styling */
+thead .wolf-exclusion-band {
+    background: #e6f3ff !important;
+    font-weight: bold !important;
+    color: #2c5282 !important;
+}
+
+/* Wolf exclusion band row hover effect */
+tbody tr:hover .wolf-exclusion-band {
+    background: #dbeafe !important;
+}
+
+/* Image section separators */
+/* Left separator - on rel_image1_id column (11th column after moving is_pinned_service) */
+#services-table th:nth-child(11),
+#services-table td:nth-child(11) {
+    border-left: 3px solid black !important;
+}
+
+/* Right separator - on alt text column (18th column after adding title and alt columns) */
+#services-table th:nth-child(18),
+#services-table td:nth-child(18) {
+    border-right: 3px solid black !important;
+}
