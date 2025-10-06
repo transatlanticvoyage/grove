@@ -8,10 +8,6 @@ class Grove_Admin {
     public function __construct() {
         add_action('admin_menu', array($this, 'add_admin_menu'));
         add_action('admin_enqueue_scripts', array($this, 'enqueue_admin_styles'));
-        
-        // Initialize PageBender
-        $this->pagebender = new Grove_PageBender();
-        
         add_action('wp_ajax_grove_driggs_get_data', array($this, 'grove_driggs_get_data'));
         add_action('wp_ajax_grove_driggs_update_field', array($this, 'grove_driggs_update_field'));
         add_action('wp_ajax_grove_locations_get_data', array($this, 'grove_locations_get_data'));
@@ -25,10 +21,6 @@ class Grove_Admin {
         add_action('wp_ajax_grove_get_all_pages', array($this, 'grove_get_all_pages'));
         add_action('wp_ajax_grove_get_page_title', array($this, 'grove_get_page_title'));
         add_action('wp_ajax_grove_update_service_page', array($this, 'grove_update_service_page'));
-        add_action('wp_ajax_grove_update_post_title', array($this, 'grove_update_post_title'));
-        add_action('wp_ajax_grove_get_page_name', array($this, 'grove_get_page_name'));
-        add_action('wp_ajax_grove_update_post_name', array($this, 'grove_update_post_name'));
-        add_action('wp_ajax_grove_get_page_permalink', array($this, 'grove_get_page_permalink'));
         add_action('wp_ajax_grove_get_image_data', array($this, 'grove_get_image_data'));
         add_action('wp_ajax_grove_rename_image_file', array($this, 'grove_rename_image_file'));
         add_action('wp_ajax_grove_update_image_title', array($this, 'grove_update_image_title'));
@@ -71,7 +63,7 @@ class Grove_Admin {
         if (strpos($hook, 'grove') !== false) {
             wp_enqueue_style(
                 'shenfur-grove-styles',
-                plugin_dir_url(dirname(__FILE__)) . 'grove-shenzi-asset-mirror/shenfur_grove_styles.css',
+                plugin_dir_url(dirname(__FILE__)) . 'assets/css/shenfur_grove_styles.css',
                 array(),
                 time()
             );
@@ -87,7 +79,7 @@ class Grove_Admin {
             'grovehub',
             '', // No callback - makes it non-clickable
             'dashicons-palmtree',
-            3.3
+            30
         );
         
         // Remove the auto-generated submenu link to the parent page
@@ -127,15 +119,6 @@ class Grove_Admin {
             'manage_options',
             'grove_services_mar',
             array($this, 'grove_services_mar_page')
-        );
-        
-        add_submenu_page(
-            'grovehub',
-            'Grove Page Bender',
-            'grove_pagebender',
-            'manage_options',
-            'grove_pagebender',
-            array($this, 'grove_pagebender_page')
         );
         
         add_submenu_page(
@@ -2160,20 +2143,7 @@ class Grove_Admin {
             <div style="height: 20px;"></div>
             
             <div style="padding: 20px;">
-                <div style="display: flex; align-items: flex-start; gap: 20px; margin-bottom: 20px;">
-                    <h1 style="margin: 0; display: flex; align-items: center; gap: 10px;"><img src="<?php echo plugin_dir_url(__FILE__) . '../grove-shenzi-asset-mirror/grove-logo-1.png'; ?>" alt="Grove Logo" style="height: 40px; width: auto;">Grove Services Manager</h1>
-                    <div style="border: 1px solid gray; padding: 10px;">
-                        <span style="font-size: 16px; font-weight: bold;">ventricle_chamber</span>
-                        <div style="margin-top: 10px;">
-                            <span>With selected:</span>
-                            <select id="ventricle-chamber-action" style="margin-left: 10px;">
-                                <option value="">Choose action...</option>
-                                <option value="chimp">run chimp function</option>
-                            </select>
-                            <button id="ventricle-chamber-submit" class="button button-primary" style="margin-left: 10px;">Submit</button>
-                        </div>
-                    </div>
-                </div>
+                <h1 style="margin-bottom: 20px;">🌳🔧 Grove Services Manager</h1>
             
             <!-- Control Bar -->
             <div style="background: white; border: 1px solid #ddd; padding: 15px; margin-bottom: 20px; border-radius: 5px;">
@@ -2181,7 +2151,6 @@ class Grove_Admin {
                     <span style="font-size: 16px; font-weight: bold;">mandible_chamber</span>
                     <button id="create-popup-btn" class="button button-primary">Create New Service</button>
                     <button id="delete-selected-btn" class="button" style="background: #dc3545; color: white; border-color: #dc3545;">Delete Selected</button>
-                    <a href="<?php echo admin_url('admin.php?page=klyrabeamraymar'); ?>" class="button button-secondary" style="text-decoration: none;">/klyrabeamraymar</a>
                     <div style="position: relative; margin-left: 18px;">
                         <input type="text" id="search-box" placeholder="Search services..." style="padding: 8px 40px 8px 12px; border: 1px solid #ccc; border-radius: 4px; width: 250px; font-size: 14px;">
                         <button id="clear-search" style="position: absolute; right: 8px; top: 50%; transform: translateY(-50%); background: #ffeb3b; border: none; padding: 4px 8px; font-size: 12px; font-weight: bold; border-radius: 3px; cursor: pointer;">CL</button>
@@ -2195,8 +2164,8 @@ class Grove_Admin {
                         </div>
                     </div>
                     <div style="margin-left: 10px;">
-                        <button id="test-button-5" style="padding: 8px 16px; border: 1px solid #ccc; border-radius: 4px; background: white; cursor: pointer; font-size: 14px;">test button 5</button>
-                        <button id="duplicate-oshabi-page-btn" style="padding: 8px 16px; border: 1px solid #ccc; border-radius: 4px; background: white; cursor: pointer; font-size: 14px;">duplicate oshabi page and assign to selected service</button>
+                        <button id="test-button-3" style="padding: 8px 16px; border: 1px solid #ccc; border-radius: 4px; background: white; cursor: pointer; font-size: 14px;">test button 3</button>
+                        <button id="test-button-4" style="padding: 8px 16px; border: 1px solid #ccc; border-radius: 4px; background: white; cursor: pointer; font-size: 14px;">test button 4</button>
                     </div>
                 </div>
             </div>
@@ -2266,11 +2235,8 @@ class Grove_Admin {
                                                 <div style="display: flex; align-items: center;">
                                                     <span style="font-size: 12px; color: #4B5563; margin-right: 8px;">Rows/page:</span>
                                                     <div style="display: inline-flex; border-radius: 6px; box-shadow: 0 1px 2px 0 rgba(0, 0, 0, 0.05);">
-                                                        <button type="button" data-rows="3" class="grove-rows-per-page-btn" style="padding: 10px 8px; font-size: 14px; border: 1px solid #D1D5DB; border-radius: 6px 0 0 6px; margin-right: -1px; cursor: pointer; background: white;">3</button>
-                                                        <button type="button" data-rows="4" class="grove-rows-per-page-btn" style="padding: 10px 8px; font-size: 14px; border: 1px solid #D1D5DB; margin-right: -1px; cursor: pointer; background: white;">4</button>
-                                                        <button type="button" data-rows="5" class="grove-rows-per-page-btn active" style="padding: 10px 8px; font-size: 14px; border: 1px solid #3B82F6; background: #3B82F6; color: white; margin-right: -1px; cursor: pointer;">5</button>
-                                                        <button type="button" data-rows="10" class="grove-rows-per-page-btn" style="padding: 10px 8px; font-size: 14px; border: 1px solid #D1D5DB; margin-right: -1px; cursor: pointer; background: white;">10</button>
-                                                        <button type="button" data-rows="25" class="grove-rows-per-page-btn" style="padding: 10px 8px; font-size: 14px; border: 1px solid #D1D5DB; margin-right: -1px; cursor: pointer; background: white;">25</button>
+                                                        <button type="button" data-rows="10" class="grove-rows-per-page-btn" style="padding: 10px 8px; font-size: 14px; border: 1px solid #D1D5DB; border-radius: 6px 0 0 6px; margin-right: -1px; cursor: pointer; background: white;">10</button>
+                                                        <button type="button" data-rows="25" class="grove-rows-per-page-btn active" style="padding: 10px 8px; font-size: 14px; border: 1px solid #3B82F6; background: #3B82F6; color: white; margin-right: -1px; cursor: pointer;">25</button>
                                                         <button type="button" data-rows="50" class="grove-rows-per-page-btn" style="padding: 10px 8px; font-size: 14px; border: 1px solid #D1D5DB; margin-right: -1px; cursor: pointer; background: white;">50</button>
                                                         <button type="button" data-rows="100" class="grove-rows-per-page-btn" style="padding: 10px 8px; font-size: 14px; border: 1px solid #D1D5DB; margin-right: -1px; cursor: pointer; background: white;">100</button>
                                                         <button type="button" data-rows="200" class="grove-rows-per-page-btn" style="padding: 10px 8px; font-size: 14px; border: 1px solid #D1D5DB; margin-right: -1px; cursor: pointer; background: white;">200</button>
@@ -2372,16 +2338,14 @@ class Grove_Admin {
                                 <th class="for_db_table_zen_services" style="border: 1px solid #ddd; font-weight: bold; text-transform: lowercase; background: #e0e0e0;"><div class="cell_inner_wrapper_div for_db_table_zen_services for_db_column_description1_long">wp_zen_services</div></th>
                                 <th class="for_db_table_zen_services" style="border: 1px solid #ddd; font-weight: bold; text-transform: lowercase; background: #e0e0e0;"><div class="cell_inner_wrapper_div for_db_table_zen_services for_db_column_is_pinned_service">wp_zen_services</div></th>
                                 <th class="for_db_table_zen_services" style="border: 1px solid #ddd; font-weight: bold; text-transform: lowercase; background: #e0e0e0;"><div class="cell_inner_wrapper_div for_db_table_zen_services for_db_column_rel_image1_id">wp_zen_services</div></th>
-                                <th class="for_db_table_abstract_images_according_to_rel_image1_id" style="border: 1px solid #ddd; font-weight: bold; text-transform: lowercase; background: #e0e0e0;"><div class="cell_inner_wrapper_div for_db_table_abstract_images_according_to_rel_image1_id">media</div></th>
-                                <th class="for_db_table_abstract_images_according_to_rel_image1_id" style="border: 1px solid #ddd; font-weight: bold; text-transform: lowercase; background: #e0e0e0;"><div class="cell_inner_wrapper_div for_db_table_abstract_images_according_to_rel_image1_id">media</div></th>
-                                <th class="for_db_table_abstract_images_according_to_rel_image1_id" style="border: 1px solid #ddd; font-weight: bold; text-transform: lowercase; background: #e0e0e0;"><div class="cell_inner_wrapper_div for_db_table_abstract_images_according_to_rel_image1_id">media</div></th>
-                                <th class="for_db_table_abstract_images_according_to_rel_image1_id" style="border: 1px solid #ddd; font-weight: bold; text-transform: lowercase; background: #e0e0e0;"><div class="cell_inner_wrapper_div for_db_table_abstract_images_according_to_rel_image1_id">media</div></th>
-                                <th class="for_db_table_abstract_images_according_to_rel_image1_id" style="border: 1px solid #ddd; font-weight: bold; text-transform: lowercase; background: #e0e0e0;"><div class="cell_inner_wrapper_div for_db_table_abstract_images_according_to_rel_image1_id">media</div></th>
-                                <th class="for_db_table_abstract_images_according_to_rel_image1_id" style="border: 1px solid #ddd; font-weight: bold; text-transform: lowercase; background: #e0e0e0;"><div class="cell_inner_wrapper_div for_db_table_abstract_images_according_to_rel_image1_id">media</div></th>
-                                <th class="for_db_table_abstract_images_according_to_rel_image1_id" style="border: 1px solid #ddd; font-weight: bold; text-transform: lowercase; background: #e0e0e0;"><div class="cell_inner_wrapper_div for_db_table_abstract_images_according_to_rel_image1_id">media</div></th>
+                                <th style="border: 1px solid #ddd; font-weight: bold; text-transform: lowercase; background: #e0e0e0;"><div class="cell_inner_wrapper_div">(filler)</div></th>
+                                <th style="border: 1px solid #ddd; font-weight: bold; text-transform: lowercase; background: #e0e0e0;"><div class="cell_inner_wrapper_div">(filler)</div></th>
+                                <th style="border: 1px solid #ddd; font-weight: bold; text-transform: lowercase; background: #e0e0e0;"><div class="cell_inner_wrapper_div">(filler)</div></th>
+                                <th style="border: 1px solid #ddd; font-weight: bold; text-transform: lowercase; background: #e0e0e0;"><div class="cell_inner_wrapper_div">(filler)</div></th>
+                                <th style="border: 1px solid #ddd; font-weight: bold; text-transform: lowercase; background: #e0e0e0;"><div class="cell_inner_wrapper_div">(filler)</div></th>
+                                <th style="border: 1px solid #ddd; font-weight: bold; text-transform: lowercase; background: #e0e0e0;"><div class="cell_inner_wrapper_div">(filler)</div></th>
+                                <th style="border: 1px solid #ddd; font-weight: bold; text-transform: lowercase; background: #e0e0e0;"><div class="cell_inner_wrapper_div">(filler)</div></th>
                                 <th class="for_db_table_zen_services" style="border: 1px solid #ddd; font-weight: bold; text-transform: lowercase; background: #e0e0e0;"><div class="cell_inner_wrapper_div for_db_table_zen_services for_db_column_asn_service_page_id">wp_zen_services</div></th>
-                                <th class="for_db_table_wp_posts_according_to_asn_service_page_id" style="border: 1px solid #ddd; font-weight: bold; text-transform: lowercase; background: #e0e0e0;"><div class="cell_inner_wrapper_div for_db_table_wp_posts_according_to_asn_service_page_id">wp_posts</div></th>
-                                <th class="for_db_table_wp_posts_according_to_asn_service_page_id" style="border: 1px solid #ddd; font-weight: bold; text-transform: lowercase; background: #e0e0e0;"><div class="cell_inner_wrapper_div for_db_table_wp_posts_according_to_asn_service_page_id">wp_posts</div></th>
                                 <th style="border: 1px solid #ddd; font-weight: bold; background: #e0e0e0;"><div class="cell_inner_wrapper_div">(filler)</div></th>
                             </tr>
                             <tr>
@@ -2398,16 +2362,14 @@ class Grove_Admin {
                                 <th class="for_db_table_zen_services" data-sort="description1_long" style="border: 1px solid #ddd; font-weight: bold; text-transform: lowercase; cursor: pointer; background: #f8f9fa;"><div class="cell_inner_wrapper_div for_db_table_zen_services for_db_column_description1_long">description1_long</div></th>
                                 <th class="for_db_table_zen_services" data-sort="is_pinned_service" style="border: 1px solid #ddd; font-weight: bold; text-transform: lowercase; cursor: pointer; background: #f8f9fa;"><div class="cell_inner_wrapper_div for_db_table_zen_services for_db_column_is_pinned_service">is_pinned_service</div></th>
                                 <th class="for_db_table_zen_services" data-sort="rel_image1_id" style="border: 1px solid #ddd; font-weight: bold; text-transform: lowercase; cursor: pointer; background: #f8f9fa;"><div class="cell_inner_wrapper_div for_db_table_zen_services for_db_column_rel_image1_id">rel_image1_id</div></th>
-                                <th class="for_db_table_abstract_images_according_to_rel_image1_id" style="border: 1px solid #ddd; font-weight: bold; text-transform: lowercase; background: #f8f9fa; text-align: left; white-space: nowrap;"><div class="cell_inner_wrapper_div for_db_table_abstract_images_according_to_rel_image1_id">image-main-display</div></th>
-                                <th class="for_db_table_abstract_images_according_to_rel_image1_id" style="border: 1px solid #ddd; font-weight: bold; font-size: 16px; text-transform: lowercase; background: #f8f9fa;"><div class="cell_inner_wrapper_div for_db_table_abstract_images_according_to_rel_image1_id">image-alternative-display-method</div></th>
-                                <th class="for_db_table_abstract_images_according_to_rel_image1_id" style="border: 1px solid #ddd; font-weight: bold; text-transform: lowercase; background: #f8f9fa;"><div class="cell_inner_wrapper_div for_db_table_abstract_images_according_to_rel_image1_id">width</div></th>
-                                <th class="for_db_table_abstract_images_according_to_rel_image1_id" style="border: 1px solid #ddd; font-weight: bold; text-transform: lowercase; background: #f8f9fa;"><div class="cell_inner_wrapper_div for_db_table_abstract_images_according_to_rel_image1_id">height</div></th>
-                                <th class="for_db_table_abstract_images_according_to_rel_image1_id" style="border: 1px solid #ddd; font-weight: bold; text-transform: lowercase; background: #f8f9fa;"><div class="cell_inner_wrapper_div for_db_table_abstract_images_according_to_rel_image1_id">file name</div></th>
-                                <th class="for_db_table_abstract_images_according_to_rel_image1_id" style="border: 1px solid #ddd; font-weight: bold; text-transform: lowercase; background: #f8f9fa;"><div class="cell_inner_wrapper_div for_db_table_abstract_images_according_to_rel_image1_id">img title</div></th>
-                                <th class="for_db_table_abstract_images_according_to_rel_image1_id" style="border: 1px solid #ddd; font-weight: bold; text-transform: lowercase; background: #f8f9fa;"><div class="cell_inner_wrapper_div for_db_table_abstract_images_according_to_rel_image1_id">alt text</div></th>
+                                <th style="border: 1px solid #ddd; font-weight: bold; text-transform: lowercase; background: #f8f9fa; text-align: left; white-space: nowrap;"><div class="cell_inner_wrapper_div">image-main-display</div></th>
+                                <th style="border: 1px solid #ddd; font-weight: bold; font-size: 16px; text-transform: lowercase; background: #f8f9fa;"><div class="cell_inner_wrapper_div">image-alternative-display-method</div></th>
+                                <th style="border: 1px solid #ddd; font-weight: bold; text-transform: lowercase; background: #f8f9fa;"><div class="cell_inner_wrapper_div">width</div></th>
+                                <th style="border: 1px solid #ddd; font-weight: bold; text-transform: lowercase; background: #f8f9fa;"><div class="cell_inner_wrapper_div">height</div></th>
+                                <th style="border: 1px solid #ddd; font-weight: bold; text-transform: lowercase; background: #f8f9fa;"><div class="cell_inner_wrapper_div">file name</div></th>
+                                <th style="border: 1px solid #ddd; font-weight: bold; text-transform: lowercase; background: #f8f9fa;"><div class="cell_inner_wrapper_div">img title</div></th>
+                                <th style="border: 1px solid #ddd; font-weight: bold; text-transform: lowercase; background: #f8f9fa;"><div class="cell_inner_wrapper_div">alt text</div></th>
                                 <th class="for_db_table_zen_services" style="border: 1px solid #ddd; font-weight: bold; text-transform: lowercase; background: #f8f9fa;"><div class="cell_inner_wrapper_div for_db_table_zen_services for_db_column_asn_service_page_id">asn_service_page_id</div></th>
-                                <th class="for_db_table_wp_posts_according_to_asn_service_page_id" style="border: 1px solid #ddd; font-weight: bold; text-transform: lowercase; background: #f8f9fa;"><div class="cell_inner_wrapper_div for_db_table_wp_posts_according_to_asn_service_page_id">post_title</div></th>
-                                <th class="for_db_table_wp_posts_according_to_asn_service_page_id" style="border: 1px solid #ddd; font-weight: bold; text-transform: lowercase; background: #f8f9fa;"><div class="cell_inner_wrapper_div for_db_table_wp_posts_according_to_asn_service_page_id">post_name</div></th>
                                 <th style="border: 1px solid #ddd; font-weight: bold; background: #f8f9fa;"><div class="cell_inner_wrapper_div">Actions</div></th>
                             </tr>
                         </thead>
@@ -2648,7 +2610,7 @@ class Grove_Admin {
                     tr.append(imageCell);
                     
                     // Image main display column
-                    let mainImageCell = '<td class="for_db_table_abstract_images_according_to_rel_image1_id" style="border: 1px solid #ddd; text-align: left; white-space: nowrap;"><div class="cell_inner_wrapper_div for_db_table_abstract_images_according_to_rel_image1_id">';
+                    let mainImageCell = '<td style="border: 1px solid #ddd; text-align: left; white-space: nowrap;"><div class="cell_inner_wrapper_div">';
                     if (service.rel_image1_id && service.rel_image1_id > 0) {
                         mainImageCell += '<div class="image-preview-container" data-attachment-id="' + service.rel_image1_id + '" style="height: 60px; min-width: 80px; display: inline-flex; align-items: center; justify-content: flex-start; border: 1px solid #ddd; background: #f9f9f9;">';
                         mainImageCell += '<span style="color: #666; font-size: 12px; padding: 0 8px;">Loading...</span>';
@@ -2662,7 +2624,7 @@ class Grove_Admin {
                     tr.append(mainImageCell);
                     
                     // Image alternative display method column
-                    let altImageCell = '<td class="for_db_table_abstract_images_according_to_rel_image1_id" style="border: 1px solid #ddd; text-align: center;"><div class="cell_inner_wrapper_div for_db_table_abstract_images_according_to_rel_image1_id">';
+                    let altImageCell = '<td style="border: 1px solid #ddd; text-align: center;"><div class="cell_inner_wrapper_div">';
                     if (service.rel_image1_id && service.rel_image1_id > 0) {
                         altImageCell += '<img src="/wp-content/uploads/' + service.rel_image1_id + '.jpg" style="height: 60px; max-width: 100px; object-fit: contain;" onerror="this.src=\'/wp-admin/admin-ajax.php?action=wp_get_attachment_image&attachment_id=' + service.rel_image1_id + '&size=thumbnail\';">';
                     } else {
@@ -2672,7 +2634,7 @@ class Grove_Admin {
                     tr.append(altImageCell);
                     
                     // Width column
-                    let widthCell = '<td class="for_db_table_abstract_images_according_to_rel_image1_id image-width-cell" style="border: 1px solid #ddd; text-align: center;" data-attachment-id="' + (service.rel_image1_id || '') + '"><div class="cell_inner_wrapper_div for_db_table_abstract_images_according_to_rel_image1_id">';
+                    let widthCell = '<td style="border: 1px solid #ddd; text-align: center;" class="image-width-cell" data-attachment-id="' + (service.rel_image1_id || '') + '"><div class="cell_inner_wrapper_div">';
                     if (service.rel_image1_id && service.rel_image1_id > 0) {
                         widthCell += '<span class="width-value">-</span>';
                     } else {
@@ -2682,7 +2644,7 @@ class Grove_Admin {
                     tr.append(widthCell);
                     
                     // Height column  
-                    let heightCell = '<td class="for_db_table_abstract_images_according_to_rel_image1_id image-height-cell" style="border: 1px solid #ddd; text-align: center;" data-attachment-id="' + (service.rel_image1_id || '') + '"><div class="cell_inner_wrapper_div for_db_table_abstract_images_according_to_rel_image1_id">';
+                    let heightCell = '<td style="border: 1px solid #ddd; text-align: center;" class="image-height-cell" data-attachment-id="' + (service.rel_image1_id || '') + '"><div class="cell_inner_wrapper_div">';
                     if (service.rel_image1_id && service.rel_image1_id > 0) {
                         heightCell += '<span class="height-value">-</span>';
                     } else {
@@ -2692,7 +2654,7 @@ class Grove_Admin {
                     tr.append(heightCell);
                     
                     // File Name column with special editing
-                    let fileNameCell = '<td class="for_db_table_abstract_images_according_to_rel_image1_id filename-cell" style="border: 1px solid #ddd; text-align: left;" data-attachment-id="' + (service.rel_image1_id || '') + '"><div class="cell_inner_wrapper_div for_db_table_abstract_images_according_to_rel_image1_id">';
+                    let fileNameCell = '<td style="border: 1px solid #ddd; text-align: left;" class="filename-cell" data-attachment-id="' + (service.rel_image1_id || '') + '"><div class="cell_inner_wrapper_div">';
                     if (service.rel_image1_id && service.rel_image1_id > 0) {
                         fileNameCell += '<div class="filename-editor-container" style="display: flex; align-items: center; gap: 4px;">';
                         fileNameCell += '<button class="button button-small filename-change-btn" style="font-size: 11px; padding: 2px 6px;">Change</button>';
@@ -2706,7 +2668,7 @@ class Grove_Admin {
                     tr.append(fileNameCell);
                     
                     // Image Title column
-                    let imgTitleCell = '<td class="for_db_table_abstract_images_according_to_rel_image1_id img-title-cell" style="border: 1px solid #ddd; text-align: left;" data-attachment-id="' + (service.rel_image1_id || '') + '"><div class="cell_inner_wrapper_div for_db_table_abstract_images_according_to_rel_image1_id">';
+                    let imgTitleCell = '<td style="border: 1px solid #ddd; text-align: left;" class="img-title-cell" data-attachment-id="' + (service.rel_image1_id || '') + '"><div class="cell_inner_wrapper_div">';
                     if (service.rel_image1_id && service.rel_image1_id > 0) {
                         imgTitleCell += '<input type="text" class="img-title-input" data-attachment-id="' + service.rel_image1_id + '" value="Loading..." style="width: 100%; padding: 4px; border: 1px solid #ddd; border-radius: 3px;">';
                     } else {
@@ -2716,7 +2678,7 @@ class Grove_Admin {
                     tr.append(imgTitleCell);
                     
                     // Alt Text column
-                    let altTextCell = '<td class="for_db_table_abstract_images_according_to_rel_image1_id alt-text-cell" style="border: 1px solid #ddd; text-align: left;" data-attachment-id="' + (service.rel_image1_id || '') + '"><div class="cell_inner_wrapper_div for_db_table_abstract_images_according_to_rel_image1_id">';
+                    let altTextCell = '<td style="border: 1px solid #ddd; text-align: left;" class="alt-text-cell" data-attachment-id="' + (service.rel_image1_id || '') + '"><div class="cell_inner_wrapper_div">';
                     if (service.rel_image1_id && service.rel_image1_id > 0) {
                         altTextCell += '<input type="text" class="alt-text-input" data-attachment-id="' + service.rel_image1_id + '" value="Loading..." style="width: 100%; padding: 4px; border: 1px solid #ddd; border-radius: 3px;">';
                     } else {
@@ -2732,41 +2694,9 @@ class Grove_Admin {
                         pageCell += '<span class="page-info" data-page-id="' + service.asn_service_page_id + '">';
                         pageCell += '(' + service.asn_service_page_id + ') | <span class="page-title-text">Loading...</span>';
                         pageCell += '</span>';
-                        
-                        // Add navigation buttons row
-                        pageCell += '<div style="margin-top: 8px; display: flex; gap: 4px;">';
-                        pageCell += '<a href="http://saltwater.local/wp-admin/post.php?post=' + service.asn_service_page_id + '&action=edit" target="_blank" class="button" style="font-size: 14px; padding: 3px; text-decoration: none;">pendulum</a>';
-                        pageCell += '<a href="http://saltwater.local/wp-admin/post.php?post=' + service.asn_service_page_id + '&action=elementor" target="_blank" class="button" style="font-size: 14px; padding: 3px; text-decoration: none;">elementor</a>';
-                        pageCell += '<a href="#" class="button frontend-link" data-page-id="' + service.asn_service_page_id + '" target="_blank" style="font-size: 14px; padding: 3px; text-decoration: none;">frontend</a>';
-                        pageCell += '</div>';
                     }
                     pageCell += '</div></td>';
                     tr.append(pageCell);
-                    
-                    // wp_posts post_title column
-                    let postTitleCell = '<td class="for_db_table_wp_posts_according_to_asn_service_page_id" style="border: 1px solid #ddd; white-space: nowrap;"><div class="cell_inner_wrapper_div for_db_table_wp_posts_according_to_asn_service_page_id" style="display: flex; align-items: stretch;">';
-                    if (service.asn_service_page_id) {
-                        postTitleCell += '<input type="text" class="post-title-input" data-service-id="' + service.service_id + '" data-page-id="' + service.asn_service_page_id + '" style="flex: 1; min-width: 200px; padding: 4px; border: 1px solid #ccc; border-right: none;" placeholder="Loading..." />';
-                        postTitleCell += '<button class="copy-btn" data-copy-target="post-title" data-service-id="' + service.service_id + '" style="width: 20px; padding: 0; border: 1px solid #999; background: #f9f9f9; cursor: pointer; font-size: 16px; line-height: 1;">•</button>';
-                    } else {
-                        postTitleCell += '<input type="text" class="post-title-input" data-service-id="' + service.service_id + '" style="flex: 1; min-width: 200px; padding: 4px; border: 1px solid #ccc; border-right: none;" placeholder="No page assigned" disabled />';
-                        postTitleCell += '<button class="copy-btn" disabled style="width: 20px; padding: 0; border: 1px solid #999; background: #f9f9f9; cursor: not-allowed; font-size: 16px; line-height: 1;">•</button>';
-                    }
-                    postTitleCell += '</div></td>';
-                    tr.append(postTitleCell);
-                    
-                    // wp_posts post_name column
-                    let postNameCell = '<td class="for_db_table_wp_posts_according_to_asn_service_page_id" style="border: 1px solid #ddd; white-space: nowrap;"><div class="cell_inner_wrapper_div for_db_table_wp_posts_according_to_asn_service_page_id" style="display: flex; align-items: stretch;">';
-                    if (service.asn_service_page_id) {
-                        postNameCell += '<input type="text" class="post-name-input" data-service-id="' + service.service_id + '" data-page-id="' + service.asn_service_page_id + '" style="flex: 1; min-width: 200px; padding: 4px; border: 1px solid #ccc; border-right: none;" placeholder="Loading..." />';
-                        postNameCell += '<button class="copy-btn" data-copy-target="post-name" data-service-id="' + service.service_id + '" style="width: 20px; padding: 0; border: 1px solid #999; background: #f9f9f9; cursor: pointer; font-size: 16px; line-height: 1;">•</button>';
-                    } else {
-                        postNameCell += '<input type="text" class="post-name-input" data-service-id="' + service.service_id + '" style="flex: 1; min-width: 200px; padding: 4px; border: 1px solid #ccc; border-right: none;" placeholder="No page assigned" disabled />';
-                        postNameCell += '<button class="copy-btn" disabled style="width: 20px; padding: 0; border: 1px solid #999; background: #f9f9f9; cursor: not-allowed; font-size: 16px; line-height: 1;">•</button>';
-                    }
-                    postNameCell += '</div></td>';
-                    tr.append(postNameCell);
-                    
                     tr.append('<td style="border: 1px solid #ddd;"><div class="cell_inner_wrapper_div"><button class="button button-small delete-btn" data-id="' + service.service_id + '">Delete</button></div></td>');
                     
                     tbody.append(tr);
@@ -2774,9 +2704,6 @@ class Grove_Admin {
                 
                 // Load image previews after table is rendered
                 loadImagePreviews();
-                
-                // Load frontend links for navigation buttons
-                loadFrontendLinks();
                 
                 // Inline editing
                 $('[data-field]').click(function() {
@@ -3150,198 +3077,11 @@ class Grove_Admin {
                 });
             }
             
-            // Load post titles for input fields
-            function loadPostTitles() {
-                $('.post-title-input:not([disabled])').each(function() {
-                    let input = $(this);
-                    let pageId = input.data('page-id');
-                    
-                    if (pageId) {
-                        $.ajax({
-                            url: ajaxurl,
-                            type: 'POST',
-                            data: {
-                                action: 'grove_get_page_title',
-                                nonce: '<?php echo wp_create_nonce('grove_services_nonce'); ?>',
-                                page_id: pageId
-                            },
-                            success: function(response) {
-                                if (response.success) {
-                                    input.val(response.data.title);
-                                    input.attr('placeholder', '');
-                                } else {
-                                    input.val('');
-                                    input.attr('placeholder', 'Page not found');
-                                }
-                            }
-                        });
-                    }
-                });
-            }
-            
-            // Load post names for input fields
-            function loadPostNames() {
-                $('.post-name-input:not([disabled])').each(function() {
-                    let input = $(this);
-                    let pageId = input.data('page-id');
-                    
-                    if (pageId) {
-                        $.ajax({
-                            url: ajaxurl,
-                            type: 'POST',
-                            data: {
-                                action: 'grove_get_page_name',
-                                nonce: '<?php echo wp_create_nonce('grove_services_nonce'); ?>',
-                                page_id: pageId
-                            },
-                            success: function(response) {
-                                if (response.success) {
-                                    input.val(response.data.name);
-                                    input.attr('placeholder', '');
-                                } else {
-                                    input.val('');
-                                    input.attr('placeholder', 'Page not found');
-                                }
-                            }
-                        });
-                    }
-                });
-            }
-            
-            // Load frontend links for navigation buttons
-            function loadFrontendLinks() {
-                $('.frontend-link').each(function() {
-                    let link = $(this);
-                    let pageId = link.data('page-id');
-                    
-                    if (pageId) {
-                        $.ajax({
-                            url: ajaxurl,
-                            type: 'POST',
-                            data: {
-                                action: 'grove_get_page_permalink',
-                                nonce: '<?php echo wp_create_nonce('grove_services_nonce'); ?>',
-                                page_id: pageId
-                            },
-                            success: function(response) {
-                                if (response.success) {
-                                    link.attr('href', response.data.permalink);
-                                } else {
-                                    link.attr('href', '#').css('opacity', '0.5');
-                                }
-                            }
-                        });
-                    }
-                });
-            }
-            
-            // Handle post title input changes
-            $(document).on('change', '.post-title-input:not([disabled])', function() {
-                let input = $(this);
-                let pageId = input.data('page-id');
-                let newTitle = input.val();
-                
-                if (!pageId) return;
-                
-                // Show saving indicator
-                input.css('background-color', '#fffacd');
-                
-                $.ajax({
-                    url: ajaxurl,
-                    type: 'POST',
-                    data: {
-                        action: 'grove_update_post_title',
-                        nonce: '<?php echo wp_create_nonce('grove_services_nonce'); ?>',
-                        page_id: pageId,
-                        title: newTitle
-                    },
-                    success: function(response) {
-                        if (response.success) {
-                            // Show success
-                            input.css('background-color', '#d4edda');
-                            setTimeout(function() {
-                                input.css('background-color', '');
-                            }, 1000);
-                            
-                            // Update the page title text in the ASN column if it exists
-                            let pageTitleText = $('.page-info[data-page-id="' + pageId + '"] .page-title-text');
-                            if (pageTitleText.length) {
-                                pageTitleText.text(newTitle);
-                            }
-                        } else {
-                            // Show error
-                            input.css('background-color', '#f8d7da');
-                            alert('Error updating post title: ' + response.data);
-                            setTimeout(function() {
-                                input.css('background-color', '');
-                            }, 2000);
-                        }
-                    },
-                    error: function() {
-                        input.css('background-color', '#f8d7da');
-                        alert('Error updating post title');
-                        setTimeout(function() {
-                            input.css('background-color', '');
-                        }, 2000);
-                    }
-                });
-            });
-            
-            // Handle post name input changes
-            $(document).on('change', '.post-name-input:not([disabled])', function() {
-                let input = $(this);
-                let pageId = input.data('page-id');
-                let newName = input.val();
-                
-                if (!pageId) return;
-                
-                // Show saving indicator
-                input.css('background-color', '#fffacd');
-                
-                $.ajax({
-                    url: ajaxurl,
-                    type: 'POST',
-                    data: {
-                        action: 'grove_update_post_name',
-                        nonce: '<?php echo wp_create_nonce('grove_services_nonce'); ?>',
-                        page_id: pageId,
-                        name: newName
-                    },
-                    success: function(response) {
-                        if (response.success) {
-                            // Show success
-                            input.css('background-color', '#d4edda');
-                            setTimeout(function() {
-                                input.css('background-color', '');
-                            }, 1000);
-                        } else {
-                            // Show error
-                            input.css('background-color', '#f8d7da');
-                            alert('Error updating post name: ' + response.data);
-                            setTimeout(function() {
-                                input.css('background-color', '');
-                            }, 2000);
-                        }
-                    },
-                    error: function() {
-                        input.css('background-color', '#f8d7da');
-                        alert('Error updating post name');
-                        setTimeout(function() {
-                            input.css('background-color', '');
-                        }, 2000);
-                    }
-                });
-            });
-            
-            // Call loadPageTitles, loadPostTitles, and loadPostNames after displaying data
+            // Call loadPageTitles after displaying data
             let originalDisplayData = displayData;
             displayData = function() {
                 originalDisplayData();
-                setTimeout(function() {
-                    loadPageTitles();
-                    loadPostTitles();
-                    loadPostNames();
-                }, 100);
+                setTimeout(loadPageTitles, 100);
             };
             
             // Open page selector modal
@@ -3703,7 +3443,7 @@ class Grove_Admin {
             // PAGINATION FUNCTIONALITY FOR ROCKET CHAMBER
             
             // Global pagination state
-            let currentRowsPerPage = 5;
+            let currentRowsPerPage = 25;
             let currentColsPerPage = 15;
             let currentRowPage = 1;
             let currentColPage = 1;
@@ -3752,13 +3492,13 @@ class Grove_Admin {
                 
                 // Update button states
                 $('#grove-first-row-page').prop('disabled', currentRowPage <= 1);
-                $('#grove-prev-row-page').prop('disabled', false);
-                $('#grove-next-row-page').prop('disabled', false);
+                $('#grove-prev-row-page').prop('disabled', currentRowPage <= 1);
+                $('#grove-next-row-page').prop('disabled', currentRowPage >= totalRowPages);
                 $('#grove-last-row-page').prop('disabled', currentRowPage >= totalRowPages);
                 
                 $('#grove-first-col-page').prop('disabled', currentColPage <= 1);
-                $('#grove-prev-col-page').prop('disabled', false);
-                $('#grove-next-col-page').prop('disabled', false);
+                $('#grove-prev-col-page').prop('disabled', currentColPage <= 1);
+                $('#grove-next-col-page').prop('disabled', currentColPage >= totalColPages);
                 $('#grove-last-col-page').prop('disabled', currentColPage >= totalColPages);
             }
             
@@ -3911,19 +3651,15 @@ class Grove_Admin {
             $('#grove-prev-row-page').click(function() {
                 if (currentRowPage > 1) {
                     currentRowPage--;
-                } else {
-                    currentRowPage = totalRowPages;
+                    applyPagination();
                 }
-                applyPagination();
             });
             
             $('#grove-next-row-page').click(function() {
                 if (currentRowPage < totalRowPages) {
                     currentRowPage++;
-                } else {
-                    currentRowPage = 1;
+                    applyPagination();
                 }
-                applyPagination();
             });
             
             $('#grove-last-row-page').click(function() {
@@ -3940,19 +3676,15 @@ class Grove_Admin {
             $('#grove-prev-col-page').click(function() {
                 if (currentColPage > 1) {
                     currentColPage--;
-                } else {
-                    currentColPage = totalColPages;
+                    applyPagination();
                 }
-                applyPagination();
             });
             
             $('#grove-next-col-page').click(function() {
                 if (currentColPage < totalColPages) {
                     currentColPage++;
-                } else {
-                    currentColPage = 1;
+                    applyPagination();
                 }
-                applyPagination();
             });
             
             $('#grove-last-col-page').click(function() {
@@ -3968,271 +3700,8 @@ class Grove_Admin {
             $('#cancel-page-select').click(function() {
                 $('#page-selector-modal').hide();
             });
-            
-            // Duplicate oshabi page and assign to selected services
-            $('#duplicate-oshabi-page-btn').click(function() {
-                // Get selected service checkboxes
-                let selectedServices = [];
-                $('.row-select:checked').each(function() {
-                    selectedServices.push($(this).data('id'));
-                });
-                
-                if (selectedServices.length === 0) {
-                    alert('Please select one or more services from the table first.');
-                    return;
-                }
-                
-                let confirmMessage = 'This will duplicate the oshabi page ' + selectedServices.length + ' times and assign each copy to a selected service.\n\n';
-                confirmMessage += 'Selected services: ' + selectedServices.length + '\n\n';
-                confirmMessage += 'Are you sure you want to proceed?';
-                
-                if (!confirm(confirmMessage)) {
-                    return;
-                }
-                
-                // Disable button and show loading state
-                let $btn = $(this);
-                let originalText = $btn.text();
-                $btn.prop('disabled', true).text('Processing...');
-                
-                $.ajax({
-                    url: ajaxurl,
-                    type: 'POST',
-                    data: {
-                        action: 'grove_quilter_duplicate_oshabi_for_services',
-                        nonce: '<?php echo wp_create_nonce('grove_services_nonce'); ?>',
-                        selected_services: selectedServices
-                    },
-                    success: function(response) {
-                        if (response.success) {
-                            let message = response.data.message;
-                            if (response.data.results && response.data.results.length > 0) {
-                                message += '\n\nDetails:\n' + response.data.results.join('\n');
-                            }
-                            
-                            if (response.data.has_errors) {
-                                alert('⚠️ Operation completed with some errors:\n\n' + message);
-                            } else {
-                                alert('✅ Operation completed successfully!\n\n' + message);
-                            }
-                            
-                            // Refresh the data to show updated asn_service_page_id values
-                            loadServicesData();
-                            
-                            // Clear checkbox selections
-                            $('.row-select:checked').prop('checked', false);
-                        } else {
-                            alert('❌ Error: ' + response.data);
-                        }
-                    },
-                    error: function() {
-                        alert('❌ Error: Failed to process duplicate request');
-                    },
-                    complete: function() {
-                        // Re-enable button
-                        $btn.prop('disabled', false).text(originalText);
-                    }
-                });
-            });
-            
-            // Copy button functionality
-            $(document).on('click', '.copy-btn', function(e) {
-                e.preventDefault();
-                let $btn = $(this);
-                let serviceId = $btn.data('service-id');
-                let copyTarget = $btn.data('copy-target');
-                
-                // Find the corresponding input field
-                let $input;
-                if (copyTarget === 'post-title') {
-                    $input = $('.post-title-input[data-service-id="' + serviceId + '"]');
-                } else if (copyTarget === 'post-name') {
-                    $input = $('.post-name-input[data-service-id="' + serviceId + '"]');
-                }
-                
-                if ($input && $input.length > 0) {
-                    let textToCopy = $input.val();
-                    
-                    // Copy to clipboard
-                    navigator.clipboard.writeText(textToCopy).then(function() {
-                        // Visual feedback
-                        let originalBg = $btn.css('background-color');
-                        $btn.css('background-color', '#90EE90');
-                        setTimeout(function() {
-                            $btn.css('background-color', originalBg);
-                        }, 200);
-                    }).catch(function(err) {
-                        console.error('Failed to copy text: ', err);
-                    });
-                }
-            });
-            
-            // Ventricle Chamber - Chimp Function Handler
-            $('#ventricle-chamber-submit').on('click', function() {
-                const action = $('#ventricle-chamber-action').val();
-                if (!action) {
-                    alert('Please select an action from the dropdown.');
-                    return;
-                }
-                
-                if (action !== 'chimp') {
-                    alert('Only chimp function is currently available.');
-                    return;
-                }
-                
-                const selectedServices = [];
-                $('.row-select:checked').each(function() {
-                    selectedServices.push($(this).data('id'));
-                });
-                
-                if (selectedServices.length === 0) {
-                    alert('Please select at least one service before running the chimp function.');
-                    return;
-                }
-                
-                const confirmMessage = `Run chimp function on ${selectedServices.length} selected service(s)?\n\nThis will update post titles to format: "(service_name) in (city), (state)"`;
-                if (!confirm(confirmMessage)) {
-                    return;
-                }
-                
-                // Disable submit button during processing
-                const $submitBtn = $('#ventricle-chamber-submit');
-                $submitBtn.prop('disabled', true).text('Processing...');
-                
-                $.ajax({
-                    url: ajaxurl,
-                    type: 'POST',
-                    data: {
-                        action: 'grove_run_chimp_function',
-                        nonce: '<?php echo wp_create_nonce('grove_services_nonce'); ?>',
-                        service_ids: selectedServices
-                    },
-                    success: function(response) {
-                        if (response.success) {
-                            showChimpResultsModal(response.data);
-                            // Optionally reload the table data
-                            loadServicesData();
-                        } else {
-                            alert('Error running chimp function: ' + response.data);
-                        }
-                    },
-                    error: function() {
-                        alert('Error running chimp function');
-                    },
-                    complete: function() {
-                        // Re-enable submit button
-                        $submitBtn.prop('disabled', false).text('Submit');
-                    }
-                });
-            });
-            
-            // Function to show detailed chimp results modal
-            function showChimpResultsModal(data) {
-                // Create modal HTML
-                const modalHtml = `
-                    <div id="chimp-results-modal" style="position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.7); z-index: 10000; display: flex; align-items: center; justify-content: center;">
-                        <div style="background: white; padding: 30px; border-radius: 10px; max-width: 90%; max-height: 90%; overflow: auto; box-shadow: 0 10px 30px rgba(0,0,0,0.3);">
-                            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px; border-bottom: 2px solid #eee; padding-bottom: 15px;">
-                                <h2 style="margin: 0; color: #333;">🐒 Chimp Function Results</h2>
-                                <button id="close-chimp-modal" style="background: #dc3232; color: white; border: none; border-radius: 50%; width: 30px; height: 30px; cursor: pointer; font-size: 16px; font-weight: bold;">×</button>
-                            </div>
-                            
-                            <div style="margin-bottom: 20px;">
-                                <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(120px, 1fr)); gap: 15px; margin-bottom: 20px;">
-                                    <div style="text-align: center; padding: 15px; background: #d4edda; border: 1px solid #c3e6cb; border-radius: 5px;">
-                                        <div style="font-size: 24px; font-weight: bold; color: #155724;">${data.success_count}</div>
-                                        <div style="color: #155724; font-size: 12px;">SUCCESS</div>
-                                    </div>
-                                    <div style="text-align: center; padding: 15px; background: #f8d7da; border: 1px solid #f5c6cb; border-radius: 5px;">
-                                        <div style="font-size: 24px; font-weight: bold; color: #721c24;">${data.error_count}</div>
-                                        <div style="color: #721c24; font-size: 12px;">ERRORS</div>
-                                    </div>
-                                    <div style="text-align: center; padding: 15px; background: #fff3cd; border: 1px solid #ffeaa7; border-radius: 5px;">
-                                        <div style="font-size: 24px; font-weight: bold; color: #856404;">${data.skipped_count}</div>
-                                        <div style="color: #856404; font-size: 12px;">SKIPPED</div>
-                                    </div>
-                                    <div style="text-align: center; padding: 15px; background: #e2e3e5; border: 1px solid #d3d3d4; border-radius: 5px;">
-                                        <div style="font-size: 24px; font-weight: bold; color: #383d41;">${data.total_count}</div>
-                                        <div style="color: #383d41; font-size: 12px;">TOTAL</div>
-                                    </div>
-                                </div>
-                                
-                                <div style="background: #f8f9fa; padding: 15px; border-radius: 5px; border-left: 4px solid #007cba;">
-                                    <strong>Summary:</strong> ${data.message}
-                                </div>
-                            </div>
-                            
-                            <div style="max-height: 400px; overflow-y: auto;">
-                                <h3 style="margin-top: 0; color: #333;">Detailed Results:</h3>
-                                <div id="detailed-results"></div>
-                            </div>
-                            
-                            <div style="text-align: center; margin-top: 20px; padding-top: 15px; border-top: 1px solid #eee;">
-                                <button id="close-chimp-modal-btn" style="background: #007cba; color: white; border: none; padding: 10px 20px; border-radius: 5px; cursor: pointer; font-size: 14px;">Close</button>
-                            </div>
-                        </div>
-                    </div>
-                `;
-                
-                // Add modal to body
-                $('body').append(modalHtml);
-                
-                // Populate detailed results
-                const detailsContainer = $('#detailed-results');
-                data.results.forEach(function(result, index) {
-                    let statusColor, statusIcon, statusBg;
-                    
-                    if (result.status === 'success') {
-                        statusColor = '#155724';
-                        statusIcon = '✅';
-                        statusBg = '#d4edda';
-                    } else if (result.status === 'error') {
-                        statusColor = '#721c24';
-                        statusIcon = '❌';
-                        statusBg = '#f8d7da';
-                    } else {
-                        statusColor = '#856404';
-                        statusIcon = '⚠️';
-                        statusBg = '#fff3cd';
-                    }
-                    
-                    const resultHtml = `
-                        <div style="margin-bottom: 15px; padding: 15px; border: 1px solid #ddd; border-radius: 5px; background: ${statusBg};">
-                            <div style="display: flex; align-items: center; margin-bottom: 10px;">
-                                <span style="font-size: 18px; margin-right: 10px;">${statusIcon}</span>
-                                <strong style="color: ${statusColor};">${result.status.toUpperCase()}</strong>
-                                <span style="margin-left: 10px; color: #666;">Service ID: ${result.service_id}</span>
-                                ${result.service_name ? '<span style="margin-left: 10px; color: #666;">| ' + result.service_name + '</span>' : ''}
-                            </div>
-                            <div style="color: #333; font-size: 14px; line-height: 1.4;">
-                                ${result.message}
-                            </div>
-                            ${result.post_id ? '<div style="margin-top: 8px; font-size: 12px; color: #666;">Post ID: ' + result.post_id + '</div>' : ''}
-                        </div>
-                    `;
-                    
-                    detailsContainer.append(resultHtml);
-                });
-                
-                // Close modal handlers
-                $('#close-chimp-modal, #close-chimp-modal-btn').on('click', function() {
-                    $('#chimp-results-modal').remove();
-                });
-                
-                // Close on background click
-                $('#chimp-results-modal').on('click', function(e) {
-                    if (e.target.id === 'chimp-results-modal') {
-                        $('#chimp-results-modal').remove();
-                    }
-                });
-            }
         });
         </script>
-        <style>
-        .copy-btn:hover:not(:disabled) {
-            background-color: #ffff00 !important;
-        }
-        </style>
         <?php
     }
     
@@ -7268,642 +6737,6 @@ class Grove_Admin {
         } else {
             wp_send_json_error('Failed to update service page');
         }
-    }
-    
-    /**
-     * Update post title
-     */
-    public function grove_update_post_title() {
-        // Check nonce
-        if (!wp_verify_nonce($_POST['nonce'], 'grove_services_nonce')) {
-            wp_send_json_error('Invalid nonce');
-            return;
-        }
-        
-        if (!current_user_can('edit_pages')) {
-            wp_send_json_error('Insufficient permissions');
-            return;
-        }
-        
-        $page_id = intval($_POST['page_id']);
-        $new_title = sanitize_text_field($_POST['title']);
-        
-        if (!$page_id) {
-            wp_send_json_error('Invalid page ID');
-            return;
-        }
-        
-        // Update the post title
-        $result = wp_update_post(array(
-            'ID' => $page_id,
-            'post_title' => $new_title
-        ));
-        
-        if (is_wp_error($result)) {
-            wp_send_json_error('Failed to update title: ' . $result->get_error_message());
-            return;
-        }
-        
-        if ($result === 0) {
-            wp_send_json_error('No changes made');
-            return;
-        }
-        
-        wp_send_json_success(array(
-            'message' => 'Post title updated successfully',
-            'title' => $new_title
-        ));
-    }
-    
-    /**
-     * Get page name (post_name) by ID
-     */
-    public function grove_get_page_name() {
-        // Check nonce
-        if (!wp_verify_nonce($_POST['nonce'], 'grove_services_nonce')) {
-            wp_send_json_error('Invalid nonce');
-            return;
-        }
-        
-        $page_id = intval($_POST['page_id']);
-        $post = get_post($page_id);
-        
-        if ($post) {
-            wp_send_json_success(array('name' => $post->post_name));
-        } else {
-            wp_send_json_error('Page not found');
-        }
-    }
-    
-    /**
-     * Update post name (post_name)
-     */
-    public function grove_update_post_name() {
-        // Check nonce
-        if (!wp_verify_nonce($_POST['nonce'], 'grove_services_nonce')) {
-            wp_send_json_error('Invalid nonce');
-            return;
-        }
-        
-        if (!current_user_can('edit_pages')) {
-            wp_send_json_error('Insufficient permissions');
-            return;
-        }
-        
-        $page_id = intval($_POST['page_id']);
-        $new_name = sanitize_title($_POST['name']);
-        
-        if (!$page_id) {
-            wp_send_json_error('Invalid page ID');
-            return;
-        }
-        
-        // Update the post name
-        $result = wp_update_post(array(
-            'ID' => $page_id,
-            'post_name' => $new_name
-        ));
-        
-        if (is_wp_error($result)) {
-            wp_send_json_error('Failed to update post name: ' . $result->get_error_message());
-            return;
-        }
-        
-        if ($result === 0) {
-            wp_send_json_error('No changes made');
-            return;
-        }
-        
-        wp_send_json_success(array(
-            'message' => 'Post name updated successfully',
-            'name' => $new_name
-        ));
-    }
-    
-    /**
-     * Get page permalink by ID
-     */
-    public function grove_get_page_permalink() {
-        // Check nonce
-        if (!wp_verify_nonce($_POST['nonce'], 'grove_services_nonce')) {
-            wp_send_json_error('Invalid nonce');
-            return;
-        }
-        
-        $page_id = intval($_POST['page_id']);
-        $permalink = get_permalink($page_id);
-        
-        if ($permalink && $permalink !== '') {
-            wp_send_json_success(array('permalink' => $permalink));
-        } else {
-            wp_send_json_error('Page not found or no permalink');
-        }
-    }
-    
-    /**
-     * Grove Page Bender Page
-     */
-    public function grove_pagebender_page() {
-        // AGGRESSIVE NOTICE SUPPRESSION - Remove ALL WordPress admin notices
-        $this->suppress_all_admin_notices();
-        ?>
-        <div class="wrap" style="margin: 0; padding: 0;">
-            <!-- Allow space for WordPress notices -->
-            <div style="height: 20px;"></div>
-            
-            <div style="padding: 20px;">
-                <h1 style="margin-bottom: 20px;">🌳📄 Grove Page Bender</h1>
-                
-                <!-- Page Template Management -->
-                <div style="background: white; border: 1px solid #ddd; padding: 20px; margin-bottom: 20px; border-radius: 5px;">
-                    <h2 style="margin-top: 0; margin-bottom: 20px;">Page Template Management</h2>
-                    
-                    <!-- Oshabi Template -->
-                    <div style="margin-bottom: 30px; padding: 15px; border: 1px solid #e0e0e0; border-radius: 4px; background: #f9f9f9;">
-                        <div style="margin-bottom: 15px;">
-                            <strong style="font-size: 16px;">Select Oshabi Page</strong>
-                            <div id="current-oshabi-assignment" style="margin-top: 10px; font-size: 14px; color: #666;">
-                                <!-- Current assignment will be displayed here -->
-                            </div>
-                        </div>
-                        <button id="select-oshabi-page-btn" class="button button-primary" style="padding: 8px 16px;">Select</button>
-                    </div>
-                    
-                    <!-- Duplicate Pages With Various Methods -->
-                    <div style="margin-bottom: 30px; padding: 15px; border: 1px solid #e0e0e0; border-radius: 4px; background: #f9f9f9;">
-                        <div style="margin-bottom: 15px;">
-                            <strong style="font-size: 16px;">Duplicate Pages With Various Methods</strong>
-                            <div style="margin-top: 10px; font-size: 14px; color: #666;">
-                                Quick duplication options for the selected oshabi page
-                            </div>
-                        </div>
-                        
-                        <!-- Publish Toggle Switch -->
-                        <div style="margin-bottom: 15px; padding: 10px; background: #fff; border: 1px solid #ddd; border-radius: 4px;">
-                            <label style="display: flex; align-items: center; cursor: pointer;">
-                                <input type="checkbox" id="grove-publish-toggle" checked style="display: none;">
-                                <div id="grove-toggle-slider" style="
-                                    width: 50px; 
-                                    height: 24px; 
-                                    background: #4CAF50; 
-                                    border-radius: 12px; 
-                                    position: relative; 
-                                    transition: background 0.3s;
-                                    margin-right: 10px;">
-                                    <div style="
-                                        width: 20px; 
-                                        height: 20px; 
-                                        background: white; 
-                                        border-radius: 50%; 
-                                        position: absolute; 
-                                        top: 2px; 
-                                        right: 2px; 
-                                        transition: transform 0.3s;">
-                                    </div>
-                                </div>
-                                <span style="font-weight: 500;">Publish page upon duplication (not 'draft')</span>
-                            </label>
-                        </div>
-                        
-                        <div style="display: flex; gap: 10px; flex-wrap: wrap;">
-                            <button id="main-quilter-method-1-btn" class="button button-secondary" style="padding: 8px 16px; background: #6c757d; color: white; border: none;">
-                                Main Quilter Method 1
-                            </button>
-                            <button id="panzer-method-btn" class="button button-secondary" style="padding: 8px 16px; background: #17a2b8; color: white; border: none;">
-                                Panzer Method
-                            </button>
-                        </div>
-                    </div>
-                    
-                    <!-- Duplicated Oshabi Pages History -->
-                    <div style="margin-bottom: 30px; padding: 15px; border: 1px solid #e0e0e0; border-radius: 4px; background: #f9f9f9;">
-                        <div style="margin-bottom: 15px;">
-                            <strong style="font-size: 16px;">Duplicated Oshabi Pages</strong>
-                            <div style="margin-top: 10px; font-size: 14px; color: #666;">
-                                History of pages duplicated from the oshabi template
-                            </div>
-                        </div>
-                        
-                        <div style="border: 1px solid #ddd; border-radius: 4px; overflow: hidden; max-height: 400px; overflow-y: auto; background: white;">
-                            <table style="width: 100%; border-collapse: collapse;">
-                                <thead style="background: #f0f0f0; position: sticky; top: 0;">
-                                    <tr>
-                                        <th style="padding: 10px; text-align: left; border-bottom: 1px solid #ddd; font-weight: bold;">Method</th>
-                                        <th style="padding: 10px; text-align: left; border-bottom: 1px solid #ddd; font-weight: bold;">Page Title</th>
-                                        <th style="padding: 10px; text-align: left; border-bottom: 1px solid #ddd; font-weight: bold;">Service</th>
-                                        <th style="padding: 10px; text-align: left; border-bottom: 1px solid #ddd; font-weight: bold;">Type</th>
-                                        <th style="padding: 10px; text-align: left; border-bottom: 1px solid #ddd; font-weight: bold;">Status</th>
-                                        <th style="padding: 10px; text-align: left; border-bottom: 1px solid #ddd; font-weight: bold;">Created</th>
-                                        <th style="padding: 10px; text-align: left; border-bottom: 1px solid #ddd; font-weight: bold;">Actions</th>
-                                    </tr>
-                                </thead>
-                                <tbody id="duplication-history-tbody">
-                                    <!-- History data will be loaded here via AJAX -->
-                                </tbody>
-                            </table>
-                        </div>
-                        
-                        <div style="margin-top: 15px; text-align: right;">
-                            <button id="refresh-history-btn" class="button button-secondary" style="margin-right: 10px;">Refresh History</button>
-                            <span id="history-loading" style="display: none; color: #666;">Loading...</span>
-                        </div>
-                    </div>
-                </div>
-            </div>
-        </div>
-        
-        <!-- Page Selector Modal -->
-        <div id="oshabi-page-selector-modal" style="display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.5); z-index: 1000;">
-            <div style="position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); background: white; padding: 30px; border-radius: 8px; width: 80%; max-width: 1200px; max-height: 80vh; overflow-y: auto;">
-                <h2 style="margin-top: 0;">Select Oshabi Page</h2>
-                
-                <!-- Search Box -->
-                <div style="margin-bottom: 20px;">
-                    <input type="text" id="oshabi-page-search" placeholder="Search pages and posts..." style="width: 300px; padding: 8px; border: 1px solid #ddd; border-radius: 4px;">
-                    <button id="clear-oshabi-page-search" class="button button-small" style="margin-left: 10px;">Clear Search</button>
-                </div>
-                
-                <!-- Pages Table -->
-                <div style="border: 1px solid #ddd; border-radius: 4px; overflow: hidden; max-height: 400px; overflow-y: auto;">
-                    <table style="width: 100%; border-collapse: collapse;">
-                        <thead style="background: #f0f0f0; position: sticky; top: 0;">
-                            <tr>
-                                <th style="padding: 10px; text-align: left; border-bottom: 1px solid #ddd;">Select</th>
-                                <th style="padding: 10px; text-align: left; border-bottom: 1px solid #ddd;">ID</th>
-                                <th style="padding: 10px; text-align: left; border-bottom: 1px solid #ddd;">Title</th>
-                                <th style="padding: 10px; text-align: left; border-bottom: 1px solid #ddd;">Type</th>
-                                <th style="padding: 10px; text-align: left; border-bottom: 1px solid #ddd;">Status</th>
-                                <th style="padding: 10px; text-align: left; border-bottom: 1px solid #ddd;">Date</th>
-                            </tr>
-                        </thead>
-                        <tbody id="oshabi-pages-tbody">
-                            <!-- Data will be loaded here via AJAX -->
-                        </tbody>
-                    </table>
-                </div>
-                
-                <!-- Modal Actions -->
-                <div style="text-align: right; margin-top: 20px;">
-                    <button id="cancel-oshabi-page-select" class="button button-secondary" style="margin-right: 10px;">Cancel</button>
-                    <button id="confirm-oshabi-page-select" class="button button-primary">Confirm Selection</button>
-                </div>
-            </div>
-        </div>
-        
-        <script type="text/javascript">
-        jQuery(document).ready(function($) {
-            let allOshabiPagesData = [];
-            let selectedOshabiPageId = null;
-            
-            // Toggle Switch Functionality
-            $('#grove-toggle-slider').click(function() {
-                var checkbox = $('#grove-publish-toggle');
-                var slider = $(this);
-                var knob = slider.find('div');
-                
-                checkbox.prop('checked', !checkbox.prop('checked'));
-                
-                if (checkbox.prop('checked')) {
-                    // ON state - green, knob to right
-                    slider.css('background', '#4CAF50');
-                    knob.css('transform', 'translateX(0px)');
-                } else {
-                    // OFF state - gray, knob to left
-                    slider.css('background', '#ccc');
-                    knob.css('transform', 'translateX(-26px)');
-                }
-            });
-            
-            // Load current assignments on page load
-            function loadCurrentAssignments() {
-                $.ajax({
-                    url: ajaxurl,
-                    type: 'POST',
-                    data: {
-                        action: 'grove_pagebender_get_current_assignments',
-                        nonce: '<?php echo wp_create_nonce('grove_pagebender_nonce'); ?>'
-                    },
-                    success: function(response) {
-                        if (response.success) {
-                            const assignments = response.data;
-                            const oshabiDiv = $('#current-oshabi-assignment');
-                            
-                            if (assignments.oshabi && assignments.oshabi_title) {
-                                oshabiDiv.html('<strong>Current Oshabi page:</strong> ' + assignments.oshabi_title + ' (ID: ' + assignments.oshabi + ')');
-                                oshabiDiv.css('color', '#28a745');
-                            } else {
-                                oshabiDiv.html('<em>No Oshabi page assigned</em>');
-                                oshabiDiv.css('color', '#666');
-                            }
-                        }
-                    }
-                });
-            }
-            
-            // Load current assignments when page loads
-            loadCurrentAssignments();
-            
-            // Load duplication history when page loads
-            loadDuplicationHistory();
-            
-            // Open Oshabi page selector modal
-            $('#select-oshabi-page-btn').click(function() {
-                selectedOshabiPageId = null;
-                
-                // Load all pages and posts
-                $.ajax({
-                    url: ajaxurl,
-                    type: 'POST',
-                    data: {
-                        action: 'grove_pagebender_get_all_pages',
-                        nonce: '<?php echo wp_create_nonce('grove_pagebender_nonce'); ?>'
-                    },
-                    success: function(response) {
-                        if (response.success) {
-                            allOshabiPagesData = response.data;
-                            displayOshabiPages(allOshabiPagesData);
-                            $('#oshabi-page-selector-modal').show();
-                        }
-                    }
-                });
-            });
-            
-            // Display pages in the modal table
-            function displayOshabiPages(pages) {
-                let tbody = $('#oshabi-pages-tbody');
-                tbody.empty();
-                
-                pages.forEach(function(page) {
-                    let row = $('<tr>');
-                    row.append('<td style="padding: 8px; border: 1px solid #ddd;"><input type="radio" name="oshabi-page-select" value="' + page.ID + '" data-title="' + page.post_title + '"></td>');
-                    row.append('<td style="padding: 8px; border: 1px solid #ddd;">' + page.ID + '</td>');
-                    row.append('<td style="padding: 8px; border: 1px solid #ddd;">' + page.post_title + '</td>');
-                    row.append('<td style="padding: 8px; border: 1px solid #ddd;">' + page.post_type + '</td>');
-                    row.append('<td style="padding: 8px; border: 1px solid #ddd;">' + page.post_status + '</td>');
-                    row.append('<td style="padding: 8px; border: 1px solid #ddd;">' + page.post_date + '</td>');
-                    tbody.append(row);
-                });
-            }
-            
-            // Handle page selection
-            $(document).on('change', 'input[name="oshabi-page-select"]', function() {
-                selectedOshabiPageId = $(this).val();
-            });
-            
-            // Search pages
-            $('#oshabi-page-search').on('input', function() {
-                let searchTerm = $(this).val().toLowerCase();
-                let filtered = allOshabiPagesData.filter(function(page) {
-                    return page.post_title.toLowerCase().includes(searchTerm) ||
-                           page.ID.toString().includes(searchTerm);
-                });
-                displayOshabiPages(filtered);
-            });
-            
-            // Clear page search
-            $('#clear-oshabi-page-search').click(function() {
-                $('#oshabi-page-search').val('');
-                displayOshabiPages(allOshabiPagesData);
-            });
-            
-            // Confirm page selection
-            $('#confirm-oshabi-page-select').click(function() {
-                if (!selectedOshabiPageId) {
-                    alert('Please select a page');
-                    return;
-                }
-                
-                // Save the selection to database
-                $.ajax({
-                    url: ajaxurl,
-                    type: 'POST',
-                    data: {
-                        action: 'grove_pagebender_save_oshabi',
-                        nonce: '<?php echo wp_create_nonce('grove_pagebender_nonce'); ?>',
-                        page_id: selectedOshabiPageId
-                    },
-                    success: function(response) {
-                        if (response.success) {
-                            alert('✅ Success: ' + response.data.message);
-                            $('#oshabi-page-selector-modal').hide();
-                            // Reload current assignments to show the update
-                            loadCurrentAssignments();
-                        } else {
-                            alert('❌ Error: ' + response.data);
-                        }
-                    },
-                    error: function() {
-                        alert('❌ Error: Failed to save oshabi assignment');
-                    }
-                });
-            });
-            
-            // Cancel page selection
-            $('#cancel-oshabi-page-select').click(function() {
-                $('#oshabi-page-selector-modal').hide();
-            });
-            
-            // Load duplication history data
-            function loadDuplicationHistory() {
-                $('#history-loading').show();
-                
-                $.ajax({
-                    url: ajaxurl,
-                    type: 'POST',
-                    data: {
-                        action: 'grove_quilter_get_duplication_history',
-                        nonce: '<?php echo wp_create_nonce('grove_pagebender_nonce'); ?>'
-                    },
-                    success: function(response) {
-                        if (response.success) {
-                            displayDuplicationHistory(response.data);
-                        } else {
-                            console.error('Failed to load duplication history:', response.data);
-                        }
-                    },
-                    error: function() {
-                        console.error('Error loading duplication history');
-                    },
-                    complete: function() {
-                        $('#history-loading').hide();
-                    }
-                });
-            }
-            
-            // Display duplication history in table
-            function displayDuplicationHistory(historyData) {
-                let tbody = $('#duplication-history-tbody');
-                tbody.empty();
-                
-                if (historyData.length === 0) {
-                    tbody.append('<tr><td colspan="7" style="padding: 20px; text-align: center; color: #666; font-style: italic;">No duplication history found</td></tr>');
-                    return;
-                }
-                
-                historyData.forEach(function(record) {
-                    let row = $('<tr>');
-                    
-                    // Method
-                    row.append('<td style="padding: 8px; border: 1px solid #ddd; font-weight: bold; color: #0073aa;">' + record.method + '</td>');
-                    
-                    // Page Title
-                    row.append('<td style="padding: 8px; border: 1px solid #ddd;">' + record.duplicated_page_title + '</td>');
-                    
-                    // Service Name
-                    let serviceName = record.assigned_service_name || 'N/A';
-                    row.append('<td style="padding: 8px; border: 1px solid #ddd;">' + serviceName + '</td>');
-                    
-                    // Type (Elementor or Regular)
-                    let pageType = record.is_elementor_page ? 'Elementor' : 'Regular';
-                    let typeIcon = record.is_elementor_page ? '🎨 ' : '📄 ';
-                    row.append('<td style="padding: 8px; border: 1px solid #ddd;">' + typeIcon + pageType + '</td>');
-                    
-                    // Status (Published or Draft) - dynamically fetched from wp_posts
-                    let status = record.post_status || 'draft';
-                    let statusIcon = status === 'publish' ? '✅ ' : '📝 ';
-                    let statusColor = status === 'publish' ? '#46b450' : '#f56565';
-                    let statusText = status === 'publish' ? 'Published' : 'Draft';
-                    row.append('<td style="padding: 8px; border: 1px solid #ddd; color: ' + statusColor + '; font-weight: 500;">' + statusIcon + statusText + '</td>');
-                    
-                    // Created Date
-                    let createdDate = new Date(record.created_at).toLocaleString();
-                    row.append('<td style="padding: 8px; border: 1px solid #ddd;">' + createdDate + '</td>');
-                    
-                    // Action Buttons (pendulum, elementor, frontend)
-                    let actionsHtml = '<div style="display: flex; gap: 5px;">';
-                    
-                    // Pendulum (Edit) Button
-                    actionsHtml += '<a href="' + ajaxurl.replace('/admin-ajax.php', '/post.php?post=' + record.duplicated_page_id + '&action=edit') + '" ';
-                    actionsHtml += 'style="background: #0073aa; color: white; padding: 4px 8px; text-decoration: none; border-radius: 3px; font-size: 11px;">pendulum</a>';
-                    
-                    // Elementor Button (if Elementor page)
-                    if (record.is_elementor_page) {
-                        actionsHtml += '<a href="' + ajaxurl.replace('/admin-ajax.php', '/post.php?post=' + record.duplicated_page_id + '&action=elementor') + '" ';
-                        actionsHtml += 'style="background: #e91e63; color: white; padding: 4px 8px; text-decoration: none; border-radius: 3px; font-size: 11px;">elementor</a>';
-                    }
-                    
-                    // Frontend Button
-                    actionsHtml += '<a href="' + ajaxurl.replace('/wp-admin/admin-ajax.php', '/?page_id=' + record.duplicated_page_id) + '" target="_blank" ';
-                    actionsHtml += 'style="background: #46b450; color: white; padding: 4px 8px; text-decoration: none; border-radius: 3px; font-size: 11px;">frontend</a>';
-                    
-                    actionsHtml += '</div>';
-                    
-                    row.append('<td style="padding: 8px; border: 1px solid #ddd;">' + actionsHtml + '</td>');
-                    
-                    tbody.append(row);
-                });
-            }
-            
-            // Refresh history button
-            $('#refresh-history-btn').click(function() {
-                loadDuplicationHistory();
-            });
-            
-            // Main Quilter Method 1 button
-            $('#main-quilter-method-1-btn').click(function() {
-                let publishPage = $('#grove-publish-toggle').prop('checked');
-                let statusText = publishPage ? 'published' : 'draft';
-                
-                let confirmMessage = 'This will duplicate the current oshabi page using Main Quilter Method 1.\n\n';
-                confirmMessage += 'The duplicated page will be created as ' + statusText + '.\n\n';
-                confirmMessage += 'Are you sure you want to proceed?';
-                
-                if (!confirm(confirmMessage)) {
-                    return;
-                }
-                
-                // Disable button and show loading state
-                let $btn = $(this);
-                let originalText = $btn.text();
-                $btn.prop('disabled', true).text('Duplicating...');
-                
-                $.ajax({
-                    url: ajaxurl,
-                    type: 'POST',
-                    data: {
-                        action: 'grove_quilter_simple_duplicate',
-                        nonce: '<?php echo wp_create_nonce('grove_pagebender_nonce'); ?>',
-                        publish_page: publishPage
-                    },
-                    success: function(response) {
-                        if (response.success) {
-                            let message = response.data.message;
-                            if (response.data.details && response.data.details.length > 0) {
-                                message += '\n\nDetails:\n' + response.data.details.join('\n');
-                            }
-                            
-                            alert('✅ Success!\n\n' + message);
-                            
-                            // Refresh the duplication history to show the new entry
-                            loadDuplicationHistory();
-                        } else {
-                            alert('❌ Error: ' + response.data);
-                        }
-                    },
-                    error: function() {
-                        alert('❌ Error: Failed to duplicate page');
-                    },
-                    complete: function() {
-                        // Re-enable button
-                        $btn.prop('disabled', false).text(originalText);
-                    }
-                });
-            });
-            
-            // Panzer Method button (functional)
-            $('#panzer-method-btn').click(function() {
-                let publishPage = $('#grove-publish-toggle').prop('checked');
-                let statusText = publishPage ? 'published' : 'draft';
-                
-                let confirmMessage = 'This will duplicate the current oshabi page using the Panzer Method.\n\n';
-                confirmMessage += 'Panzer Method uses proven logic from a working WordPress.org plugin.\n\n';
-                confirmMessage += 'The duplicated page will be created as ' + statusText + '.\n\n';
-                confirmMessage += 'Are you sure you want to proceed?';
-                
-                if (!confirm(confirmMessage)) {
-                    return;
-                }
-                
-                // Disable button and show loading state
-                let $btn = $(this);
-                let originalText = $btn.text();
-                $btn.prop('disabled', true).text('Processing...');
-                
-                $.ajax({
-                    url: ajaxurl,
-                    type: 'POST',
-                    data: {
-                        action: 'grove_panzer_duplicate_page',
-                        nonce: '<?php echo wp_create_nonce('grove_pagebender_nonce'); ?>',
-                        publish_page: publishPage
-                    },
-                    success: function(response) {
-                        if (response.success) {
-                            let message = response.data.message;
-                            if (response.data.details && response.data.details.length > 0) {
-                                message += '\n\nDetails:\n' + response.data.details.join('\n');
-                            }
-                            
-                            alert('✅ Success!\n\n' + message);
-                            
-                            // Refresh the duplication history to show the new entry
-                            loadDuplicationHistory();
-                        } else {
-                            alert('❌ Error: ' + response.data);
-                        }
-                    },
-                    error: function() {
-                        alert('❌ Error: Failed to duplicate page using Panzer method');
-                    },
-                    complete: function() {
-                        // Re-enable button
-                        $btn.prop('disabled', false).text(originalText);
-                    }
-                });
-            });
-        });
-        </script>
-        <?php
     }
     
     public function grove_cache_manager_page() {

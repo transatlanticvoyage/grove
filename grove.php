@@ -38,23 +38,16 @@ class GrovePlugin {
     
     private function load_dependencies() {
         require_once GROVE_PLUGIN_PATH . 'includes/class-grove-admin.php';
-        require_once GROVE_PLUGIN_PATH . 'includes/class-grove-pagebender.php';
-        require_once GROVE_PLUGIN_PATH . 'includes/class-grove-quilter.php';
-        require_once GROVE_PLUGIN_PATH . 'includes/class-grove-panzer.php';
         require_once GROVE_PLUGIN_PATH . 'includes/class-grove-tax-exports.php';
         require_once GROVE_PLUGIN_PATH . 'includes/class-grove-zen-shortcodes.php';
         require_once GROVE_PLUGIN_PATH . 'includes/class-grove-database.php';
         require_once GROVE_PLUGIN_PATH . 'includes/class-grove-buffalor.php';
-        require_once GROVE_PLUGIN_PATH . 'includes/class-grove-chimp.php';
     }
     
     private function init_hooks() {
         new Grove_Admin();
         new Grove_Zen_Shortcodes();
         new Grove_Database();
-        new Grove_Quilter();
-        new Grove_Panzer();
-        new Grove_Chimp();
     }
     
     public function activate() {
