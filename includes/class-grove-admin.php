@@ -2168,7 +2168,7 @@ class Grove_Admin {
                             <span>With selected:</span>
                             <select id="ventricle-chamber-action" style="margin-left: 10px;">
                                 <option value="">Choose action...</option>
-                                <option value="chimp">run chimp function</option>
+                                <option value="chimp">run chimp function - Automatically updates WordPress post titles and URL slugs for selected services by combining the service name with location data from the zen_sitespren table (driggs_city and driggs_state_code), resulting in titles formatted as "(Service Name) in (City), (State)" and clean URL slugs based on the service name. This function also verifies that each service has an assigned page (asn_service_page_id) before processing and will skip services without assigned pages or missing posts. Useful for bulk-standardizing service page titles and URLs to improve SEO and maintain consistent naming conventions across all service pages.</option>
                             </select>
                             <button id="ventricle-chamber-submit" class="button button-primary" style="margin-left: 10px;">Submit</button>
                         </div>
