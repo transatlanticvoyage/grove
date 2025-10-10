@@ -79,14 +79,26 @@ class Grove_Chimp {
     private function process_service_chimp($service_id) {
         global $wpdb;
         
+        // Debug logging
+        error_log("Grove Chimp Debug - Service ID: " . $service_id);
+        error_log("Grove Chimp Debug - DB Prefix: " . $wpdb->prefix);
+        error_log("Grove Chimp Debug - DB Name: " . DB_NAME);
+        
         // Get service data from zen_services table
         $service_table = $wpdb->prefix . 'zen_services';
-        $service = $wpdb->get_row($wpdb->prepare(
+        error_log("Grove Chimp Debug - Table Name: " . $service_table);
+        
+        $sql = $wpdb->prepare(
             "SELECT service_id, service_name, asn_service_page_id 
              FROM {$service_table} 
              WHERE service_id = %d",
             $service_id
-        ));
+        );
+        error_log("Grove Chimp Debug - SQL Query: " . $sql);
+        
+        $service = $wpdb->get_row($sql);
+        error_log("Grove Chimp Debug - Query Result: " . print_r($service, true));
+        error_log("Grove Chimp Debug - WPDB Last Error: " . $wpdb->last_error);
         
         if (!$service) {
             return array(
