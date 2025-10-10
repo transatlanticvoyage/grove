@@ -331,12 +331,14 @@ class Grove_Database {
             service_image_url text DEFAULT NULL,
             service_image_id int(11) DEFAULT NULL,
             is_pinned_service tinyint(1) DEFAULT 0,
+            is_active_service tinyint(1) DEFAULT 1,
             position_in_custom_order int(11) DEFAULT 0,
             created_at timestamp DEFAULT CURRENT_TIMESTAMP,
             updated_at timestamp DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
             PRIMARY KEY (service_id),
             INDEX idx_service_name (service_name),
             INDEX idx_is_pinned (is_pinned_service),
+            INDEX idx_is_active (is_active_service),
             INDEX idx_position (position_in_custom_order)
         ) $charset_collate;";
         

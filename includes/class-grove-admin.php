@@ -20,6 +20,8 @@ class Grove_Admin {
         add_action('wp_ajax_grove_locations_create', array($this, 'grove_locations_create'));
         add_action('wp_ajax_grove_services_get_data', array($this, 'grove_services_get_data'));
         add_action('wp_ajax_grove_services_update_field', array($this, 'grove_services_update_field'));
+        add_action('wp_ajax_grove_services_update_active_status', array($this, 'grove_services_update_active_status'));
+        add_action('wp_ajax_grove_services_update_pinned_status', array($this, 'grove_services_update_pinned_status'));
         add_action('wp_ajax_grove_services_delete', array($this, 'grove_services_delete'));
         add_action('wp_ajax_grove_services_create', array($this, 'grove_services_create'));
         add_action('wp_ajax_grove_get_all_pages', array($this, 'grove_get_all_pages'));
@@ -454,6 +456,16 @@ class Grove_Admin {
             -webkit-user-select: text !important;
             -moz-user-select: text !important;
             pointer-events: auto !important;
+        }
+        
+        /* Toggle Switch Styles - Klyra Style */
+        .grove-toggle-switch.off {
+            background: #ccc !important;
+        }
+        
+        .grove-toggle-switch.off .grove-toggle-knob {
+            right: auto !important;
+            left: 2px !important;
         }
         </style>
         
@@ -2173,6 +2185,12 @@ class Grove_Admin {
                             <button id="ventricle-chamber-submit" class="button button-primary" style="margin-left: 10px;">Submit</button>
                         </div>
                     </div>
+                    <div style="border: 1px solid black; padding: 10px;">
+                        <span style="font-size: 16px; font-weight: bold;">sinus_chamber</span>
+                        <div style="margin-top: 10px;">
+                            <button id="copy-venmo" class="button">copy venmo</button>
+                        </div>
+                    </div>
                 </div>
             
             <!-- Control Bar -->
@@ -2370,6 +2388,7 @@ class Grove_Admin {
                                 <th class="for_db_table_zen_services" style="border: 1px solid #ddd; font-weight: bold; text-transform: lowercase; background: #e0e0e0;"><div class="cell_inner_wrapper_div for_db_table_zen_services for_db_column_service_slug_id">wp_zen_services</div></th>
                                 <th class="for_db_table_zen_services" style="border: 1px solid #ddd; font-weight: bold; text-transform: lowercase; background: #e0e0e0;"><div class="cell_inner_wrapper_div for_db_table_zen_services for_db_column_description1_short">wp_zen_services</div></th>
                                 <th class="for_db_table_zen_services" style="border: 1px solid #ddd; font-weight: bold; text-transform: lowercase; background: #e0e0e0;"><div class="cell_inner_wrapper_div for_db_table_zen_services for_db_column_description1_long">wp_zen_services</div></th>
+                                <th class="for_db_table_zen_services" style="border: 1px solid #ddd; font-weight: bold; text-transform: lowercase; background: #e0e0e0;"><div class="cell_inner_wrapper_div for_db_table_zen_services for_db_column_is_active_service">wp_zen_services</div></th>
                                 <th class="for_db_table_zen_services" style="border: 1px solid #ddd; font-weight: bold; text-transform: lowercase; background: #e0e0e0;"><div class="cell_inner_wrapper_div for_db_table_zen_services for_db_column_is_pinned_service">wp_zen_services</div></th>
                                 <th class="for_db_table_zen_services" style="border: 1px solid #ddd; font-weight: bold; text-transform: lowercase; background: #e0e0e0;"><div class="cell_inner_wrapper_div for_db_table_zen_services for_db_column_rel_image1_id">wp_zen_services</div></th>
                                 <th class="for_db_table_abstract_images_according_to_rel_image1_id" style="border: 1px solid #ddd; font-weight: bold; text-transform: lowercase; background: #e0e0e0;"><div class="cell_inner_wrapper_div for_db_table_abstract_images_according_to_rel_image1_id">media</div></th>
@@ -2396,6 +2415,7 @@ class Grove_Admin {
                                 <th class="for_db_table_zen_services" data-sort="service_slug_id" style="border: 1px solid #ddd; font-weight: bold; text-transform: lowercase; cursor: pointer; background: #f8f9fa;"><div class="cell_inner_wrapper_div for_db_table_zen_services for_db_column_service_slug_id">service_slug_id</div></th>
                                 <th class="for_db_table_zen_services" data-sort="description1_short" style="border: 1px solid #ddd; font-weight: bold; text-transform: lowercase; cursor: pointer; background: #f8f9fa;"><div class="cell_inner_wrapper_div for_db_table_zen_services for_db_column_description1_short">description1_short</div></th>
                                 <th class="for_db_table_zen_services" data-sort="description1_long" style="border: 1px solid #ddd; font-weight: bold; text-transform: lowercase; cursor: pointer; background: #f8f9fa;"><div class="cell_inner_wrapper_div for_db_table_zen_services for_db_column_description1_long">description1_long</div></th>
+                                <th class="for_db_table_zen_services" data-sort="is_active_service" style="border: 1px solid #ddd; font-weight: bold; text-transform: lowercase; cursor: pointer; background: #f8f9fa;"><div class="cell_inner_wrapper_div for_db_table_zen_services for_db_column_is_active_service">is_active_service</div></th>
                                 <th class="for_db_table_zen_services" data-sort="is_pinned_service" style="border: 1px solid #ddd; font-weight: bold; text-transform: lowercase; cursor: pointer; background: #f8f9fa;"><div class="cell_inner_wrapper_div for_db_table_zen_services for_db_column_is_pinned_service">is_pinned_service</div></th>
                                 <th class="for_db_table_zen_services" data-sort="rel_image1_id" style="border: 1px solid #ddd; font-weight: bold; text-transform: lowercase; cursor: pointer; background: #f8f9fa;"><div class="cell_inner_wrapper_div for_db_table_zen_services for_db_column_rel_image1_id">rel_image1_id</div></th>
                                 <th class="for_db_table_abstract_images_according_to_rel_image1_id" style="border: 1px solid #ddd; font-weight: bold; text-transform: lowercase; background: #f8f9fa; text-align: left; white-space: nowrap;"><div class="cell_inner_wrapper_div for_db_table_abstract_images_according_to_rel_image1_id">image-main-display</div></th>
@@ -2519,7 +2539,7 @@ class Grove_Admin {
             let filteredData = [];
             
             // Wolf Exclusion Band - Columns that are always visible (sticky)
-            const wolfExclusionBandColumns = ['service_id', 'service_name', 'suggested_url_slug'];
+            const wolfExclusionBandColumns = ['service_id', 'service_name'];
             
             // Paginated Columns - Columns subject to pagination controls (excluding wolf band and special columns)
             const paginatedColumns = [
@@ -2567,6 +2587,132 @@ class Grove_Admin {
                 });
                 
                 mediaUploader.open();
+            });
+            
+            // Handle toggle switch for is_active_service
+            $(document).on('click', '.grove-toggle-switch', function(e) {
+                e.preventDefault();
+                e.stopPropagation();
+                
+                let toggle = $(this);
+                let serviceId = toggle.data('service-id');
+                let currentlyActive = !toggle.hasClass('off');
+                let newActiveState = currentlyActive ? 0 : 1;
+                
+                // Disable toggle during update
+                toggle.css('pointer-events', 'none');
+                
+                $.ajax({
+                    url: ajaxurl,
+                    type: 'POST',
+                    data: {
+                        action: 'grove_services_update_active_status',
+                        service_id: serviceId,
+                        is_active: newActiveState,
+                        nonce: '<?php echo wp_create_nonce('grove_services_nonce'); ?>'
+                    },
+                    success: function(response) {
+                        if (response.success) {
+                            // Update successful - toggle the visual state
+                            if (newActiveState === 1) {
+                                toggle.removeClass('off');
+                                toggle.css('background', '#4CAF50');
+                                toggle.find('.grove-toggle-knob').css({
+                                    'right': '2px',
+                                    'left': 'auto'
+                                });
+                            } else {
+                                toggle.addClass('off');
+                                toggle.css('background', '#ccc');
+                                toggle.find('.grove-toggle-knob').css({
+                                    'left': '2px',
+                                    'right': 'auto'
+                                });
+                            }
+                            
+                            // Re-enable toggle
+                            toggle.css('pointer-events', 'auto');
+                            
+                            // Update the current data array to reflect the change
+                            let serviceIndex = currentData.findIndex(s => s.service_id == serviceId);
+                            if (serviceIndex !== -1) {
+                                currentData[serviceIndex].is_active_service = newActiveState;
+                            }
+                        } else {
+                            // Update failed - re-enable toggle and show error
+                            toggle.css('pointer-events', 'auto');
+                            alert('Error updating service status: ' + (response.data || 'Unknown error'));
+                        }
+                    },
+                    error: function() {
+                        // AJAX error - re-enable toggle and show error
+                        toggle.css('pointer-events', 'auto');
+                        alert('Error updating service status: Network error');
+                    }
+                });
+            });
+            
+            // Handle toggle switch for is_pinned_service
+            $(document).on('click', '.grove-pinned-toggle', function(e) {
+                e.preventDefault();
+                e.stopPropagation();
+                
+                let toggle = $(this);
+                let serviceId = toggle.data('service-id');
+                let currentlyPinned = !toggle.hasClass('off');
+                let newPinnedState = currentlyPinned ? 0 : 1;
+                
+                // Disable toggle during update
+                toggle.css('pointer-events', 'none');
+                
+                $.ajax({
+                    url: ajaxurl,
+                    type: 'POST',
+                    data: {
+                        action: 'grove_services_update_pinned_status',
+                        service_id: serviceId,
+                        is_pinned: newPinnedState,
+                        nonce: '<?php echo wp_create_nonce('grove_services_nonce'); ?>'
+                    },
+                    success: function(response) {
+                        if (response.success) {
+                            // Update successful - toggle the visual state
+                            if (newPinnedState === 1) {
+                                toggle.removeClass('off');
+                                toggle.css('background', '#4CAF50');
+                                toggle.find('.grove-toggle-knob').css({
+                                    'right': '2px',
+                                    'left': 'auto'
+                                });
+                            } else {
+                                toggle.addClass('off');
+                                toggle.css('background', '#ccc');
+                                toggle.find('.grove-toggle-knob').css({
+                                    'left': '2px',
+                                    'right': 'auto'
+                                });
+                            }
+                            
+                            // Re-enable toggle
+                            toggle.css('pointer-events', 'auto');
+                            
+                            // Update the current data array to reflect the change
+                            let serviceIndex = currentData.findIndex(s => s.service_id == serviceId);
+                            if (serviceIndex !== -1) {
+                                currentData[serviceIndex].is_pinned_service = newPinnedState;
+                            }
+                        } else {
+                            // Update failed - re-enable toggle and show error
+                            toggle.css('pointer-events', 'auto');
+                            alert('Error updating pinned status: ' + (response.data || 'Unknown error'));
+                        }
+                    },
+                    error: function() {
+                        // AJAX error - re-enable toggle and show error
+                        toggle.css('pointer-events', 'auto');
+                        alert('Error updating pinned status: Network error');
+                    }
+                });
             });
             
             $(document).on('click', '.delete-image-btn', function(e) {
@@ -2619,13 +2765,28 @@ class Grove_Admin {
                     // Data columns
                     tr.append('<td class="for_db_table_zen_services" style="border: 1px solid #ddd;"><div class="cell_inner_wrapper_div for_db_table_zen_services for_db_column_service_id">' + (service.service_id || '') + '</div></td>');
                     tr.append('<td class="for_db_table_zen_services" style="border: 1px solid #ddd; cursor: pointer;" data-field="service_name" data-id="' + service.service_id + '"><div class="cell_inner_wrapper_div for_db_table_zen_services for_db_column_service_name">' + (service.service_name || '') + '</div></td>');
+                    
+                    // First 3 paginated columns in new order: description1_short, is_active_service, is_pinned_service
+                    tr.append('<td class="for_db_table_zen_services" style="border: 1px solid #ddd; cursor: pointer;" data-field="description1_short" data-id="' + service.service_id + '"><div class="cell_inner_wrapper_div for_db_table_zen_services for_db_column_description1_short">' + (service.description1_short || '') + '</div></td>');
+                    let isActiveToggle = '<td class="for_db_table_zen_services" style="border: 1px solid #ddd; text-align: center;"><div class="cell_inner_wrapper_div for_db_table_zen_services for_db_column_is_active_service">' +
+                        '<div class="grove-toggle-switch" data-service-id="' + service.service_id + '" style="position: relative; width: 50px; height: 24px; background: ' + (service.is_active_service ? '#4CAF50' : '#ccc') + '; border-radius: 12px; cursor: pointer; transition: background 0.3s; margin: 0 auto;">' +
+                        '<div class="grove-toggle-knob" style="position: absolute; top: 2px; ' + (service.is_active_service ? 'right: 2px;' : 'left: 2px;') + ' width: 20px; height: 20px; background: white; border-radius: 50%; transition: all 0.3s; box-shadow: 0 2px 4px rgba(0,0,0,0.2);"></div>' +
+                        '</div>' +
+                        '</div></td>';
+                    tr.append(isActiveToggle);
+                    let isPinnedToggle = '<td class="for_db_table_zen_services" style="border: 1px solid #ddd; text-align: center;"><div class="cell_inner_wrapper_div for_db_table_zen_services for_db_column_is_pinned_service">' +
+                        '<div class="grove-toggle-switch grove-pinned-toggle" data-service-id="' + service.service_id + '" style="position: relative; width: 50px; height: 24px; background: ' + (service.is_pinned_service ? '#4CAF50' : '#ccc') + '; border-radius: 12px; cursor: pointer; transition: background 0.3s; margin: 0 auto;">' +
+                        '<div class="grove-toggle-knob" style="position: absolute; top: 2px; ' + (service.is_pinned_service ? 'right: 2px;' : 'left: 2px;') + ' width: 20px; height: 20px; background: white; border-radius: 50%; transition: all 0.3s; box-shadow: 0 2px 4px rgba(0,0,0,0.2);"></div>' +
+                        '</div>' +
+                        '</div></td>';
+                    tr.append(isPinnedToggle);
+                    
+                    // Remaining columns in existing order
                     tr.append('<td class="for_db_table_zen_services" style="border: 1px solid #ddd; cursor: pointer;" data-field="suggested_url_slug" data-id="' + service.service_id + '"><div class="cell_inner_wrapper_div for_db_table_zen_services for_db_column_suggested_url_slug">' + (service.suggested_url_slug || '') + '</div></td>');
                     tr.append('<td class="for_db_table_zen_services" style="border: 1px solid #ddd; cursor: pointer;" data-field="service_placard" data-id="' + service.service_id + '"><div class="cell_inner_wrapper_div for_db_table_zen_services for_db_column_service_placard">' + (service.service_placard || '') + '</div></td>');
                     tr.append('<td class="for_db_table_zen_services" style="border: 1px solid #ddd; cursor: pointer;" data-field="service_moniker" data-id="' + service.service_id + '"><div class="cell_inner_wrapper_div for_db_table_zen_services for_db_column_service_moniker">' + (service.service_moniker || '') + '</div></td>');
                     tr.append('<td class="for_db_table_zen_services" style="border: 1px solid #ddd; cursor: pointer;" data-field="service_slug_id" data-id="' + service.service_id + '"><div class="cell_inner_wrapper_div for_db_table_zen_services for_db_column_service_slug_id">' + (service.service_slug_id || '') + '</div></td>');
-                    tr.append('<td class="for_db_table_zen_services" style="border: 1px solid #ddd; cursor: pointer;" data-field="description1_short" data-id="' + service.service_id + '"><div class="cell_inner_wrapper_div for_db_table_zen_services for_db_column_description1_short">' + (service.description1_short || '') + '</div></td>');
                     tr.append('<td class="for_db_table_zen_services" style="border: 1px solid #ddd; cursor: pointer;" data-field="description1_long" data-id="' + service.service_id + '"><div class="cell_inner_wrapper_div for_db_table_zen_services for_db_column_description1_long">' + (service.description1_long || '') + '</div></td>');
-                    tr.append('<td class="for_db_table_zen_services" style="border: 1px solid #ddd; text-align: center;"><div class="cell_inner_wrapper_div for_db_table_zen_services for_db_column_is_pinned_service">' + (service.is_pinned_service ? 'Yes' : 'No') + '</div></td>');
                     
                     // Image column with only buttons and ID
                     let imageCell = '<td class="for_db_table_zen_services image-cell" style="border: 1px solid #ddd; text-align: center;" data-id="' + service.service_id + '"><div class="cell_inner_wrapper_div for_db_table_zen_services for_db_column_rel_image1_id">';
@@ -2932,21 +3093,21 @@ class Grove_Admin {
             // Nebularis export functions
             function exportToMarkdown() {
                 let markdownContent = '# Grove Services Export\n\n';
-                markdownContent += '| Service ID | Service Name | Suggested URL Slug | Service Placard | Service Moniker | Service Slug ID | Description Short | Description Long | Image ID | ASN Service Page ID | Is Pinned |\n';
-                markdownContent += '|------------|--------------|-------------------|-----------------|-----------------|-----------------|-------------------|------------------|----------|---------------------|----------|\n';
+                markdownContent += '| Service ID | Service Name | Suggested URL Slug | Service Placard | Service Moniker | Service Slug ID | Description Short | Description Long | Is Active | Is Pinned | Image ID | ASN Service Page ID |\n';
+                markdownContent += '|------------|--------------|-------------------|-----------------|-----------------|-----------------|-------------------|------------------|-----------|-----------|----------|---------------------|\n';
                 
                 currentData.forEach(function(service) {
-                    markdownContent += `| ${service.service_id || ''} | ${service.service_name || ''} | ${service.suggested_url_slug || ''} | ${service.service_placard || ''} | ${service.service_moniker || ''} | ${service.service_slug_id || ''} | ${service.description1_short || ''} | ${service.description1_long || ''} | ${service.rel_image1_id || ''} | ${service.asn_service_page_id || ''} | ${service.is_pinned_service ? 'Yes' : 'No'} |\n`;
+                    markdownContent += `| ${service.service_id || ''} | ${service.service_name || ''} | ${service.suggested_url_slug || ''} | ${service.service_placard || ''} | ${service.service_moniker || ''} | ${service.service_slug_id || ''} | ${service.description1_short || ''} | ${service.description1_long || ''} | ${service.is_active_service ? 'Yes' : 'No'} | ${service.is_pinned_service ? 'Yes' : 'No'} | ${service.rel_image1_id || ''} | ${service.asn_service_page_id || ''} |\n`;
                 });
                 
                 downloadFile(markdownContent, 'grove-services-export.md', 'text/markdown');
             }
             
             function exportToXLSCopy() {
-                let xlsContent = 'Service ID\tService Name\tSuggested URL Slug\tService Placard\tService Moniker\tService Slug ID\tDescription Short\tDescription Long\tImage ID\tASN Service Page ID\tIs Pinned\n';
+                let xlsContent = 'Service ID\tService Name\tSuggested URL Slug\tService Placard\tService Moniker\tService Slug ID\tDescription Short\tDescription Long\tIs Active\tIs Pinned\tImage ID\tASN Service Page ID\n';
                 
                 currentData.forEach(function(service) {
-                    xlsContent += `${service.service_id || ''}\t${service.service_name || ''}\t${service.suggested_url_slug || ''}\t${service.service_placard || ''}\t${service.service_moniker || ''}\t${service.service_slug_id || ''}\t${service.description1_short || ''}\t${service.description1_long || ''}\t${service.rel_image1_id || ''}\t${service.asn_service_page_id || ''}\t${service.is_pinned_service ? 'Yes' : 'No'}\n`;
+                    xlsContent += `${service.service_id || ''}\t${service.service_name || ''}\t${service.suggested_url_slug || ''}\t${service.service_placard || ''}\t${service.service_moniker || ''}\t${service.service_slug_id || ''}\t${service.description1_short || ''}\t${service.description1_long || ''}\t${service.is_active_service ? 'Yes' : 'No'}\t${service.is_pinned_service ? 'Yes' : 'No'}\t${service.rel_image1_id || ''}\t${service.asn_service_page_id || ''}\n`;
                 });
                 
                 navigator.clipboard.writeText(xlsContent).then(function() {
@@ -2967,13 +3128,14 @@ class Grove_Admin {
                 sqlContent += '  service_slug_id INT,\n';
                 sqlContent += '  description1_short TEXT,\n';
                 sqlContent += '  description1_long TEXT,\n';
+                sqlContent += '  is_active_service BOOLEAN,\n';
+                sqlContent += '  is_pinned_service BOOLEAN,\n';
                 sqlContent += '  rel_image1_id INT,\n';
-                sqlContent += '  asn_service_page_id INT,\n';
-                sqlContent += '  is_pinned_service BOOLEAN\n';
+                sqlContent += '  asn_service_page_id INT\n';
                 sqlContent += ');\n\n';
                 
                 currentData.forEach(function(service) {
-                    sqlContent += `INSERT INTO grove_services_export VALUES (${service.service_id || 'NULL'}, '${(service.service_name || '').replace(/'/g, "''")}', '${(service.suggested_url_slug || '').replace(/'/g, "''")}', '${(service.service_placard || '').replace(/'/g, "''")}', '${(service.service_moniker || '').replace(/'/g, "''")}', ${service.service_slug_id || 'NULL'}, '${(service.description1_short || '').replace(/'/g, "''")}', '${(service.description1_long || '').replace(/'/g, "''")}', ${service.rel_image1_id || 'NULL'}, ${service.asn_service_page_id || 'NULL'}, ${service.is_pinned_service ? 'TRUE' : 'FALSE'});\n`;
+                    sqlContent += `INSERT INTO grove_services_export VALUES (${service.service_id || 'NULL'}, '${(service.service_name || '').replace(/'/g, "''")}', '${(service.suggested_url_slug || '').replace(/'/g, "''")}', '${(service.service_placard || '').replace(/'/g, "''")}', '${(service.service_moniker || '').replace(/'/g, "''")}', ${service.service_slug_id || 'NULL'}, '${(service.description1_short || '').replace(/'/g, "''")}', '${(service.description1_long || '').replace(/'/g, "''")}', ${service.is_active_service ? 'TRUE' : 'FALSE'}, ${service.is_pinned_service ? 'TRUE' : 'FALSE'}, ${service.rel_image1_id || 'NULL'}, ${service.asn_service_page_id || 'NULL'});\n`;
                 });
                 
                 downloadFile(sqlContent, 'grove-services-export.sql', 'text/sql');
@@ -3718,7 +3880,7 @@ class Grove_Admin {
                 
                 // Count actual columns in the table, excluding wolf exclusion band columns
                 let totalTableCols = $('#services-table thead tr:last th').length;
-                const wolfBandColumnCount = 4; // checkbox, service_id, service_name, suggested_url_slug
+                const wolfBandColumnCount = 3; // checkbox, service_id, service_name
                 totalDataCols = Math.max(0, totalTableCols - wolfBandColumnCount);
                 
                 if (currentRowsPerPage === 'all') {
@@ -3789,8 +3951,8 @@ class Grove_Admin {
             // Separate function for column pagination with Wolf Exclusion Band support
             function applyColumnPagination() {
                 if (currentColsPerPage !== 'all') {
-                    // Wolf Exclusion Band: checkbox + service_id + service_name + suggested_url_slug (indices 0,1,2,3)
-                    const wolfBandIndices = [0, 1, 2, 3]; // checkbox, service_id, service_name, suggested_url_slug
+                    // Wolf Exclusion Band: checkbox + service_id + service_name (indices 0,1,2)
+                    const wolfBandIndices = [0, 1, 2]; // checkbox, service_id, service_name
                     const wolfBandCount = wolfBandIndices.length;
                     
                     // Calculate paginated column range (starts after wolf band)
@@ -3824,7 +3986,7 @@ class Grove_Admin {
                     });
                 } else {
                     // "All" option: Show all columns but maintain wolf exclusion band
-                    const wolfBandIndices = [0, 1, 2, 3]; // checkbox, service_id, service_name, suggested_url_slug
+                    const wolfBandIndices = [0, 1, 2]; // checkbox, service_id, service_name
                     
                     // Apply to each header row separately
                     $('#services-table thead tr').each(function() {
@@ -4668,6 +4830,98 @@ class Grove_Admin {
             wp_send_json_success('Field updated successfully');
         } catch (Exception $e) {
             wp_send_json_error('Error updating field: ' . $e->getMessage());
+        }
+    }
+    
+    /**
+     * AJAX: Update service active status
+     */
+    public function grove_services_update_active_status() {
+        check_ajax_referer('grove_services_nonce', 'nonce');
+        
+        if (!current_user_can('manage_options')) {
+            wp_die('Unauthorized');
+        }
+        
+        $service_id = intval($_POST['service_id']);
+        $is_active = intval($_POST['is_active']);
+        
+        if ($service_id <= 0) {
+            wp_send_json_error('Invalid service ID');
+            return;
+        }
+        
+        if ($is_active !== 0 && $is_active !== 1) {
+            wp_send_json_error('Invalid active status value');
+            return;
+        }
+        
+        global $wpdb;
+        $table_name = $wpdb->prefix . 'zen_services';
+        
+        try {
+            $result = $wpdb->update(
+                $table_name,
+                array('is_active_service' => $is_active),
+                array('service_id' => $service_id),
+                array('%d'),
+                array('%d')
+            );
+            
+            if ($result === false) {
+                wp_send_json_error('Database update failed: ' . $wpdb->last_error);
+                return;
+            }
+            
+            wp_send_json_success('Service status updated successfully');
+        } catch (Exception $e) {
+            wp_send_json_error('Error updating service status: ' . $e->getMessage());
+        }
+    }
+    
+    /**
+     * AJAX: Update service pinned status
+     */
+    public function grove_services_update_pinned_status() {
+        check_ajax_referer('grove_services_nonce', 'nonce');
+        
+        if (!current_user_can('manage_options')) {
+            wp_die('Unauthorized');
+        }
+        
+        $service_id = intval($_POST['service_id']);
+        $is_pinned = intval($_POST['is_pinned']);
+        
+        if ($service_id <= 0) {
+            wp_send_json_error('Invalid service ID');
+            return;
+        }
+        
+        if ($is_pinned !== 0 && $is_pinned !== 1) {
+            wp_send_json_error('Invalid pinned status value');
+            return;
+        }
+        
+        global $wpdb;
+        $table_name = $wpdb->prefix . 'zen_services';
+        
+        try {
+            $result = $wpdb->update(
+                $table_name,
+                array('is_pinned_service' => $is_pinned),
+                array('service_id' => $service_id),
+                array('%d'),
+                array('%d')
+            );
+            
+            if ($result === false) {
+                wp_send_json_error('Database update failed: ' . $wpdb->last_error);
+                return;
+            }
+            
+            wp_send_json_success('Service pinned status updated successfully');
+        } catch (Exception $e) {
+            wp_send_json_error('Error updating pinned status: ' . $e->getMessage());
         }
     }
     
