@@ -468,6 +468,35 @@ class Grove_Admin {
             right: auto !important;
             left: 2px !important;
         }
+        
+        /* Table sorting styles */
+        #services-table th[data-sort] {
+            cursor: pointer;
+            position: relative;
+            user-select: none;
+        }
+        
+        #services-table th[data-sort]:hover {
+            background-color: #e9ecef !important;
+        }
+        
+        #services-table th[data-sort]:after {
+            content: '↕';
+            position: absolute;
+            right: 8px;
+            color: #999;
+            font-size: 10px;
+        }
+        
+        #services-table th[data-sort].sort-asc:after {
+            content: '↑';
+            color: #007cba;
+        }
+        
+        #services-table th[data-sort].sort-desc:after {
+            content: '↓';
+            color: #007cba;
+        }
         </style>
         
         <script type="text/javascript">
@@ -3184,6 +3213,67 @@ class Grove_Admin {
                 document.body.removeChild(textArea);
             }
             
+            // Table sorting functionality
+            let currentSort = { column: null, direction: 'asc' };
+            
+            $(document).on('click', '#services-table th[data-sort]', function(e) {
+                let column = $(this).data('sort');
+                
+                // Toggle direction if clicking same column, otherwise default to asc
+                if (currentSort.column === column) {
+                    currentSort.direction = currentSort.direction === 'asc' ? 'desc' : 'asc';
+                } else {
+                    currentSort.column = column;
+                    currentSort.direction = 'asc';
+                }
+                
+                // Update visual indicators
+                $('#services-table th[data-sort]').removeClass('sort-asc sort-desc');
+                $(this).addClass('sort-' + currentSort.direction);
+                
+                // Sort the data
+                sortServicesData();
+            });
+            
+            function sortServicesData() {
+                if (!currentSort.column || !filteredData.length) return;
+                
+                filteredData.sort(function(a, b) {
+                    let aVal = a[currentSort.column];
+                    let bVal = b[currentSort.column];
+                    
+                    // Handle null/undefined values
+                    if (aVal == null) aVal = '';
+                    if (bVal == null) bVal = '';
+                    
+                    // For numeric columns, convert to numbers
+                    if (currentSort.column === 'position_in_custom_order' || 
+                        currentSort.column === 'service_id' || 
+                        currentSort.column === 'rel_image1_id' || 
+                        currentSort.column === 'rel_icon_image_id' ||
+                        currentSort.column === 'asn_service_page_id') {
+                        aVal = parseInt(aVal) || 0;
+                        bVal = parseInt(bVal) || 0;
+                    } else {
+                        // For text columns, convert to lowercase strings
+                        aVal = aVal.toString().toLowerCase();
+                        bVal = bVal.toString().toLowerCase();
+                    }
+                    
+                    if (currentSort.direction === 'asc') {
+                        return aVal < bVal ? -1 : (aVal > bVal ? 1 : 0);
+                    } else {
+                        return aVal > bVal ? -1 : (aVal < bVal ? 1 : 0);
+                    }
+                });
+                
+                // Rebuild table with sorted data
+                displayData();
+                
+                // Reapply column pagination to maintain column visibility state
+                applyColumnPagination();
+            }
+            
             $(document).on('click', '.delete-image-btn, .delete-icon-image-btn', function(e) {
                 e.preventDefault();
                 e.stopPropagation();
@@ -3273,7 +3363,7 @@ class Grove_Admin {
                     // Position in custom order column with editable input
                     let positionCell = '<td class="for_db_table_zen_services" style="border: 1px solid #ddd; text-align: center;"><div class="cell_inner_wrapper_div for_db_table_zen_services for_db_column_position_in_custom_order">' +
                         '<div style="display: flex; align-items: center; justify-content: center; gap: 4px;">' +
-                        '<input type="number" class="position-input" data-service-id="' + service.service_id + '" value="0" style="width: 60px; padding: 4px; border: 1px solid #ddd; border-radius: 3px; text-align: center;">' +
+                        '<input type="number" class="position-input" data-service-id="' + service.service_id + '" value="' + (service.position_in_custom_order || 0) + '" style="width: 60px; padding: 4px; border: 1px solid #ddd; border-radius: 3px; text-align: center;">' +
                         '<button class="position-clear-btn" data-service-id="' + service.service_id + '" style="padding: 4px 6px; background: #fffacd; border: 1px solid #ddd; border-radius: 3px; font-size: 11px; cursor: pointer;">CL</button>' +
                         '</div>' +
                         '</div></td>';
