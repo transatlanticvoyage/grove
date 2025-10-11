@@ -76,6 +76,9 @@ class Grove_Zen_Shortcodes {
         // Special phone href shortcode for Elementor Dynamic Tags
         add_shortcode('special_phone_href_value_1', array($this, 'render_special_phone_href_value_1'));
         
+        // Special phone href shortcode for raw HTML (closing shortcode)
+        add_shortcode('special_phone_href_for_raw_html', array($this, 'render_special_phone_href_for_raw_html'));
+        
         // Factory codes shortcodes
         add_shortcode('sitespren_phone_link', array($this, 'render_sitespren_phone_link'));
         
@@ -868,6 +871,64 @@ class Grove_Zen_Shortcodes {
         
         // Return clean tel: URL with + prefix
         return 'tel:+' . $full_digits;
+    }
+    
+    /**
+     * Render special phone href for raw HTML (closing shortcode)
+     * Creates a clickable phone link wrapping inner content
+     * Usage: [special_phone_href_for_raw_html class="btn btn-primary"]Call us![/special_phone_href_for_raw_html]
+     */
+    public function render_special_phone_href_for_raw_html($atts, $content = null) {
+        // Default attributes
+        $atts = shortcode_atts(array(
+            'wppma_id' => '1',
+            'class' => '',
+            'rel' => '',
+            'target' => '',
+            'aria_label' => ''
+        ), $atts, 'special_phone_href_for_raw_html');
+        
+        // Get sitespren data using existing shortcodes
+        $country_code = do_shortcode('[sitespren dbcol="driggs_phone_country_code" wppma_id="' . $atts['wppma_id'] . '"]');
+        $phone_number = do_shortcode('[sitespren dbcol="driggs_phone_1" wppma_id="' . $atts['wppma_id'] . '"]');
+        
+        // Normalize: keep only digits from both country code and phone number
+        $cc_digits = preg_replace('/[^0-9]/', '', $country_code);
+        $phone_digits = preg_replace('/[^0-9]/', '', $phone_number);
+        
+        // Combine and ensure we have digits
+        $full_digits = $cc_digits . $phone_digits;
+        
+        if (empty($full_digits)) {
+            // If no phone number found, just return the processed content without link
+            return do_shortcode($content);
+        }
+        
+        // Build tel: URL
+        $href = 'tel:+' . $full_digits;
+        
+        // Process inner content (allows nested shortcodes like [phone_local])
+        $label = do_shortcode($content);
+        
+        // Build link attributes
+        $attrs = array();
+        $attrs[] = 'href="' . esc_url($href) . '"';
+        
+        if (!empty($atts['class'])) {
+            $attrs[] = 'class="' . esc_attr($atts['class']) . '"';
+        }
+        if (!empty($atts['rel'])) {
+            $attrs[] = 'rel="' . esc_attr($atts['rel']) . '"';
+        }
+        if (!empty($atts['target'])) {
+            $attrs[] = 'target="' . esc_attr($atts['target']) . '"';
+        }
+        if (!empty($atts['aria_label'])) {
+            $attrs[] = 'aria-label="' . esc_attr($atts['aria_label']) . '"';
+        }
+        
+        // Return complete anchor tag
+        return '<a ' . implode(' ', $attrs) . '>' . wp_kses_post($label) . '</a>';
     }
     
     /**
