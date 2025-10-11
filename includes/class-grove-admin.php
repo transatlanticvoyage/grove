@@ -2646,6 +2646,7 @@ class Grove_Admin {
                             <th style="padding: 8px; border: 1px solid #ddd; background: #f8f9fa; font-weight: bold;">is_pinned</th>
                             <th style="padding: 8px; border: 1px solid #ddd; background: #f8f9fa; font-weight: bold;">basic link list 1</th>
                             <th style="padding: 8px; border: 1px solid #ddd; background: #f8f9fa; font-weight: bold;">hyena widget 1</th>
+                            <th style="padding: 8px; border: 1px solid #ddd; background: #f8f9fa; font-weight: bold;">option list 1 for form</th>
                         </tr>
                     </thead>
                     <tbody>
@@ -2658,6 +2659,9 @@ class Grove_Admin {
                             <td style="padding: 8px; border: 1px solid #ddd; text-align: center;">
                                 <button class="venmo-copy-btn" style="padding: 4px 8px; background: #007cba; color: white; border: none; border-radius: 3px; cursor: pointer;">copy</button>
                             </td>
+                            <td style="padding: 8px; border: 1px solid #ddd; text-align: center;">
+                                <button class="venmo-copy-btn option-list-copy" data-filter="active" data-pinned="any" style="padding: 4px 8px; background: #007cba; color: white; border: none; border-radius: 3px; cursor: pointer;">copy</button>
+                            </td>
                         </tr>
                         <tr>
                             <td style="padding: 8px; border: 1px solid #ddd; text-align: center;">yes</td>
@@ -2667,6 +2671,9 @@ class Grove_Admin {
                             </td>
                             <td style="padding: 8px; border: 1px solid #ddd; text-align: center;">
                                 <button class="venmo-copy-btn" style="padding: 4px 8px; background: #007cba; color: white; border: none; border-radius: 3px; cursor: pointer;">copy</button>
+                            </td>
+                            <td style="padding: 8px; border: 1px solid #ddd; text-align: center;">
+                                <button class="venmo-copy-btn option-list-copy" data-filter="active" data-pinned="pinned" style="padding: 4px 8px; background: #007cba; color: white; border: none; border-radius: 3px; cursor: pointer;">copy</button>
                             </td>
                         </tr>
                         <tr>
@@ -2677,6 +2684,9 @@ class Grove_Admin {
                             </td>
                             <td style="padding: 8px; border: 1px solid #ddd; text-align: center;">
                                 <button class="venmo-copy-btn" style="padding: 4px 8px; background: #007cba; color: white; border: none; border-radius: 3px; cursor: pointer;">copy</button>
+                            </td>
+                            <td style="padding: 8px; border: 1px solid #ddd; text-align: center;">
+                                <button class="venmo-copy-btn option-list-copy" data-filter="active" data-pinned="not-pinned" style="padding: 4px 8px; background: #007cba; color: white; border: none; border-radius: 3px; cursor: pointer;">copy</button>
                             </td>
                         </tr>
                         <tr>
@@ -2687,6 +2697,9 @@ class Grove_Admin {
                             </td>
                             <td style="padding: 8px; border: 1px solid #ddd; text-align: center;">
                                 <button class="venmo-copy-btn" style="padding: 4px 8px; background: #007cba; color: white; border: none; border-radius: 3px; cursor: pointer;">copy</button>
+                            </td>
+                            <td style="padding: 8px; border: 1px solid #ddd; text-align: center;">
+                                <button class="venmo-copy-btn option-list-copy" data-filter="inactive" data-pinned="any" style="padding: 4px 8px; background: #007cba; color: white; border: none; border-radius: 3px; cursor: pointer;">copy</button>
                             </td>
                         </tr>
                     </tbody>
@@ -3103,12 +3116,18 @@ class Grove_Admin {
             $(document).on('click', '.venmo-copy-btn', function(e) {
                 e.preventDefault();
                 
-                // Check if this is a basic link list copy button (not hyena widget)
-                let isBasicLinkList = $(this).closest('td').index() === 2; // 3rd column (0-indexed)
+                // Check which column this button is in
+                let columnIndex = $(this).closest('td').index();
+                let isBasicLinkList = columnIndex === 2; // 3rd column (0-indexed)
+                let isHyenaWidget = columnIndex === 3; // 4th column (0-indexed)
+                let isOptionList = $(this).hasClass('option-list-copy'); // New option list column
                 
-                if (!isBasicLinkList) {
+                if (isHyenaWidget) {
                     // Hyena widget functionality not implemented yet
                     alert('Hyena widget functionality not implemented yet');
+                    return;
+                } else if (!isBasicLinkList && !isOptionList) {
+                    alert('Unknown copy button type');
                     return;
                 }
                 
@@ -3151,34 +3170,43 @@ class Grove_Admin {
                     },
                     success: function(response) {
                         if (response.success) {
-                            // Build the HTML string from all the links
-                            let htmlString = '';
-                            response.data.forEach(function(link) {
-                                htmlString += link.html;
-                            });
+                            let finalText = '';
+                            
+                            if (isOptionList) {
+                                // Format as option list for form
+                                response.data.forEach(function(link) {
+                                    finalText += '<option>' + link.service_name + '</option>\n';
+                                });
+                            } else {
+                                // Basic link list format (existing functionality)
+                                response.data.forEach(function(link) {
+                                    finalText += link.html;
+                                });
+                            }
                             
                             // Copy to clipboard
                             if (navigator.clipboard && window.isSecureContext) {
                                 // Modern async clipboard API
-                                navigator.clipboard.writeText(htmlString).then(function() {
-                                    alert('Links copied to clipboard! (' + response.data.length + ' links)');
+                                navigator.clipboard.writeText(finalText).then(function() {
+                                    let formatType = isOptionList ? 'option list' : 'links';
+                                    alert(formatType + ' copied to clipboard! (' + response.data.length + ' items)');
                                 }).catch(function(err) {
                                     console.error('Failed to copy: ', err);
-                                    fallbackCopyTextToClipboard(htmlString);
+                                    fallbackCopyTextToClipboard(finalText);
                                 });
                             } else {
                                 // Fallback for older browsers
-                                fallbackCopyTextToClipboard(htmlString);
+                                fallbackCopyTextToClipboard(finalText);
                             }
                         } else {
-                            alert('Error generating links: ' + (response.data || 'Unknown error'));
+                            alert('Error generating content: ' + (response.data || 'Unknown error'));
                         }
                         
                         // Re-enable button
                         btn.prop('disabled', false).text('copy');
                     },
                     error: function(xhr, status, error) {
-                        alert('Error generating links: Network error - ' + error);
+                        alert('Error generating content: Network error - ' + error);
                         btn.prop('disabled', false).text('copy');
                     }
                 });
