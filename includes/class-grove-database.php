@@ -12,7 +12,7 @@ if (file_exists(dirname(dirname(dirname(__FILE__))) . '/shenzi-shared-db-schema/
  */
 class Grove_Database {
     
-    const ZEN_DB_VERSION = '2.2';
+    const ZEN_DB_VERSION = '2.3';
     
     public function __construct() {
         // Check and create tables on initialization
@@ -153,6 +153,9 @@ class Grove_Database {
             driggs_hours_friday text DEFAULT NULL,
             driggs_hours_saturday text DEFAULT NULL,
             driggs_hours_sunday text DEFAULT NULL,
+            driggs_raven_contact_short_path text DEFAULT NULL,
+            driggs_raven_contact_long_url text DEFAULT NULL,
+            driggs_raven_method text DEFAULT 'short_path',
             ns_full varchar(255) DEFAULT NULL,
             ip_address varchar(45) DEFAULT NULL,
             is_starred1 varchar(10) DEFAULT NULL,
@@ -245,6 +248,9 @@ class Grove_Database {
             driggs_hours_friday text DEFAULT NULL,
             driggs_hours_saturday text DEFAULT NULL,
             driggs_hours_sunday text DEFAULT NULL,
+            driggs_raven_contact_short_path text DEFAULT NULL,
+            driggs_raven_contact_long_url text DEFAULT NULL,
+            driggs_raven_method text DEFAULT 'short_path',
             ns_full varchar(255) DEFAULT NULL,
             ip_address varchar(45) DEFAULT NULL,
             is_starred1 varchar(10) DEFAULT NULL,

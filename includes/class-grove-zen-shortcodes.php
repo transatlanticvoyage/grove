@@ -79,6 +79,9 @@ class Grove_Zen_Shortcodes {
         // Special phone href shortcode for raw HTML (closing shortcode)
         add_shortcode('special_phone_href_for_raw_html', array($this, 'render_special_phone_href_for_raw_html'));
         
+        // Raven contact link shortcode for Elementor Dynamic Tags
+        add_shortcode('raven_contact_link', array($this, 'render_raven_contact_link'));
+        
         // Factory codes shortcodes
         add_shortcode('sitespren_phone_link', array($this, 'render_sitespren_phone_link'));
         
@@ -933,6 +936,43 @@ class Grove_Zen_Shortcodes {
         
         // Return complete anchor tag
         return '<a ' . implode(' ', $attrs) . '>' . wp_kses_post($label) . '</a>';
+    }
+    
+    /**
+     * Render raven contact link for Elementor Dynamic Tags
+     * Returns a complete URL based on method selection
+     * Usage: [raven_contact_link]
+     */
+    public function render_raven_contact_link($atts) {
+        $atts = shortcode_atts(array(
+            'wppma_id' => '1'
+        ), $atts, 'raven_contact_link');
+        
+        // Get sitespren data
+        $sitespren = Grove_Database::get_sitespren(intval($atts['wppma_id']));
+        
+        if (!$sitespren) {
+            return '';
+        }
+        
+        // Get method (default to 'short_path' if not set)
+        $method = isset($sitespren->driggs_raven_method) ? $sitespren->driggs_raven_method : 'short_path';
+        
+        if ($method === 'long_url') {
+            // Method 2: Return full URL directly
+            $long_url = isset($sitespren->driggs_raven_contact_long_url) ? $sitespren->driggs_raven_contact_long_url : '';
+            return !empty($long_url) ? $long_url : '';
+        } else {
+            // Method 1: Build from short path using home_url()
+            $short_path = isset($sitespren->driggs_raven_contact_short_path) ? $sitespren->driggs_raven_contact_short_path : '';
+            
+            if (empty($short_path)) {
+                return '';
+            }
+            
+            // Build complete URL: https://example.com/contact-us/
+            return trailingslashit(home_url()) . trailingslashit($short_path);
+        }
     }
     
     /**

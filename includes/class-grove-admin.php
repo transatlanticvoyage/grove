@@ -49,6 +49,7 @@ class Grove_Admin {
         add_action('wp_ajax_grove_export_csv', array($this, 'grove_export_csv'));
         add_action('wp_ajax_grove_export_nova_beluga_both', array($this, 'grove_export_nova_beluga_both'));
         add_action('wp_ajax_grove_save_hours', array($this, 'grove_save_hours'));
+        add_action('wp_ajax_grove_save_raven_settings', array($this, 'grove_save_raven_settings'));
         add_action('wp_ajax_grove_export_nova_beluga_friendly', array($this, 'grove_export_nova_beluga_friendly'));
         add_action('wp_ajax_grove_get_friendly_name', array($this, 'grove_get_friendly_name'));
         add_action('wp_ajax_grove_get_all_friendly_names', array($this, 'grove_get_all_friendly_names'));
@@ -203,6 +204,15 @@ class Grove_Admin {
             'manage_options',
             'grove_cache_manager',
             array($this, 'grove_cache_manager_page')
+        );
+        
+        add_submenu_page(
+            'grovehub',
+            'Grove Misc Options',
+            'grove_misc_options',
+            'manage_options',
+            'grove_misc_options',
+            array($this, 'grove_misc_options_page')
         );
     }
     
@@ -9836,5 +9846,211 @@ class Grove_Admin {
         }
         
         wp_send_json_success('Hours saved successfully');
+    }
+    
+    /**
+     * Grove Misc Options page
+     */
+    public function grove_misc_options_page() {
+        // AGGRESSIVE NOTICE SUPPRESSION - Remove ALL WordPress admin notices
+        $this->suppress_all_admin_notices();
+        
+        // Load existing raven contact data from database
+        global $wpdb;
+        $table_name = $wpdb->prefix . 'zen_sitespren';
+        $raven_data = $wpdb->get_row($wpdb->prepare(
+            "SELECT driggs_raven_contact_short_path, driggs_raven_contact_long_url, driggs_raven_method FROM $table_name WHERE wppma_id = %d",
+            1
+        ), ARRAY_A);
+        
+        // Set defaults if no data exists
+        $current_method = isset($raven_data['driggs_raven_method']) ? $raven_data['driggs_raven_method'] : 'short_path';
+        $current_short_path = isset($raven_data['driggs_raven_contact_short_path']) ? $raven_data['driggs_raven_contact_short_path'] : '';
+        $current_long_url = isset($raven_data['driggs_raven_contact_long_url']) ? $raven_data['driggs_raven_contact_long_url'] : '';
+        
+        ?>
+        <div class="wrap" style="margin: 0; padding: 0;">
+            <!-- Allow space for WordPress notices -->
+            <div style="height: 20px;"></div>
+            
+            <div style="padding: 20px;">
+                <h1>Grove Misc Options</h1>
+                
+                <!-- Raven Contact Link Settings -->
+                <div style="background: white; border: 1px solid #ddd; border-radius: 5px; padding: 20px; margin-bottom: 20px;">
+                    <h2 style="margin-top: 0; margin-bottom: 20px;">Raven Contact Link Settings</h2>
+                    <p style="margin-bottom: 20px; color: #666;">Configure how the <code>[raven_contact_link]</code> shortcode generates URLs for Elementor buttons.</p>
+                    
+                    <!-- Method Selection -->
+                    <div style="margin-bottom: 20px;">
+                        <label style="display: block; font-weight: bold; margin-bottom: 8px;">URL Generation Method:</label>
+                        <select id="raven-method" style="padding: 8px; border: 1px solid #ccc; border-radius: 4px; width: 200px;">
+                            <option value="short_path" <?php echo ($current_method === 'short_path') ? 'selected' : ''; ?>>Short Path (Recommended)</option>
+                            <option value="long_url" <?php echo ($current_method === 'long_url') ? 'selected' : ''; ?>>Full URL</option>
+                        </select>
+                    </div>
+                    
+                    <!-- Short Path Input -->
+                    <div id="short-path-section" style="margin-bottom: 20px; <?php echo ($current_method === 'long_url') ? 'display: none;' : ''; ?>">
+                        <label for="raven-short-path" style="display: block; font-weight: bold; margin-bottom: 8px;">Contact Page Path:</label>
+                        <div style="display: flex; align-items: center; gap: 10px; margin-bottom: 8px;">
+                            <span style="color: #666; font-family: monospace;"><?php echo home_url(); ?>/</span>
+                            <input type="text" id="raven-short-path" value="<?php echo esc_attr($current_short_path); ?>" placeholder="contact-us" style="padding: 8px; border: 1px solid #ccc; border-radius: 4px; width: 200px;">
+                            <span style="color: #666; font-family: monospace;">/</span>
+                        </div>
+                        <p style="margin: 0; font-size: 12px; color: #666;">Example: "contact-us" becomes "<?php echo home_url(); ?>/contact-us/"</p>
+                    </div>
+                    
+                    <!-- Long URL Input -->
+                    <div id="long-url-section" style="margin-bottom: 20px; <?php echo ($current_method === 'short_path') ? 'display: none;' : ''; ?>">
+                        <label for="raven-long-url" style="display: block; font-weight: bold; margin-bottom: 8px;">Full Contact URL:</label>
+                        <input type="text" id="raven-long-url" value="<?php echo esc_attr($current_long_url); ?>" placeholder="https://example.com/contact/" style="padding: 8px; border: 1px solid #ccc; border-radius: 4px; width: 400px;">
+                        <p style="margin: 8px 0 0 0; font-size: 12px; color: #666;">Enter the complete URL including protocol (https://)</p>
+                    </div>
+                    
+                    <!-- Save Button -->
+                    <div style="margin-top: 20px;">
+                        <button type="button" id="save-raven-settings" style="padding: 10px 20px; background: #0073aa; color: white; border: none; border-radius: 4px; cursor: pointer; font-weight: bold;">
+                            Save Raven Settings
+                        </button>
+                        <span id="raven-save-status" style="margin-left: 15px; color: #46b450; font-weight: bold; display: none;">✓ Saved!</span>
+                    </div>
+                    
+                    <!-- Shortcode Usage -->
+                    <div style="margin-top: 30px; padding: 15px; background: #f0f8ff; border: 1px solid #b3d9ff; border-radius: 4px;">
+                        <h4 style="margin-top: 0; margin-bottom: 10px;">Shortcode Usage:</h4>
+                        <div style="display: flex; align-items: center; gap: 10px; margin-bottom: 10px;">
+                            <input type="text" value="[raven_contact_link]" readonly style="padding: 8px; font-family: monospace; background: white; border: 1px solid #ccc; border-radius: 3px; width: 200px;">
+                            <button type="button" onclick="copyRavenShortcode()" style="padding: 8px 16px; background: #28a745; color: white; border: none; border-radius: 3px; cursor: pointer;">Copy</button>
+                        </div>
+                        <p style="margin: 0; font-size: 12px; color: #666;">Use this shortcode in Elementor Dynamic Tags for button link fields.</p>
+                    </div>
+                </div>
+                
+                <!-- JavaScript for dynamic UI and AJAX -->
+                <script>
+                jQuery(document).ready(function($) {
+                    // Handle method selection changes
+                    $('#raven-method').on('change', function() {
+                        var method = $(this).val();
+                        if (method === 'short_path') {
+                            $('#short-path-section').show();
+                            $('#long-url-section').hide();
+                        } else {
+                            $('#short-path-section').hide();
+                            $('#long-url-section').show();
+                        }
+                    });
+                    
+                    // Handle save button click
+                    $('#save-raven-settings').on('click', function() {
+                        var button = $(this);
+                        var statusSpan = $('#raven-save-status');
+                        
+                        var method = $('#raven-method').val();
+                        var shortPath = $('#raven-short-path').val();
+                        var longUrl = $('#raven-long-url').val();
+                        
+                        button.prop('disabled', true).text('Saving...');
+                        statusSpan.hide();
+                        
+                        $.ajax({
+                            url: ajaxurl,
+                            type: 'POST',
+                            data: {
+                                action: 'grove_save_raven_settings',
+                                method: method,
+                                short_path: shortPath,
+                                long_url: longUrl,
+                                _ajax_nonce: '<?php echo wp_create_nonce('grove_raven_nonce'); ?>'
+                            },
+                            success: function(response) {
+                                if (response.success) {
+                                    statusSpan.show().delay(3000).fadeOut();
+                                } else {
+                                    alert('Error saving: ' + response.data);
+                                }
+                                button.prop('disabled', false).text('Save Raven Settings');
+                            },
+                            error: function() {
+                                alert('Error saving raven settings');
+                                button.prop('disabled', false).text('Save Raven Settings');
+                            }
+                        });
+                    });
+                });
+                
+                // Copy shortcode function
+                function copyRavenShortcode() {
+                    const input = event.target.previousElementSibling;
+                    input.select();
+                    input.setSelectionRange(0, 99999);
+                    
+                    try {
+                        document.execCommand("copy");
+                        const button = event.target;
+                        const originalText = button.textContent;
+                        button.textContent = "Copied!";
+                        button.style.background = "#17a2b8";
+                        setTimeout(() => {
+                            button.textContent = originalText;
+                            button.style.background = "#28a745";
+                        }, 2000);
+                    } catch (err) {
+                        alert("Failed to copy shortcode");
+                    }
+                }
+                </script>
+                
+            </div>
+        </div>
+        <?php
+    }
+    
+    /**
+     * AJAX handler for saving raven contact settings
+     */
+    public function grove_save_raven_settings() {
+        // Verify nonce
+        if (!wp_verify_nonce($_POST['_ajax_nonce'], 'grove_raven_nonce')) {
+            wp_send_json_error('Invalid nonce');
+        }
+        
+        // Check user capabilities
+        if (!current_user_can('manage_options')) {
+            wp_send_json_error('Insufficient permissions');
+        }
+        
+        global $wpdb;
+        $table_name = $wpdb->prefix . 'zen_sitespren';
+        
+        // Get form data
+        $method = sanitize_text_field($_POST['method']);
+        $short_path = sanitize_text_field($_POST['short_path']);
+        $long_url = sanitize_url($_POST['long_url']);
+        
+        // Validate method
+        if (!in_array($method, ['short_path', 'long_url'])) {
+            wp_send_json_error('Invalid method');
+        }
+        
+        // Update database
+        $result = $wpdb->update(
+            $table_name,
+            array(
+                'driggs_raven_method' => $method,
+                'driggs_raven_contact_short_path' => $short_path,
+                'driggs_raven_contact_long_url' => $long_url
+            ),
+            array('wppma_id' => 1),
+            array('%s', '%s', '%s'),
+            array('%d')
+        );
+        
+        if ($result === false) {
+            wp_send_json_error('Database update failed');
+        }
+        
+        wp_send_json_success('Raven settings saved successfully');
     }
 }
