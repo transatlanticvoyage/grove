@@ -9281,8 +9281,9 @@ class Grove_Admin {
                                 <th style="padding: 8px; border: 1px solid #ddd; background: #f8f9fa; font-weight: bold;">open time</th>
                                 <th style="padding: 8px; border: 1px solid #ddd; background: #f8f9fa; font-weight: bold;">to</th>
                                 <th style="padding: 8px; border: 1px solid #ddd; background: #f8f9fa; font-weight: bold;">close time</th>
-                                <th style="padding: 8px; border: 1px solid #ddd; background: #f8f9fa; font-weight: bold;">raw db value</th>
+                                <th style="padding: 8px; border: 1px solid #ddd; background: #add8e6; font-weight: bold;">raw db value</th>
                                 <th style="padding: 8px; border: 1px solid #ddd; background: #f8f9fa; font-weight: bold;">populate raw from widgets</th>
+                                <th style="padding: 8px; border: 1px solid #ddd; background: #f8f9fa; font-weight: bold;">shortcode</th>
                             </tr>
                         </thead>
                         <tbody>
@@ -9308,11 +9309,17 @@ class Grove_Admin {
                                         <input type="text" value="7:00 PM" class="close-time-input" style="width: 70px; padding: 4px; border: 1px solid #ccc; border-radius: 3px; text-align: center;" readonly>
                                     </div>
                                 </td>
-                                <td style="padding: 8px; border: 1px solid #ddd; text-align: center;">
-                                    <input type="text" class="raw-db-input" style="width: 120px; padding: 4px; border: 1px solid #ccc; border-radius: 3px; text-align: center;" placeholder="9:00 AM to 7:00 PM">
+                                <td style="padding: 8px; border: 1px solid #ddd; text-align: center; background: #add8e6;">
+                                    <input type="text" class="raw-db-input" style="width: 195px; padding: 4px; border: 1px solid #ccc; border-radius: 3px; text-align: center; background: white;" placeholder="9:00 AM to 7:00 PM">
                                 </td>
                                 <td style="padding: 8px; border: 1px solid #ddd; text-align: center;">
                                     <button class="populate-btn" style="padding: 6px 12px; background: #007cba; color: white; border: none; border-radius: 3px; cursor: pointer;">populate</button>
+                                </td>
+                                <td style="padding: 8px; border: 1px solid #ddd; text-align: center;">
+                                    <div style="display: flex; align-items: center; gap: 5px;">
+                                        <input type="text" class="shortcode-input" readonly style="width: 150px; padding: 4px; border: 1px solid #ccc; border-radius: 3px; text-align: center; background: #f9f9f9;">
+                                        <button class="copy-shortcode-btn" style="padding: 4px 8px; background: #ffc107; border: 1px solid #ddd; border-radius: 3px; cursor: pointer; transition: background-color 0.3s;" onmouseover="this.style.backgroundColor='#e0a800'" onmouseout="this.style.backgroundColor='#ffc107'">copy</button>
+                                    </div>
                                 </td>
                             </tr>
                             <tr>
@@ -9337,11 +9344,17 @@ class Grove_Admin {
                                         <input type="text" value="7:00 PM" class="close-time-input" style="width: 70px; padding: 4px; border: 1px solid #ccc; border-radius: 3px; text-align: center;" readonly>
                                     </div>
                                 </td>
-                                <td style="padding: 8px; border: 1px solid #ddd; text-align: center;">
-                                    <input type="text" class="raw-db-input" style="width: 120px; padding: 4px; border: 1px solid #ccc; border-radius: 3px; text-align: center;" placeholder="9:00 AM to 7:00 PM">
+                                <td style="padding: 8px; border: 1px solid #ddd; text-align: center; background: #add8e6;">
+                                    <input type="text" class="raw-db-input" style="width: 195px; padding: 4px; border: 1px solid #ccc; border-radius: 3px; text-align: center; background: white;" placeholder="9:00 AM to 7:00 PM">
                                 </td>
                                 <td style="padding: 8px; border: 1px solid #ddd; text-align: center;">
                                     <button class="populate-btn" style="padding: 6px 12px; background: #007cba; color: white; border: none; border-radius: 3px; cursor: pointer;">populate</button>
+                                </td>
+                                <td style="padding: 8px; border: 1px solid #ddd; text-align: center;">
+                                    <div style="display: flex; align-items: center; gap: 5px;">
+                                        <input type="text" class="shortcode-input" readonly style="width: 150px; padding: 4px; border: 1px solid #ccc; border-radius: 3px; text-align: center; background: #f9f9f9;">
+                                        <button class="copy-shortcode-btn" style="padding: 4px 8px; background: #ffc107; border: 1px solid #ddd; border-radius: 3px; cursor: pointer; transition: background-color 0.3s;" onmouseover="this.style.backgroundColor='#e0a800'" onmouseout="this.style.backgroundColor='#ffc107'">copy</button>
+                                    </div>
                                 </td>
                             </tr>
                             <tr>
@@ -9366,11 +9379,17 @@ class Grove_Admin {
                                         <input type="text" value="7:00 PM" class="close-time-input" style="width: 70px; padding: 4px; border: 1px solid #ccc; border-radius: 3px; text-align: center;" readonly>
                                     </div>
                                 </td>
-                                <td style="padding: 8px; border: 1px solid #ddd; text-align: center;">
-                                    <input type="text" class="raw-db-input" style="width: 120px; padding: 4px; border: 1px solid #ccc; border-radius: 3px; text-align: center;" placeholder="9:00 AM to 7:00 PM">
+                                <td style="padding: 8px; border: 1px solid #ddd; text-align: center; background: #add8e6;">
+                                    <input type="text" class="raw-db-input" style="width: 195px; padding: 4px; border: 1px solid #ccc; border-radius: 3px; text-align: center; background: white;" placeholder="9:00 AM to 7:00 PM">
                                 </td>
                                 <td style="padding: 8px; border: 1px solid #ddd; text-align: center;">
                                     <button class="populate-btn" style="padding: 6px 12px; background: #007cba; color: white; border: none; border-radius: 3px; cursor: pointer;">populate</button>
+                                </td>
+                                <td style="padding: 8px; border: 1px solid #ddd; text-align: center;">
+                                    <div style="display: flex; align-items: center; gap: 5px;">
+                                        <input type="text" class="shortcode-input" readonly style="width: 150px; padding: 4px; border: 1px solid #ccc; border-radius: 3px; text-align: center; background: #f9f9f9;">
+                                        <button class="copy-shortcode-btn" style="padding: 4px 8px; background: #ffc107; border: 1px solid #ddd; border-radius: 3px; cursor: pointer; transition: background-color 0.3s;" onmouseover="this.style.backgroundColor='#e0a800'" onmouseout="this.style.backgroundColor='#ffc107'">copy</button>
+                                    </div>
                                 </td>
                             </tr>
                             <tr>
@@ -9395,11 +9414,17 @@ class Grove_Admin {
                                         <input type="text" value="7:00 PM" class="close-time-input" style="width: 70px; padding: 4px; border: 1px solid #ccc; border-radius: 3px; text-align: center;" readonly>
                                     </div>
                                 </td>
-                                <td style="padding: 8px; border: 1px solid #ddd; text-align: center;">
-                                    <input type="text" class="raw-db-input" style="width: 120px; padding: 4px; border: 1px solid #ccc; border-radius: 3px; text-align: center;" placeholder="9:00 AM to 7:00 PM">
+                                <td style="padding: 8px; border: 1px solid #ddd; text-align: center; background: #add8e6;">
+                                    <input type="text" class="raw-db-input" style="width: 195px; padding: 4px; border: 1px solid #ccc; border-radius: 3px; text-align: center; background: white;" placeholder="9:00 AM to 7:00 PM">
                                 </td>
                                 <td style="padding: 8px; border: 1px solid #ddd; text-align: center;">
                                     <button class="populate-btn" style="padding: 6px 12px; background: #007cba; color: white; border: none; border-radius: 3px; cursor: pointer;">populate</button>
+                                </td>
+                                <td style="padding: 8px; border: 1px solid #ddd; text-align: center;">
+                                    <div style="display: flex; align-items: center; gap: 5px;">
+                                        <input type="text" class="shortcode-input" readonly style="width: 150px; padding: 4px; border: 1px solid #ccc; border-radius: 3px; text-align: center; background: #f9f9f9;">
+                                        <button class="copy-shortcode-btn" style="padding: 4px 8px; background: #ffc107; border: 1px solid #ddd; border-radius: 3px; cursor: pointer; transition: background-color 0.3s;" onmouseover="this.style.backgroundColor='#e0a800'" onmouseout="this.style.backgroundColor='#ffc107'">copy</button>
+                                    </div>
                                 </td>
                             </tr>
                             <tr>
@@ -9424,11 +9449,17 @@ class Grove_Admin {
                                         <input type="text" value="7:00 PM" class="close-time-input" style="width: 70px; padding: 4px; border: 1px solid #ccc; border-radius: 3px; text-align: center;" readonly>
                                     </div>
                                 </td>
-                                <td style="padding: 8px; border: 1px solid #ddd; text-align: center;">
-                                    <input type="text" class="raw-db-input" style="width: 120px; padding: 4px; border: 1px solid #ccc; border-radius: 3px; text-align: center;" placeholder="9:00 AM to 7:00 PM">
+                                <td style="padding: 8px; border: 1px solid #ddd; text-align: center; background: #add8e6;">
+                                    <input type="text" class="raw-db-input" style="width: 195px; padding: 4px; border: 1px solid #ccc; border-radius: 3px; text-align: center; background: white;" placeholder="9:00 AM to 7:00 PM">
                                 </td>
                                 <td style="padding: 8px; border: 1px solid #ddd; text-align: center;">
                                     <button class="populate-btn" style="padding: 6px 12px; background: #007cba; color: white; border: none; border-radius: 3px; cursor: pointer;">populate</button>
+                                </td>
+                                <td style="padding: 8px; border: 1px solid #ddd; text-align: center;">
+                                    <div style="display: flex; align-items: center; gap: 5px;">
+                                        <input type="text" class="shortcode-input" readonly style="width: 150px; padding: 4px; border: 1px solid #ccc; border-radius: 3px; text-align: center; background: #f9f9f9;">
+                                        <button class="copy-shortcode-btn" style="padding: 4px 8px; background: #ffc107; border: 1px solid #ddd; border-radius: 3px; cursor: pointer; transition: background-color 0.3s;" onmouseover="this.style.backgroundColor='#e0a800'" onmouseout="this.style.backgroundColor='#ffc107'">copy</button>
+                                    </div>
                                 </td>
                             </tr>
                             <tr>
@@ -9453,11 +9484,17 @@ class Grove_Admin {
                                         <input type="text" value="7:00 PM" class="close-time-input" style="width: 70px; padding: 4px; border: 1px solid #ccc; border-radius: 3px; text-align: center;" readonly>
                                     </div>
                                 </td>
-                                <td style="padding: 8px; border: 1px solid #ddd; text-align: center;">
-                                    <input type="text" class="raw-db-input" style="width: 120px; padding: 4px; border: 1px solid #ccc; border-radius: 3px; text-align: center;" placeholder="9:00 AM to 7:00 PM">
+                                <td style="padding: 8px; border: 1px solid #ddd; text-align: center; background: #add8e6;">
+                                    <input type="text" class="raw-db-input" style="width: 195px; padding: 4px; border: 1px solid #ccc; border-radius: 3px; text-align: center; background: white;" placeholder="9:00 AM to 7:00 PM">
                                 </td>
                                 <td style="padding: 8px; border: 1px solid #ddd; text-align: center;">
                                     <button class="populate-btn" style="padding: 6px 12px; background: #007cba; color: white; border: none; border-radius: 3px; cursor: pointer;">populate</button>
+                                </td>
+                                <td style="padding: 8px; border: 1px solid #ddd; text-align: center;">
+                                    <div style="display: flex; align-items: center; gap: 5px;">
+                                        <input type="text" class="shortcode-input" readonly style="width: 150px; padding: 4px; border: 1px solid #ccc; border-radius: 3px; text-align: center; background: #f9f9f9;">
+                                        <button class="copy-shortcode-btn" style="padding: 4px 8px; background: #ffc107; border: 1px solid #ddd; border-radius: 3px; cursor: pointer; transition: background-color 0.3s;" onmouseover="this.style.backgroundColor='#e0a800'" onmouseout="this.style.backgroundColor='#ffc107'">copy</button>
+                                    </div>
                                 </td>
                             </tr>
                             <tr>
@@ -9482,20 +9519,27 @@ class Grove_Admin {
                                         <input type="text" value="7:00 PM" class="close-time-input" style="width: 70px; padding: 4px; border: 1px solid #ccc; border-radius: 3px; text-align: center;" readonly>
                                     </div>
                                 </td>
-                                <td style="padding: 8px; border: 1px solid #ddd; text-align: center;">
-                                    <input type="text" class="raw-db-input" style="width: 120px; padding: 4px; border: 1px solid #ccc; border-radius: 3px; text-align: center;" placeholder="9:00 AM to 7:00 PM">
+                                <td style="padding: 8px; border: 1px solid #ddd; text-align: center; background: #add8e6;">
+                                    <input type="text" class="raw-db-input" style="width: 195px; padding: 4px; border: 1px solid #ccc; border-radius: 3px; text-align: center; background: white;" placeholder="9:00 AM to 7:00 PM">
                                 </td>
                                 <td style="padding: 8px; border: 1px solid #ddd; text-align: center;">
                                     <button class="populate-btn" style="padding: 6px 12px; background: #007cba; color: white; border: none; border-radius: 3px; cursor: pointer;">populate</button>
+                                </td>
+                                <td style="padding: 8px; border: 1px solid #ddd; text-align: center;">
+                                    <div style="display: flex; align-items: center; gap: 5px;">
+                                        <input type="text" class="shortcode-input" readonly style="width: 150px; padding: 4px; border: 1px solid #ccc; border-radius: 3px; text-align: center; background: #f9f9f9;">
+                                        <button class="copy-shortcode-btn" style="padding: 4px 8px; background: #ffc107; border: 1px solid #ddd; border-radius: 3px; cursor: pointer; transition: background-color 0.3s;" onmouseover="this.style.backgroundColor='#e0a800'" onmouseout="this.style.backgroundColor='#ffc107'">copy</button>
+                                    </div>
                                 </td>
                             </tr>
                         </tbody>
                     </table>
                 </div>
                 
-                <!-- Save Button -->
+                <!-- Control Buttons -->
                 <div style="margin-top: 20px;">
-                    <button id="save-hours-btn" class="button button-primary" style="padding: 10px 20px; font-size: 16px;">Save Hours to Database</button>
+                    <button id="populate-all-btn" style="padding: 10px 20px; font-size: 16px; background: #007cba; color: white; border: none; border-radius: 3px; cursor: pointer; margin-bottom: 10px; display: block;">populate all raw db values from widgets</button>
+                    <button id="save-hours-btn" class="button button-primary" style="padding: 10px 20px; font-size: 16px; background: #228b22; border-color: #228b22;">Save Hours to Database</button>
                 </div>
             </div>
         </div>
@@ -9527,7 +9571,14 @@ class Grove_Admin {
                             }
                             
                             // Populate raw input
-                            $(this).find('.raw-db-input').val(hoursValue);
+                            var rawInput = $(this).find('.raw-db-input');
+                            rawInput.val(hoursValue);
+                            
+                            // Style the input with bold black text for saved values
+                            rawInput.css({
+                                'color': 'black',
+                                'font-weight': 'bold'
+                            });
                         }
                     }
                 });
@@ -9535,6 +9586,22 @@ class Grove_Admin {
             
             // Load existing data on page load
             parseExistingHours();
+            
+            // Populate shortcode inputs
+            function populateShortcodes() {
+                var days = ['monday', 'tuesday', 'wednesday', 'thursday', 'friday', 'saturday', 'sunday'];
+                
+                $('tbody tr').each(function(index) {
+                    if (index < days.length) {
+                        var day = days[index];
+                        var shortcode = '[sitespren dbcol="driggs_hours_' + day + '"]';
+                        $(this).find('.shortcode-input').val(shortcode);
+                    }
+                });
+            }
+            
+            // Populate shortcodes on page load
+            populateShortcodes();
             
             // Time button functionality
             $(document).on('click', '.time-btn-left, .time-btn-right', function(e) {
@@ -9583,7 +9650,83 @@ class Grove_Admin {
                 
                 let populatedValue = openTime + ' to ' + closeTime;
                 rawInput.val(populatedValue);
+                
+                // Style the input with bold black text for populated values
+                rawInput.css({
+                    'color': 'black',
+                    'font-weight': 'bold'
+                });
             });
+            
+            // Populate all button functionality
+            $('#populate-all-btn').on('click', function(e) {
+                e.preventDefault();
+                
+                // Trigger populate for each row
+                $('tbody tr').each(function() {
+                    let row = $(this);
+                    let openTime = row.find('.open-time-input').val();
+                    let closeTime = row.find('.close-time-input').val();
+                    let rawInput = row.find('.raw-db-input');
+                    
+                    let populatedValue = openTime + ' to ' + closeTime;
+                    rawInput.val(populatedValue);
+                    
+                    // Style the input with bold black text for populated values
+                    rawInput.css({
+                        'color': 'black',
+                        'font-weight': 'bold'
+                    });
+                });
+            });
+            
+            // Copy shortcode functionality
+            $(document).on('click', '.copy-shortcode-btn', function(e) {
+                e.preventDefault();
+                
+                let shortcodeInput = $(this).siblings('.shortcode-input');
+                let shortcodeText = shortcodeInput.val();
+                
+                // Copy to clipboard
+                if (navigator.clipboard && window.isSecureContext) {
+                    navigator.clipboard.writeText(shortcodeText).then(function() {
+                        // Brief visual feedback
+                        let btn = $(e.target);
+                        let originalText = btn.text();
+                        btn.text('copied!');
+                        setTimeout(function() {
+                            btn.text(originalText);
+                        }, 1000);
+                    }).catch(function(err) {
+                        console.error('Failed to copy: ', err);
+                        fallbackCopyToClipboard(shortcodeText);
+                    });
+                } else {
+                    fallbackCopyToClipboard(shortcodeText);
+                }
+            });
+            
+            // Fallback copy function for shortcodes
+            function fallbackCopyToClipboard(text) {
+                let textArea = document.createElement("textarea");
+                textArea.value = text;
+                textArea.style.position = "fixed";
+                textArea.style.left = "-999999px";
+                textArea.style.top = "-999999px";
+                document.body.appendChild(textArea);
+                textArea.focus();
+                textArea.select();
+                
+                try {
+                    document.execCommand('copy');
+                    alert('Shortcode copied to clipboard!');
+                } catch (err) {
+                    console.error('Fallback: Unable to copy', err);
+                    alert('Failed to copy shortcode');
+                }
+                
+                document.body.removeChild(textArea);
+            }
             
             // Save hours functionality
             $('#save-hours-btn').on('click', function(e) {
