@@ -244,6 +244,8 @@ class Grove_Buffalor {
                 
                 <?php self::display_phone_href_raw_html_section(); ?>
                 
+                <?php self::display_style_attribute_examples(); ?>
+                
             </div>
         </div>
         <?php
@@ -429,7 +431,7 @@ add_shortcode(\'buffalo_phone_number\', \'buffalo_phone_number_shortcode\');';
         echo '<h4 style="margin-top: 0; color: #856404;">Usage Notes:</h4>';
         echo '<ul style="margin: 10px 0; padding-left: 20px; color: #856404;">';
         echo '<li><strong>Perfect for:</strong> Elementor Text Editor widgets, WordPress content areas</li>';
-        echo '<li><strong>Supports attributes:</strong> class, rel, target, aria_label</li>';
+        echo '<li><strong>Supports attributes:</strong> class, style, rel, target, aria_label</li>';
         echo '<li><strong>Nested shortcodes:</strong> You can use [phone_local], [phone_international], etc. inside</li>';
         echo '<li><strong>Fallback:</strong> If no phone number found, returns content without link</li>';
         echo '</ul>';
@@ -468,6 +470,99 @@ add_shortcode(\'buffalo_phone_number\', \'buffalo_phone_number_shortcode\');';
                 setTimeout(() => {
                     button.textContent = originalText;
                     button.style.background = "#28a745";
+                }, 2000);
+            } catch (err) {
+                alert("Failed to copy shortcode");
+            }
+        }
+        </script>';
+    }
+    
+    /**
+     * Display style attribute examples section
+     */
+    private static function display_style_attribute_examples() {
+        echo '<div style="margin-top: 30px; padding: 20px; background: #fff5f5; border: 1px solid #ffb3b3; border-radius: 5px;">';
+        echo '<h3 style="margin-top: 0;">Style Attribute Examples</h3>';
+        echo '<p>Add inline CSS styling directly to your phone links:</p>';
+        
+        // Button style example
+        echo '<div style="margin: 15px 0;">';
+        echo '<label style="display: block; font-weight: bold; margin-bottom: 5px;">Button Style:</label>';
+        $button_style = '[special_phone_href_for_raw_html style="background:#007cba;color:white;padding:10px 20px;text-decoration:none;border-radius:5px;"]Call Now![/special_phone_href_for_raw_html]';
+        echo '<div style="display: flex; align-items: center; gap: 10px; margin-bottom: 10px;">';
+        echo '<input type="text" value="' . esc_attr($button_style) . '" readonly style="padding: 8px; font-family: monospace; background: white; border: 1px solid #ccc; border-radius: 3px; width: 650px; font-size: 11px;">';
+        echo '<button type="button" onclick="copyStyleButton()" style="padding: 8px 16px; background: #dc3545; color: white; border: none; border-radius: 3px; cursor: pointer;">Copy</button>';
+        echo '</div>';
+        echo '<div style="margin-top: 10px;"><strong>Live Preview:</strong> ' . do_shortcode($button_style) . '</div>';
+        echo '</div>';
+        
+        // Custom color example
+        echo '<div style="margin: 15px 0;">';
+        echo '<label style="display: block; font-weight: bold; margin-bottom: 5px;">Custom Colors:</label>';
+        $color_style = '[special_phone_href_for_raw_html style="color:#ff6b35;font-weight:bold;text-decoration:underline;"]📞 Call us at [phone_local][/special_phone_href_for_raw_html]';
+        echo '<div style="display: flex; align-items: center; gap: 10px; margin-bottom: 10px;">';
+        echo '<input type="text" value="' . esc_attr($color_style) . '" readonly style="padding: 8px; font-family: monospace; background: white; border: 1px solid #ccc; border-radius: 3px; width: 650px; font-size: 11px;">';
+        echo '<button type="button" onclick="copyStyleColor()" style="padding: 8px 16px; background: #dc3545; color: white; border: none; border-radius: 3px; cursor: pointer;">Copy</button>';
+        echo '</div>';
+        echo '<div style="margin-top: 10px;"><strong>Live Preview:</strong> ' . do_shortcode($color_style) . '</div>';
+        echo '</div>';
+        
+        // Combined class and style example
+        echo '<div style="margin: 15px 0;">';
+        echo '<label style="display: block; font-weight: bold; margin-bottom: 5px;">Class + Style Combined:</label>';
+        $combined_style = '[special_phone_href_for_raw_html class="my-phone-btn" style="border:2px solid #28a745;padding:8px 15px;background:#f8f9fa;"]Contact Us Today[/special_phone_href_for_raw_html]';
+        echo '<div style="display: flex; align-items: center; gap: 10px; margin-bottom: 10px;">';
+        echo '<input type="text" value="' . esc_attr($combined_style) . '" readonly style="padding: 8px; font-family: monospace; background: white; border: 1px solid #ccc; border-radius: 3px; width: 650px; font-size: 11px;">';
+        echo '<button type="button" onclick="copyStyleCombined()" style="padding: 8px 16px; background: #dc3545; color: white; border: none; border-radius: 3px; cursor: pointer;">Copy</button>';
+        echo '</div>';
+        echo '<div style="margin-top: 10px;"><strong>Live Preview:</strong> ' . do_shortcode($combined_style) . '</div>';
+        echo '</div>';
+        
+        echo '<div style="margin-top: 20px; padding: 15px; background-color: #e7f3ff; border: 1px solid #b3d9ff; border-radius: 4px;">';
+        echo '<h4 style="margin-top: 0; color: #0066cc;">Quick CSS Tips:</h4>';
+        echo '<ul style="margin: 10px 0; padding-left: 20px; color: #0066cc;">';
+        echo '<li><strong>Button look:</strong> background, color, padding, border-radius</li>';
+        echo '<li><strong>Typography:</strong> font-weight, font-size, text-decoration</li>';
+        echo '<li><strong>Spacing:</strong> margin, padding</li>';
+        echo '<li><strong>Borders:</strong> border, border-radius</li>';
+        echo '<li><strong>Combine with class:</strong> Use both class and style attributes together</li>';
+        echo '</ul>';
+        echo '</div>';
+        
+        echo '</div>';
+        
+        echo '<script>
+        function copyStyleButton() {
+            const input = event.target.previousElementSibling;
+            input.select();
+            input.setSelectionRange(0, 99999);
+            copyStyleToClipboard(event.target, "Button style copied!");
+        }
+        
+        function copyStyleColor() {
+            const input = event.target.previousElementSibling;
+            input.select();
+            input.setSelectionRange(0, 99999);
+            copyStyleToClipboard(event.target, "Color style copied!");
+        }
+        
+        function copyStyleCombined() {
+            const input = event.target.previousElementSibling;
+            input.select();
+            input.setSelectionRange(0, 99999);
+            copyStyleToClipboard(event.target, "Combined style copied!");
+        }
+        
+        function copyStyleToClipboard(button, message) {
+            try {
+                document.execCommand("copy");
+                const originalText = button.textContent;
+                button.textContent = "Copied!";
+                button.style.background = "#6f42c1";
+                setTimeout(() => {
+                    button.textContent = originalText;
+                    button.style.background = "#dc3545";
                 }, 2000);
             } catch (err) {
                 alert("Failed to copy shortcode");

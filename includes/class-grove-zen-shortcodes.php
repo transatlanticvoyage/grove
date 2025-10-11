@@ -883,6 +883,7 @@ class Grove_Zen_Shortcodes {
         $atts = shortcode_atts(array(
             'wppma_id' => '1',
             'class' => '',
+            'style' => '',
             'rel' => '',
             'target' => '',
             'aria_label' => ''
@@ -916,6 +917,9 @@ class Grove_Zen_Shortcodes {
         
         if (!empty($atts['class'])) {
             $attrs[] = 'class="' . esc_attr($atts['class']) . '"';
+        }
+        if (!empty($atts['style'])) {
+            $attrs[] = 'style="' . esc_attr($atts['style']) . '"';
         }
         if (!empty($atts['rel'])) {
             $attrs[] = 'rel="' . esc_attr($atts['rel']) . '"';
