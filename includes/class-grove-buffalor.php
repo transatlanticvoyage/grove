@@ -239,6 +239,9 @@ class Grove_Buffalor {
                     });
                 });
                 </script>
+                
+                <?php self::display_phone_href_shortcode_section(); ?>
+                
             </div>
         </div>
         <?php
@@ -340,5 +343,45 @@ add_shortcode(\'buffalo_phone_number\', \'buffalo_phone_number_shortcode\');';
         return '<div class="phone-number">
   <a href="tel:+11234567890">Call us: 1234567890</a>
 </div>';
+    }
+    
+    /**
+     * Display special phone href shortcode section
+     */
+    private static function display_phone_href_shortcode_section() {
+        echo '<div style="margin-top: 30px; padding: 20px; background: #f9f9f9; border: 1px solid #ddd; border-radius: 5px;">';
+        echo '<h3 style="margin-top: 0;">Special Phone Href Shortcode (for Elementor Dynamic Tags)</h3>';
+        echo '<p>Use this shortcode to generate clean tel: URLs for Elementor Dynamic Tags:</p>';
+        
+        $shortcode_text = '[special_phone_href_value_1 wppma_id="1"]';
+        echo '<div style="display: flex; align-items: center; gap: 10px; margin: 15px 0;">';
+        echo '<input type="text" value="' . esc_attr($shortcode_text) . '" readonly style="padding: 8px; font-family: monospace; background: white; border: 1px solid #ccc; border-radius: 3px; width: 300px;">';
+        echo '<button type="button" onclick="copyPhoneHrefShortcode()" style="padding: 8px 16px; background: #0073aa; color: white; border: none; border-radius: 3px; cursor: pointer;">Copy</button>';
+        echo '</div>';
+        
+        echo '<p><small><strong>Note:</strong> This shortcode returns only the tel: URL (e.g., tel:+11234567890) for use in Elementor Dynamic Tags href fields.</small></p>';
+        echo '</div>';
+        
+        echo '<script>
+        function copyPhoneHrefShortcode() {
+            const input = event.target.previousElementSibling;
+            input.select();
+            input.setSelectionRange(0, 99999);
+            
+            try {
+                document.execCommand("copy");
+                const button = event.target;
+                const originalText = button.textContent;
+                button.textContent = "Copied!";
+                button.style.background = "#28a745";
+                setTimeout(() => {
+                    button.textContent = originalText;
+                    button.style.background = "#0073aa";
+                }, 2000);
+            } catch (err) {
+                alert("Failed to copy shortcode");
+            }
+        }
+        </script>';
     }
 }

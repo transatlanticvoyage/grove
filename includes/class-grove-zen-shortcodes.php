@@ -73,6 +73,9 @@ class Grove_Zen_Shortcodes {
         add_shortcode('phone_link', array($this, 'render_phone_link'));
         add_shortcode('beginning_a_code_moose', array($this, 'render_beginning_a_code_moose'));
         
+        // Special phone href shortcode for Elementor Dynamic Tags
+        add_shortcode('special_phone_href_value_1', array($this, 'render_special_phone_href_value_1'));
+        
         // Factory codes shortcodes
         add_shortcode('sitespren_phone_link', array($this, 'render_sitespren_phone_link'));
         
@@ -825,6 +828,46 @@ class Grove_Zen_Shortcodes {
         }
         
         return '<div class="phone-number"><a href="tel:' . esc_attr($atts['prefix']) . esc_attr($phone) . '">' . esc_html($atts['text']) . esc_html($phone) . '</a></div>';
+    }
+    
+    /**
+     * Render special phone href value for Elementor Dynamic Tags
+     * Returns a clean tel: URL for use in link fields
+     * Usage: [special_phone_href_value_1]
+     */
+    public function render_special_phone_href_value_1($atts) {
+        $atts = shortcode_atts(array(
+            'wppma_id' => '1'
+        ), $atts, 'special_phone_href_value_1');
+        
+        // Get sitespren data
+        $sitespren = Grove_Database::get_sitespren(intval($atts['wppma_id']));
+        
+        if (!$sitespren) {
+            return '';
+        }
+        
+        // Get country code and phone number
+        $country_code = isset($sitespren->driggs_phone_country_code) ? $sitespren->driggs_phone_country_code : '1';
+        $phone_number = isset($sitespren->driggs_phone_1) ? $sitespren->driggs_phone_1 : '';
+        
+        if (empty($phone_number)) {
+            return '';
+        }
+        
+        // Normalize: keep only digits from both country code and phone number
+        $cc_digits = preg_replace('/[^0-9]/', '', $country_code);
+        $phone_digits = preg_replace('/[^0-9]/', '', $phone_number);
+        
+        // Combine and ensure we have digits
+        $full_digits = $cc_digits . $phone_digits;
+        
+        if (empty($full_digits)) {
+            return '';
+        }
+        
+        // Return clean tel: URL with + prefix
+        return 'tel:+' . $full_digits;
     }
     
     /**
