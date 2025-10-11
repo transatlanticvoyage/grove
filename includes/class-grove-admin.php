@@ -48,6 +48,7 @@ class Grove_Admin {
         add_action('wp_ajax_grove_export_walrustax', array($this, 'grove_export_walrustax'));
         add_action('wp_ajax_grove_export_csv', array($this, 'grove_export_csv'));
         add_action('wp_ajax_grove_export_nova_beluga_both', array($this, 'grove_export_nova_beluga_both'));
+        add_action('wp_ajax_grove_save_hours', array($this, 'grove_save_hours'));
         add_action('wp_ajax_grove_export_nova_beluga_friendly', array($this, 'grove_export_nova_beluga_friendly'));
         add_action('wp_ajax_grove_get_friendly_name', array($this, 'grove_get_friendly_name'));
         add_action('wp_ajax_grove_get_all_friendly_names', array($this, 'grove_get_all_friendly_names'));
@@ -9254,6 +9255,14 @@ class Grove_Admin {
         // AGGRESSIVE NOTICE SUPPRESSION - Remove ALL WordPress admin notices
         $this->suppress_all_admin_notices();
         
+        // Load existing hours data from database
+        global $wpdb;
+        $table_name = $wpdb->prefix . 'zen_sitespren';
+        $hours_data = $wpdb->get_row($wpdb->prepare(
+            "SELECT driggs_hours_monday, driggs_hours_tuesday, driggs_hours_wednesday, driggs_hours_thursday, driggs_hours_friday, driggs_hours_saturday, driggs_hours_sunday FROM $table_name WHERE wppma_id = %d",
+            1
+        ), ARRAY_A);
+        
         ?>
         <div class="wrap" style="margin: 0; padding: 0;">
             <!-- Allow space for WordPress notices -->
@@ -9261,8 +9270,428 @@ class Grove_Admin {
             
             <div style="padding: 20px;">
                 <h1 style="margin-bottom: 20px;">Grove Hour Glass</h1>
+                
+                <!-- Hours Management Table -->
+                <div style="background: white; border: 1px solid #ddd; border-radius: 5px; overflow: hidden; margin-bottom: 20px; display: inline-block;">
+                    <table style="width: auto; border-collapse: collapse; table-layout: auto;">
+                        <thead>
+                            <tr>
+                                <th style="padding: 8px; border: 1px solid #ddd; background: #f8f9fa; font-weight: bold; text-align: center;">&nbsp;</th>
+                                <th style="padding: 8px; border: 1px solid #ddd; background: #f8f9fa; font-weight: bold;">day</th>
+                                <th style="padding: 8px; border: 1px solid #ddd; background: #f8f9fa; font-weight: bold;">open time</th>
+                                <th style="padding: 8px; border: 1px solid #ddd; background: #f8f9fa; font-weight: bold;">to</th>
+                                <th style="padding: 8px; border: 1px solid #ddd; background: #f8f9fa; font-weight: bold;">close time</th>
+                                <th style="padding: 8px; border: 1px solid #ddd; background: #f8f9fa; font-weight: bold;">raw db value</th>
+                                <th style="padding: 8px; border: 1px solid #ddd; background: #f8f9fa; font-weight: bold;">populate raw from widgets</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr>
+                                <td style="padding: 8px; border: 1px solid #ddd; text-align: center;"><input type="checkbox"></td>
+                                <td style="padding: 8px; border: 1px solid #ddd;">driggs_hours_monday</td>
+                                <td style="padding: 8px; border: 1px solid #ddd; text-align: center;">
+                                    <div style="display: flex; align-items: center; gap: 5px;">
+                                        <div style="display: flex;">
+                                            <button class="time-btn-left" style="padding: 8px 16px; border: 1px solid #ccc; background: #f9f9f9; cursor: pointer; border-radius: 3px 0 0 3px;">‹</button>
+                                            <button class="time-btn-right" style="padding: 8px 16px; border: 1px solid #ccc; border-left: none; background: #f9f9f9; cursor: pointer; border-radius: 0 3px 3px 0;">›</button>
+                                        </div>
+                                        <input type="text" value="9:00 AM" class="open-time-input" style="width: 70px; padding: 4px; border: 1px solid #ccc; border-radius: 3px; text-align: center;" readonly>
+                                    </div>
+                                </td>
+                                <td style="padding: 8px; border: 1px solid #ddd; text-align: center;">to</td>
+                                <td style="padding: 8px; border: 1px solid #ddd; text-align: center;">
+                                    <div style="display: flex; align-items: center; gap: 5px;">
+                                        <div style="display: flex;">
+                                            <button class="time-btn-left" style="padding: 8px 16px; border: 1px solid #ccc; background: #f9f9f9; cursor: pointer; border-radius: 3px 0 0 3px;">‹</button>
+                                            <button class="time-btn-right" style="padding: 8px 16px; border: 1px solid #ccc; border-left: none; background: #f9f9f9; cursor: pointer; border-radius: 0 3px 3px 0;">›</button>
+                                        </div>
+                                        <input type="text" value="7:00 PM" class="close-time-input" style="width: 70px; padding: 4px; border: 1px solid #ccc; border-radius: 3px; text-align: center;" readonly>
+                                    </div>
+                                </td>
+                                <td style="padding: 8px; border: 1px solid #ddd; text-align: center;">
+                                    <input type="text" class="raw-db-input" style="width: 120px; padding: 4px; border: 1px solid #ccc; border-radius: 3px; text-align: center;" placeholder="9:00 AM to 7:00 PM">
+                                </td>
+                                <td style="padding: 8px; border: 1px solid #ddd; text-align: center;">
+                                    <button class="populate-btn" style="padding: 6px 12px; background: #007cba; color: white; border: none; border-radius: 3px; cursor: pointer;">populate</button>
+                                </td>
+                            </tr>
+                            <tr>
+                                <td style="padding: 8px; border: 1px solid #ddd; text-align: center;"><input type="checkbox"></td>
+                                <td style="padding: 8px; border: 1px solid #ddd;">driggs_hours_tuesday</td>
+                                <td style="padding: 8px; border: 1px solid #ddd; text-align: center;">
+                                    <div style="display: flex; align-items: center; gap: 5px;">
+                                        <div style="display: flex;">
+                                            <button class="time-btn-left" style="padding: 8px 16px; border: 1px solid #ccc; background: #f9f9f9; cursor: pointer; border-radius: 3px 0 0 3px;">‹</button>
+                                            <button class="time-btn-right" style="padding: 8px 16px; border: 1px solid #ccc; border-left: none; background: #f9f9f9; cursor: pointer; border-radius: 0 3px 3px 0;">›</button>
+                                        </div>
+                                        <input type="text" value="9:00 AM" class="open-time-input" style="width: 70px; padding: 4px; border: 1px solid #ccc; border-radius: 3px; text-align: center;" readonly>
+                                    </div>
+                                </td>
+                                <td style="padding: 8px; border: 1px solid #ddd; text-align: center;">to</td>
+                                <td style="padding: 8px; border: 1px solid #ddd; text-align: center;">
+                                    <div style="display: flex; align-items: center; gap: 5px;">
+                                        <div style="display: flex;">
+                                            <button class="time-btn-left" style="padding: 8px 16px; border: 1px solid #ccc; background: #f9f9f9; cursor: pointer; border-radius: 3px 0 0 3px;">‹</button>
+                                            <button class="time-btn-right" style="padding: 8px 16px; border: 1px solid #ccc; border-left: none; background: #f9f9f9; cursor: pointer; border-radius: 0 3px 3px 0;">›</button>
+                                        </div>
+                                        <input type="text" value="7:00 PM" class="close-time-input" style="width: 70px; padding: 4px; border: 1px solid #ccc; border-radius: 3px; text-align: center;" readonly>
+                                    </div>
+                                </td>
+                                <td style="padding: 8px; border: 1px solid #ddd; text-align: center;">
+                                    <input type="text" class="raw-db-input" style="width: 120px; padding: 4px; border: 1px solid #ccc; border-radius: 3px; text-align: center;" placeholder="9:00 AM to 7:00 PM">
+                                </td>
+                                <td style="padding: 8px; border: 1px solid #ddd; text-align: center;">
+                                    <button class="populate-btn" style="padding: 6px 12px; background: #007cba; color: white; border: none; border-radius: 3px; cursor: pointer;">populate</button>
+                                </td>
+                            </tr>
+                            <tr>
+                                <td style="padding: 8px; border: 1px solid #ddd; text-align: center;"><input type="checkbox"></td>
+                                <td style="padding: 8px; border: 1px solid #ddd;">driggs_hours_wednesday</td>
+                                <td style="padding: 8px; border: 1px solid #ddd; text-align: center;">
+                                    <div style="display: flex; align-items: center; gap: 5px;">
+                                        <div style="display: flex;">
+                                            <button class="time-btn-left" style="padding: 8px 16px; border: 1px solid #ccc; background: #f9f9f9; cursor: pointer; border-radius: 3px 0 0 3px;">‹</button>
+                                            <button class="time-btn-right" style="padding: 8px 16px; border: 1px solid #ccc; border-left: none; background: #f9f9f9; cursor: pointer; border-radius: 0 3px 3px 0;">›</button>
+                                        </div>
+                                        <input type="text" value="9:00 AM" class="open-time-input" style="width: 70px; padding: 4px; border: 1px solid #ccc; border-radius: 3px; text-align: center;" readonly>
+                                    </div>
+                                </td>
+                                <td style="padding: 8px; border: 1px solid #ddd; text-align: center;">to</td>
+                                <td style="padding: 8px; border: 1px solid #ddd; text-align: center;">
+                                    <div style="display: flex; align-items: center; gap: 5px;">
+                                        <div style="display: flex;">
+                                            <button class="time-btn-left" style="padding: 8px 16px; border: 1px solid #ccc; background: #f9f9f9; cursor: pointer; border-radius: 3px 0 0 3px;">‹</button>
+                                            <button class="time-btn-right" style="padding: 8px 16px; border: 1px solid #ccc; border-left: none; background: #f9f9f9; cursor: pointer; border-radius: 0 3px 3px 0;">›</button>
+                                        </div>
+                                        <input type="text" value="7:00 PM" class="close-time-input" style="width: 70px; padding: 4px; border: 1px solid #ccc; border-radius: 3px; text-align: center;" readonly>
+                                    </div>
+                                </td>
+                                <td style="padding: 8px; border: 1px solid #ddd; text-align: center;">
+                                    <input type="text" class="raw-db-input" style="width: 120px; padding: 4px; border: 1px solid #ccc; border-radius: 3px; text-align: center;" placeholder="9:00 AM to 7:00 PM">
+                                </td>
+                                <td style="padding: 8px; border: 1px solid #ddd; text-align: center;">
+                                    <button class="populate-btn" style="padding: 6px 12px; background: #007cba; color: white; border: none; border-radius: 3px; cursor: pointer;">populate</button>
+                                </td>
+                            </tr>
+                            <tr>
+                                <td style="padding: 8px; border: 1px solid #ddd; text-align: center;"><input type="checkbox"></td>
+                                <td style="padding: 8px; border: 1px solid #ddd;">driggs_hours_thursday</td>
+                                <td style="padding: 8px; border: 1px solid #ddd; text-align: center;">
+                                    <div style="display: flex; align-items: center; gap: 5px;">
+                                        <div style="display: flex;">
+                                            <button class="time-btn-left" style="padding: 8px 16px; border: 1px solid #ccc; background: #f9f9f9; cursor: pointer; border-radius: 3px 0 0 3px;">‹</button>
+                                            <button class="time-btn-right" style="padding: 8px 16px; border: 1px solid #ccc; border-left: none; background: #f9f9f9; cursor: pointer; border-radius: 0 3px 3px 0;">›</button>
+                                        </div>
+                                        <input type="text" value="9:00 AM" class="open-time-input" style="width: 70px; padding: 4px; border: 1px solid #ccc; border-radius: 3px; text-align: center;" readonly>
+                                    </div>
+                                </td>
+                                <td style="padding: 8px; border: 1px solid #ddd; text-align: center;">to</td>
+                                <td style="padding: 8px; border: 1px solid #ddd; text-align: center;">
+                                    <div style="display: flex; align-items: center; gap: 5px;">
+                                        <div style="display: flex;">
+                                            <button class="time-btn-left" style="padding: 8px 16px; border: 1px solid #ccc; background: #f9f9f9; cursor: pointer; border-radius: 3px 0 0 3px;">‹</button>
+                                            <button class="time-btn-right" style="padding: 8px 16px; border: 1px solid #ccc; border-left: none; background: #f9f9f9; cursor: pointer; border-radius: 0 3px 3px 0;">›</button>
+                                        </div>
+                                        <input type="text" value="7:00 PM" class="close-time-input" style="width: 70px; padding: 4px; border: 1px solid #ccc; border-radius: 3px; text-align: center;" readonly>
+                                    </div>
+                                </td>
+                                <td style="padding: 8px; border: 1px solid #ddd; text-align: center;">
+                                    <input type="text" class="raw-db-input" style="width: 120px; padding: 4px; border: 1px solid #ccc; border-radius: 3px; text-align: center;" placeholder="9:00 AM to 7:00 PM">
+                                </td>
+                                <td style="padding: 8px; border: 1px solid #ddd; text-align: center;">
+                                    <button class="populate-btn" style="padding: 6px 12px; background: #007cba; color: white; border: none; border-radius: 3px; cursor: pointer;">populate</button>
+                                </td>
+                            </tr>
+                            <tr>
+                                <td style="padding: 8px; border: 1px solid #ddd; text-align: center;"><input type="checkbox"></td>
+                                <td style="padding: 8px; border: 1px solid #ddd;">driggs_hours_friday</td>
+                                <td style="padding: 8px; border: 1px solid #ddd; text-align: center;">
+                                    <div style="display: flex; align-items: center; gap: 5px;">
+                                        <div style="display: flex;">
+                                            <button class="time-btn-left" style="padding: 8px 16px; border: 1px solid #ccc; background: #f9f9f9; cursor: pointer; border-radius: 3px 0 0 3px;">‹</button>
+                                            <button class="time-btn-right" style="padding: 8px 16px; border: 1px solid #ccc; border-left: none; background: #f9f9f9; cursor: pointer; border-radius: 0 3px 3px 0;">›</button>
+                                        </div>
+                                        <input type="text" value="9:00 AM" class="open-time-input" style="width: 70px; padding: 4px; border: 1px solid #ccc; border-radius: 3px; text-align: center;" readonly>
+                                    </div>
+                                </td>
+                                <td style="padding: 8px; border: 1px solid #ddd; text-align: center;">to</td>
+                                <td style="padding: 8px; border: 1px solid #ddd; text-align: center;">
+                                    <div style="display: flex; align-items: center; gap: 5px;">
+                                        <div style="display: flex;">
+                                            <button class="time-btn-left" style="padding: 8px 16px; border: 1px solid #ccc; background: #f9f9f9; cursor: pointer; border-radius: 3px 0 0 3px;">‹</button>
+                                            <button class="time-btn-right" style="padding: 8px 16px; border: 1px solid #ccc; border-left: none; background: #f9f9f9; cursor: pointer; border-radius: 0 3px 3px 0;">›</button>
+                                        </div>
+                                        <input type="text" value="7:00 PM" class="close-time-input" style="width: 70px; padding: 4px; border: 1px solid #ccc; border-radius: 3px; text-align: center;" readonly>
+                                    </div>
+                                </td>
+                                <td style="padding: 8px; border: 1px solid #ddd; text-align: center;">
+                                    <input type="text" class="raw-db-input" style="width: 120px; padding: 4px; border: 1px solid #ccc; border-radius: 3px; text-align: center;" placeholder="9:00 AM to 7:00 PM">
+                                </td>
+                                <td style="padding: 8px; border: 1px solid #ddd; text-align: center;">
+                                    <button class="populate-btn" style="padding: 6px 12px; background: #007cba; color: white; border: none; border-radius: 3px; cursor: pointer;">populate</button>
+                                </td>
+                            </tr>
+                            <tr>
+                                <td style="padding: 8px; border: 1px solid #ddd; text-align: center;"><input type="checkbox"></td>
+                                <td style="padding: 8px; border: 1px solid #ddd;">driggs_hours_saturday</td>
+                                <td style="padding: 8px; border: 1px solid #ddd; text-align: center;">
+                                    <div style="display: flex; align-items: center; gap: 5px;">
+                                        <div style="display: flex;">
+                                            <button class="time-btn-left" style="padding: 8px 16px; border: 1px solid #ccc; background: #f9f9f9; cursor: pointer; border-radius: 3px 0 0 3px;">‹</button>
+                                            <button class="time-btn-right" style="padding: 8px 16px; border: 1px solid #ccc; border-left: none; background: #f9f9f9; cursor: pointer; border-radius: 0 3px 3px 0;">›</button>
+                                        </div>
+                                        <input type="text" value="9:00 AM" class="open-time-input" style="width: 70px; padding: 4px; border: 1px solid #ccc; border-radius: 3px; text-align: center;" readonly>
+                                    </div>
+                                </td>
+                                <td style="padding: 8px; border: 1px solid #ddd; text-align: center;">to</td>
+                                <td style="padding: 8px; border: 1px solid #ddd; text-align: center;">
+                                    <div style="display: flex; align-items: center; gap: 5px;">
+                                        <div style="display: flex;">
+                                            <button class="time-btn-left" style="padding: 8px 16px; border: 1px solid #ccc; background: #f9f9f9; cursor: pointer; border-radius: 3px 0 0 3px;">‹</button>
+                                            <button class="time-btn-right" style="padding: 8px 16px; border: 1px solid #ccc; border-left: none; background: #f9f9f9; cursor: pointer; border-radius: 0 3px 3px 0;">›</button>
+                                        </div>
+                                        <input type="text" value="7:00 PM" class="close-time-input" style="width: 70px; padding: 4px; border: 1px solid #ccc; border-radius: 3px; text-align: center;" readonly>
+                                    </div>
+                                </td>
+                                <td style="padding: 8px; border: 1px solid #ddd; text-align: center;">
+                                    <input type="text" class="raw-db-input" style="width: 120px; padding: 4px; border: 1px solid #ccc; border-radius: 3px; text-align: center;" placeholder="9:00 AM to 7:00 PM">
+                                </td>
+                                <td style="padding: 8px; border: 1px solid #ddd; text-align: center;">
+                                    <button class="populate-btn" style="padding: 6px 12px; background: #007cba; color: white; border: none; border-radius: 3px; cursor: pointer;">populate</button>
+                                </td>
+                            </tr>
+                            <tr>
+                                <td style="padding: 8px; border: 1px solid #ddd; text-align: center;"><input type="checkbox"></td>
+                                <td style="padding: 8px; border: 1px solid #ddd;">driggs_hours_sunday</td>
+                                <td style="padding: 8px; border: 1px solid #ddd; text-align: center;">
+                                    <div style="display: flex; align-items: center; gap: 5px;">
+                                        <div style="display: flex;">
+                                            <button class="time-btn-left" style="padding: 8px 16px; border: 1px solid #ccc; background: #f9f9f9; cursor: pointer; border-radius: 3px 0 0 3px;">‹</button>
+                                            <button class="time-btn-right" style="padding: 8px 16px; border: 1px solid #ccc; border-left: none; background: #f9f9f9; cursor: pointer; border-radius: 0 3px 3px 0;">›</button>
+                                        </div>
+                                        <input type="text" value="9:00 AM" class="open-time-input" style="width: 70px; padding: 4px; border: 1px solid #ccc; border-radius: 3px; text-align: center;" readonly>
+                                    </div>
+                                </td>
+                                <td style="padding: 8px; border: 1px solid #ddd; text-align: center;">to</td>
+                                <td style="padding: 8px; border: 1px solid #ddd; text-align: center;">
+                                    <div style="display: flex; align-items: center; gap: 5px;">
+                                        <div style="display: flex;">
+                                            <button class="time-btn-left" style="padding: 8px 16px; border: 1px solid #ccc; background: #f9f9f9; cursor: pointer; border-radius: 3px 0 0 3px;">‹</button>
+                                            <button class="time-btn-right" style="padding: 8px 16px; border: 1px solid #ccc; border-left: none; background: #f9f9f9; cursor: pointer; border-radius: 0 3px 3px 0;">›</button>
+                                        </div>
+                                        <input type="text" value="7:00 PM" class="close-time-input" style="width: 70px; padding: 4px; border: 1px solid #ccc; border-radius: 3px; text-align: center;" readonly>
+                                    </div>
+                                </td>
+                                <td style="padding: 8px; border: 1px solid #ddd; text-align: center;">
+                                    <input type="text" class="raw-db-input" style="width: 120px; padding: 4px; border: 1px solid #ccc; border-radius: 3px; text-align: center;" placeholder="9:00 AM to 7:00 PM">
+                                </td>
+                                <td style="padding: 8px; border: 1px solid #ddd; text-align: center;">
+                                    <button class="populate-btn" style="padding: 6px 12px; background: #007cba; color: white; border: none; border-radius: 3px; cursor: pointer;">populate</button>
+                                </td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+                
+                <!-- Save Button -->
+                <div style="margin-top: 20px;">
+                    <button id="save-hours-btn" class="button button-primary" style="padding: 10px 20px; font-size: 16px;">Save Hours to Database</button>
+                </div>
             </div>
         </div>
+        
+        <script type="text/javascript">
+        jQuery(document).ready(function($) {
+            // Load existing hours data
+            var hoursData = <?php echo json_encode($hours_data ?: array()); ?>;
+            
+            // Parse and populate existing hours
+            function parseExistingHours() {
+                var days = ['monday', 'tuesday', 'wednesday', 'thursday', 'friday', 'saturday', 'sunday'];
+                
+                $('tbody tr').each(function(index) {
+                    if (index < days.length) {
+                        var day = days[index];
+                        var columnName = 'driggs_hours_' + day;
+                        var hoursValue = hoursData[columnName];
+                        
+                        if (hoursValue && hoursValue.trim()) {
+                            // Parse "9:00 AM to 7:00 PM" format
+                            var match = hoursValue.match(/^(.+?)\s+to\s+(.+?)$/i);
+                            if (match) {
+                                var openTime = match[1].trim();
+                                var closeTime = match[2].trim();
+                                
+                                $(this).find('.open-time-input').val(openTime);
+                                $(this).find('.close-time-input').val(closeTime);
+                            }
+                            
+                            // Populate raw input
+                            $(this).find('.raw-db-input').val(hoursValue);
+                        }
+                    }
+                });
+            }
+            
+            // Load existing data on page load
+            parseExistingHours();
+            
+            // Time button functionality
+            $(document).on('click', '.time-btn-left, .time-btn-right', function(e) {
+                e.preventDefault();
+                
+                let isIncrement = $(this).hasClass('time-btn-right');
+                let input = $(this).parent().siblings('input[type="text"]');
+                let currentTime = input.val();
+                
+                // Parse current time
+                let timeParts = currentTime.match(/^(\d{1,2}):(\d{2})\s*(AM|PM)$/i);
+                if (!timeParts) return;
+                
+                let hours = parseInt(timeParts[1]);
+                let minutes = parseInt(timeParts[2]);
+                let period = timeParts[3].toUpperCase();
+                
+                // Adjust hour based on button clicked
+                if (isIncrement) {
+                    hours++;
+                    if (hours > 12) {
+                        hours = 1;
+                        period = (period === 'AM') ? 'PM' : 'AM';
+                    }
+                } else {
+                    hours--;
+                    if (hours < 1) {
+                        hours = 12;
+                        period = (period === 'AM') ? 'PM' : 'AM';
+                    }
+                }
+                
+                // Format and update
+                let newTime = hours + ':' + minutes.toString().padStart(2, '0') + ' ' + period;
+                input.val(newTime);
+            });
+            
+            // Populate button functionality
+            $(document).on('click', '.populate-btn', function(e) {
+                e.preventDefault();
+                
+                let row = $(this).closest('tr');
+                let openTime = row.find('.open-time-input').val();
+                let closeTime = row.find('.close-time-input').val();
+                let rawInput = row.find('.raw-db-input');
+                
+                let populatedValue = openTime + ' to ' + closeTime;
+                rawInput.val(populatedValue);
+            });
+            
+            // Save hours functionality
+            $('#save-hours-btn').on('click', function(e) {
+                e.preventDefault();
+                
+                let hoursData = {};
+                let days = ['monday', 'tuesday', 'wednesday', 'thursday', 'friday', 'saturday', 'sunday'];
+                
+                // Collect data from each row
+                $('tbody tr').each(function(index) {
+                    if (index < days.length) {
+                        let rawValue = $(this).find('.raw-db-input').val();
+                        hoursData['driggs_hours_' + days[index]] = rawValue;
+                    }
+                });
+                
+                // Disable button during request
+                $(this).prop('disabled', true).text('Saving...');
+                
+                // Make AJAX request
+                $.ajax({
+                    url: ajaxurl,
+                    type: 'POST',
+                    data: {
+                        action: 'grove_save_hours',
+                        hours_data: hoursData,
+                        nonce: '<?php echo wp_create_nonce('grove_hours_nonce'); ?>'
+                    },
+                    success: function(response) {
+                        if (response.success) {
+                            alert('Hours saved successfully!');
+                        } else {
+                            alert('Error saving hours: ' + (response.data || 'Unknown error'));
+                        }
+                        $('#save-hours-btn').prop('disabled', false).text('Save Hours to Database');
+                    },
+                    error: function(xhr, status, error) {
+                        alert('Error saving hours: Network error - ' + error);
+                        $('#save-hours-btn').prop('disabled', false).text('Save Hours to Database');
+                    }
+                });
+            });
+        });
+        </script>
         <?php
+    }
+    
+    public function grove_save_hours() {
+        check_ajax_referer('grove_hours_nonce', 'nonce');
+        
+        if (!current_user_can('manage_options')) {
+            wp_send_json_error('Insufficient permissions');
+        }
+        
+        $hours_data = isset($_POST['hours_data']) ? $_POST['hours_data'] : array();
+        
+        if (empty($hours_data)) {
+            wp_send_json_error('No hours data provided');
+        }
+        
+        global $wpdb;
+        $table_name = $wpdb->prefix . 'zen_sitespren';
+        
+        // Get the current site record (assuming wppma_id = 1)
+        $site_record = $wpdb->get_row($wpdb->prepare(
+            "SELECT wppma_id FROM $table_name WHERE wppma_id = %d",
+            1
+        ));
+        
+        if (!$site_record) {
+            wp_send_json_error('Site record not found');
+        }
+        
+        // Prepare update data
+        $update_data = array();
+        $allowed_columns = array(
+            'driggs_hours_monday',
+            'driggs_hours_tuesday', 
+            'driggs_hours_wednesday',
+            'driggs_hours_thursday',
+            'driggs_hours_friday',
+            'driggs_hours_saturday',
+            'driggs_hours_sunday'
+        );
+        
+        foreach ($hours_data as $column => $value) {
+            if (in_array($column, $allowed_columns)) {
+                $update_data[$column] = sanitize_text_field($value);
+            }
+        }
+        
+        if (empty($update_data)) {
+            wp_send_json_error('No valid hours data to save');
+        }
+        
+        // Update the database
+        $result = $wpdb->update(
+            $table_name,
+            $update_data,
+            array('wppma_id' => 1),
+            array_fill(0, count($update_data), '%s'),
+            array('%d')
+        );
+        
+        if ($result === false) {
+            wp_send_json_error('Database update failed');
+        }
+        
+        wp_send_json_success('Hours saved successfully');
     }
 }
