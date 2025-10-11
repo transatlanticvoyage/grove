@@ -471,6 +471,10 @@ class Grove_Admin {
         
         <script type="text/javascript">
         jQuery(document).ready(function($) {
+            // Debug: Check if ajaxurl is available
+            console.log('Services page - ajaxurl is:', typeof ajaxurl !== 'undefined' ? ajaxurl : 'UNDEFINED');
+            console.log('jQuery version:', $.fn.jquery);
+            
             let currentData = {};
             let hasChanges = false;
             
@@ -2286,8 +2290,8 @@ class Grove_Admin {
                                                     <div style="display: inline-flex; border-radius: 6px; box-shadow: 0 1px 2px 0 rgba(0, 0, 0, 0.05);">
                                                         <button type="button" data-rows="3" class="grove-rows-per-page-btn" style="padding: 10px 8px; font-size: 14px; border: 1px solid #D1D5DB; border-radius: 6px 0 0 6px; margin-right: -1px; cursor: pointer; background: white;">3</button>
                                                         <button type="button" data-rows="4" class="grove-rows-per-page-btn" style="padding: 10px 8px; font-size: 14px; border: 1px solid #D1D5DB; margin-right: -1px; cursor: pointer; background: white;">4</button>
-                                                        <button type="button" data-rows="5" class="grove-rows-per-page-btn active" style="padding: 10px 8px; font-size: 14px; border: 1px solid #3B82F6; background: #3B82F6; color: white; margin-right: -1px; cursor: pointer;">5</button>
-                                                        <button type="button" data-rows="10" class="grove-rows-per-page-btn" style="padding: 10px 8px; font-size: 14px; border: 1px solid #D1D5DB; margin-right: -1px; cursor: pointer; background: white;">10</button>
+                                                        <button type="button" data-rows="5" class="grove-rows-per-page-btn" style="padding: 10px 8px; font-size: 14px; border: 1px solid #D1D5DB; margin-right: -1px; cursor: pointer; background: white;">5</button>
+                                                        <button type="button" data-rows="10" class="grove-rows-per-page-btn active" style="padding: 10px 8px; font-size: 14px; border: 1px solid #3B82F6; background: #3B82F6; color: white; margin-right: -1px; cursor: pointer;">10</button>
                                                         <button type="button" data-rows="25" class="grove-rows-per-page-btn" style="padding: 10px 8px; font-size: 14px; border: 1px solid #D1D5DB; margin-right: -1px; cursor: pointer; background: white;">25</button>
                                                         <button type="button" data-rows="50" class="grove-rows-per-page-btn" style="padding: 10px 8px; font-size: 14px; border: 1px solid #D1D5DB; margin-right: -1px; cursor: pointer; background: white;">50</button>
                                                         <button type="button" data-rows="100" class="grove-rows-per-page-btn" style="padding: 10px 8px; font-size: 14px; border: 1px solid #D1D5DB; margin-right: -1px; cursor: pointer; background: white;">100</button>
@@ -2336,10 +2340,13 @@ class Grove_Admin {
                                         <td style="border: 1px solid black; padding: 4px;">
                                             <div style="display: flex; align-items: end; gap: 16px;">
                                                 <!-- Column Pagination Bar 1: Columns per page quantity selector -->
+                                                <!-- ⚠️ IMPORTANT: The button with class "active" must match currentColsPerPage variable around line 3930! -->
                                                 <div style="display: flex; align-items: center;">
                                                     <span style="font-size: 12px; color: #4B5563; margin-right: 8px;">Cols/page:</span>
-                                                    <button type="button" data-cols="6" class="grove-cols-per-page-btn" style="padding: 10px 8px; font-size: 14px; padding-top: 10px; padding-bottom: 10px; border: 1px solid #000; border-radius: 4px 0 0 4px; margin-right: -1px; cursor: pointer; background: white;">6</button>
-                                                    <button type="button" data-cols="8" class="grove-cols-per-page-btn active" style="padding: 10px 8px; font-size: 14px; padding-top: 10px; padding-bottom: 10px; border: 1px solid #000; margin-right: -1px; cursor: pointer; background: #f8f782; color: black;">8</button>
+                                                    <button type="button" data-cols="4" class="grove-cols-per-page-btn active" style="padding: 10px 8px; font-size: 14px; padding-top: 10px; padding-bottom: 10px; border: 1px solid #000; border-radius: 4px 0 0 4px; margin-right: -1px; cursor: pointer; background: #f8f782; color: black;">4</button>
+                                                    <button type="button" data-cols="5" class="grove-cols-per-page-btn" style="padding: 10px 8px; font-size: 14px; padding-top: 10px; padding-bottom: 10px; border: 1px solid #000; margin-right: -1px; cursor: pointer; background: white;">5</button>
+                                                    <button type="button" data-cols="6" class="grove-cols-per-page-btn" style="padding: 10px 8px; font-size: 14px; padding-top: 10px; padding-bottom: 10px; border: 1px solid #000; margin-right: -1px; cursor: pointer; background: white;">6</button>
+                                                    <button type="button" data-cols="8" class="grove-cols-per-page-btn" style="padding: 10px 8px; font-size: 14px; padding-top: 10px; padding-bottom: 10px; border: 1px solid #000; margin-right: -1px; cursor: pointer; background: white;">8</button>
                                                     <button type="button" data-cols="11" class="grove-cols-per-page-btn" style="padding: 10px 8px; font-size: 14px; padding-top: 10px; padding-bottom: 10px; border: 1px solid #000; margin-right: -1px; cursor: pointer; background: white;">11</button>
                                                     <button type="button" data-cols="15" class="grove-cols-per-page-btn" style="padding: 10px 8px; font-size: 14px; padding-top: 10px; padding-bottom: 10px; border: 1px solid #000; margin-right: -1px; cursor: pointer; background: white;">15</button>
                                                     <button type="button" data-cols="all" class="grove-cols-per-page-btn" style="padding: 10px 8px; font-size: 14px; padding-top: 10px; padding-bottom: 10px; border: 1px solid #000; border-radius: 0 4px 4px 0; cursor: pointer; background: white;">All</button>
@@ -2382,14 +2389,18 @@ class Grove_Admin {
                                 <th style="border: 1px solid #ddd; font-weight: bold; text-align: center; background: #e0e0e0;"><div class="cell_inner_wrapper_div">-</div></th>
                                 <th class="for_db_table_zen_services" style="border: 1px solid #ddd; font-weight: bold; text-transform: lowercase; background: #e0e0e0;"><div class="cell_inner_wrapper_div for_db_table_zen_services for_db_column_service_id">wp_zen_services</div></th>
                                 <th class="for_db_table_zen_services" style="border: 1px solid #ddd; font-weight: bold; text-transform: lowercase; background: #e0e0e0;"><div class="cell_inner_wrapper_div for_db_table_zen_services for_db_column_service_name">wp_zen_services</div></th>
+                                
+                                <!-- First 3 paginated columns in new order: description1_short, is_active_service, is_pinned_service -->
+                                <th class="for_db_table_zen_services" style="border: 1px solid #ddd; font-weight: bold; text-transform: lowercase; background: #e0e0e0;"><div class="cell_inner_wrapper_div for_db_table_zen_services for_db_column_description1_short">wp_zen_services</div></th>
+                                <th class="for_db_table_zen_services" style="border: 1px solid #ddd; font-weight: bold; text-transform: lowercase; background: #e0e0e0;"><div class="cell_inner_wrapper_div for_db_table_zen_services for_db_column_is_active_service">wp_zen_services</div></th>
+                                <th class="for_db_table_zen_services" style="border: 1px solid #ddd; font-weight: bold; text-transform: lowercase; background: #e0e0e0;"><div class="cell_inner_wrapper_div for_db_table_zen_services for_db_column_is_pinned_service">wp_zen_services</div></th>
+                                
+                                <!-- Remaining columns in existing order -->
                                 <th class="for_db_table_zen_services" style="border: 1px solid #ddd; font-weight: bold; text-transform: lowercase; background: #e0e0e0;"><div class="cell_inner_wrapper_div for_db_table_zen_services for_db_column_suggested_url_slug">wp_zen_services</div></th>
                                 <th class="for_db_table_zen_services" style="border: 1px solid #ddd; font-weight: bold; text-transform: lowercase; background: #e0e0e0;"><div class="cell_inner_wrapper_div for_db_table_zen_services for_db_column_service_placard">wp_zen_services</div></th>
                                 <th class="for_db_table_zen_services" style="border: 1px solid #ddd; font-weight: bold; text-transform: lowercase; background: #e0e0e0;"><div class="cell_inner_wrapper_div for_db_table_zen_services for_db_column_service_moniker">wp_zen_services</div></th>
                                 <th class="for_db_table_zen_services" style="border: 1px solid #ddd; font-weight: bold; text-transform: lowercase; background: #e0e0e0;"><div class="cell_inner_wrapper_div for_db_table_zen_services for_db_column_service_slug_id">wp_zen_services</div></th>
-                                <th class="for_db_table_zen_services" style="border: 1px solid #ddd; font-weight: bold; text-transform: lowercase; background: #e0e0e0;"><div class="cell_inner_wrapper_div for_db_table_zen_services for_db_column_description1_short">wp_zen_services</div></th>
                                 <th class="for_db_table_zen_services" style="border: 1px solid #ddd; font-weight: bold; text-transform: lowercase; background: #e0e0e0;"><div class="cell_inner_wrapper_div for_db_table_zen_services for_db_column_description1_long">wp_zen_services</div></th>
-                                <th class="for_db_table_zen_services" style="border: 1px solid #ddd; font-weight: bold; text-transform: lowercase; background: #e0e0e0;"><div class="cell_inner_wrapper_div for_db_table_zen_services for_db_column_is_active_service">wp_zen_services</div></th>
-                                <th class="for_db_table_zen_services" style="border: 1px solid #ddd; font-weight: bold; text-transform: lowercase; background: #e0e0e0;"><div class="cell_inner_wrapper_div for_db_table_zen_services for_db_column_is_pinned_service">wp_zen_services</div></th>
                                 <th class="for_db_table_zen_services" style="border: 1px solid #ddd; font-weight: bold; text-transform: lowercase; background: #e0e0e0;"><div class="cell_inner_wrapper_div for_db_table_zen_services for_db_column_rel_image1_id">wp_zen_services</div></th>
                                 <th class="for_db_table_abstract_images_according_to_rel_image1_id" style="border: 1px solid #ddd; font-weight: bold; text-transform: lowercase; background: #e0e0e0;"><div class="cell_inner_wrapper_div for_db_table_abstract_images_according_to_rel_image1_id">media</div></th>
                                 <th class="for_db_table_abstract_images_according_to_rel_image1_id" style="border: 1px solid #ddd; font-weight: bold; text-transform: lowercase; background: #e0e0e0;"><div class="cell_inner_wrapper_div for_db_table_abstract_images_according_to_rel_image1_id">media</div></th>
@@ -2409,14 +2420,18 @@ class Grove_Admin {
                                 </th>
                                 <th class="for_db_table_zen_services" data-sort="service_id" style="border: 1px solid #ddd; font-weight: bold; text-transform: lowercase; cursor: pointer; background: #f8f9fa;"><div class="cell_inner_wrapper_div for_db_table_zen_services for_db_column_service_id">service_id</div></th>
                                 <th class="for_db_table_zen_services" data-sort="service_name" style="border: 1px solid #ddd; font-weight: bold; text-transform: lowercase; cursor: pointer; background: #f8f9fa;"><div class="cell_inner_wrapper_div for_db_table_zen_services for_db_column_service_name">service_name</div></th>
+                                
+                                <!-- First 3 paginated columns in new order: description1_short, is_active_service, is_pinned_service -->
+                                <th class="for_db_table_zen_services" data-sort="description1_short" style="border: 1px solid #ddd; font-weight: bold; text-transform: lowercase; cursor: pointer; background: #f8f9fa;"><div class="cell_inner_wrapper_div for_db_table_zen_services for_db_column_description1_short">description1_short</div></th>
+                                <th class="for_db_table_zen_services" data-sort="is_active_service" style="border: 1px solid #ddd; font-weight: bold; text-transform: lowercase; cursor: pointer; background: #f8f9fa;"><div class="cell_inner_wrapper_div for_db_table_zen_services for_db_column_is_active_service">is_active_service</div></th>
+                                <th class="for_db_table_zen_services" data-sort="is_pinned_service" style="border: 1px solid #ddd; font-weight: bold; text-transform: lowercase; cursor: pointer; background: #f8f9fa;"><div class="cell_inner_wrapper_div for_db_table_zen_services for_db_column_is_pinned_service">is_pinned_service</div></th>
+                                
+                                <!-- Remaining columns in existing order -->
                                 <th class="for_db_table_zen_services" data-sort="suggested_url_slug" style="border: 1px solid #ddd; font-weight: bold; text-transform: lowercase; cursor: pointer; background: #f8f9fa;"><div class="cell_inner_wrapper_div for_db_table_zen_services for_db_column_suggested_url_slug">suggested_url_slug</div></th>
                                 <th class="for_db_table_zen_services" data-sort="service_placard" style="border: 1px solid #ddd; font-weight: bold; text-transform: lowercase; cursor: pointer; background: #f8f9fa;"><div class="cell_inner_wrapper_div for_db_table_zen_services for_db_column_service_placard">service_placard</div></th>
                                 <th class="for_db_table_zen_services" data-sort="service_moniker" style="border: 1px solid #ddd; font-weight: bold; text-transform: lowercase; cursor: pointer; background: #f8f9fa;"><div class="cell_inner_wrapper_div for_db_table_zen_services for_db_column_service_moniker">service_moniker</div></th>
                                 <th class="for_db_table_zen_services" data-sort="service_slug_id" style="border: 1px solid #ddd; font-weight: bold; text-transform: lowercase; cursor: pointer; background: #f8f9fa;"><div class="cell_inner_wrapper_div for_db_table_zen_services for_db_column_service_slug_id">service_slug_id</div></th>
-                                <th class="for_db_table_zen_services" data-sort="description1_short" style="border: 1px solid #ddd; font-weight: bold; text-transform: lowercase; cursor: pointer; background: #f8f9fa;"><div class="cell_inner_wrapper_div for_db_table_zen_services for_db_column_description1_short">description1_short</div></th>
                                 <th class="for_db_table_zen_services" data-sort="description1_long" style="border: 1px solid #ddd; font-weight: bold; text-transform: lowercase; cursor: pointer; background: #f8f9fa;"><div class="cell_inner_wrapper_div for_db_table_zen_services for_db_column_description1_long">description1_long</div></th>
-                                <th class="for_db_table_zen_services" data-sort="is_active_service" style="border: 1px solid #ddd; font-weight: bold; text-transform: lowercase; cursor: pointer; background: #f8f9fa;"><div class="cell_inner_wrapper_div for_db_table_zen_services for_db_column_is_active_service">is_active_service</div></th>
-                                <th class="for_db_table_zen_services" data-sort="is_pinned_service" style="border: 1px solid #ddd; font-weight: bold; text-transform: lowercase; cursor: pointer; background: #f8f9fa;"><div class="cell_inner_wrapper_div for_db_table_zen_services for_db_column_is_pinned_service">is_pinned_service</div></th>
                                 <th class="for_db_table_zen_services" data-sort="rel_image1_id" style="border: 1px solid #ddd; font-weight: bold; text-transform: lowercase; cursor: pointer; background: #f8f9fa;"><div class="cell_inner_wrapper_div for_db_table_zen_services for_db_column_rel_image1_id">rel_image1_id</div></th>
                                 <th class="for_db_table_abstract_images_according_to_rel_image1_id" style="border: 1px solid #ddd; font-weight: bold; text-transform: lowercase; background: #f8f9fa; text-align: left; white-space: nowrap;"><div class="cell_inner_wrapper_div for_db_table_abstract_images_according_to_rel_image1_id">image-main-display</div></th>
                                 <th class="for_db_table_abstract_images_according_to_rel_image1_id" style="border: 1px solid #ddd; font-weight: bold; font-size: 16px; text-transform: lowercase; background: #f8f9fa;"><div class="cell_inner_wrapper_div for_db_table_abstract_images_according_to_rel_image1_id">image-alternative-display-method</div></th>
@@ -2589,18 +2604,36 @@ class Grove_Admin {
                 mediaUploader.open();
             });
             
-            // Handle toggle switch for is_active_service
-            $(document).on('click', '.grove-toggle-switch', function(e) {
+            // Debug: Test if any clicks on toggle containers are detected
+            $(document).on('click', 'td', function(e) {
+                if ($(e.target).closest('.grove-toggle-switch').length > 0) {
+                    console.log('Click detected on toggle area!', e.target, $(e.target).closest('.grove-toggle-switch')[0]);
+                }
+            });
+            
+            // Handle toggle switch for is_active_service (only those without grove-pinned-toggle class)
+            $(document).on('click', '.grove-toggle-switch:not(.grove-pinned-toggle)', function(e) {
+                console.log('Active toggle clicked!'); // Debug
                 e.preventDefault();
                 e.stopPropagation();
                 
                 let toggle = $(this);
+                console.log('Toggle element:', toggle); // Debug
+                
                 let serviceId = toggle.data('service-id');
                 let currentlyActive = !toggle.hasClass('off');
                 let newActiveState = currentlyActive ? 0 : 1;
                 
+                console.log('Active toggle - Service ID:', serviceId, 'Current:', currentlyActive, 'New:', newActiveState); // Debug
+                
                 // Disable toggle during update
                 toggle.css('pointer-events', 'none');
+                
+                console.log('Sending AJAX request for active status...', {
+                    action: 'grove_services_update_active_status',
+                    service_id: serviceId,
+                    is_active: newActiveState
+                });
                 
                 $.ajax({
                     url: ajaxurl,
@@ -2612,6 +2645,7 @@ class Grove_Admin {
                         nonce: '<?php echo wp_create_nonce('grove_services_nonce'); ?>'
                     },
                     success: function(response) {
+                        console.log('Active status AJAX success:', response);
                         if (response.success) {
                             // Update successful - toggle the visual state
                             if (newActiveState === 1) {
@@ -2644,10 +2678,11 @@ class Grove_Admin {
                             alert('Error updating service status: ' + (response.data || 'Unknown error'));
                         }
                     },
-                    error: function() {
+                    error: function(xhr, status, error) {
                         // AJAX error - re-enable toggle and show error
+                        console.log('Active status AJAX error:', xhr, status, error);
                         toggle.css('pointer-events', 'auto');
-                        alert('Error updating service status: Network error');
+                        alert('Error updating service status: Network error - ' + error);
                     }
                 });
             });
@@ -2657,13 +2692,23 @@ class Grove_Admin {
                 e.preventDefault();
                 e.stopPropagation();
                 
+                console.log('Pinned toggle clicked!'); // Debug
+                
                 let toggle = $(this);
                 let serviceId = toggle.data('service-id');
                 let currentlyPinned = !toggle.hasClass('off');
                 let newPinnedState = currentlyPinned ? 0 : 1;
                 
+                console.log('Pinned toggle - Service ID:', serviceId, 'Current:', currentlyPinned, 'New:', newPinnedState); // Debug
+                
                 // Disable toggle during update
                 toggle.css('pointer-events', 'none');
+                
+                console.log('Sending AJAX request for pinned status...', {
+                    action: 'grove_services_update_pinned_status',
+                    service_id: serviceId,
+                    is_pinned: newPinnedState
+                });
                 
                 $.ajax({
                     url: ajaxurl,
@@ -2675,6 +2720,7 @@ class Grove_Admin {
                         nonce: '<?php echo wp_create_nonce('grove_services_nonce'); ?>'
                     },
                     success: function(response) {
+                        console.log('Pinned status AJAX success:', response);
                         if (response.success) {
                             // Update successful - toggle the visual state
                             if (newPinnedState === 1) {
@@ -2707,10 +2753,11 @@ class Grove_Admin {
                             alert('Error updating pinned status: ' + (response.data || 'Unknown error'));
                         }
                     },
-                    error: function() {
+                    error: function(xhr, status, error) {
                         // AJAX error - re-enable toggle and show error
+                        console.log('Pinned status AJAX error:', xhr, status, error);
                         toggle.css('pointer-events', 'auto');
-                        alert('Error updating pinned status: Network error');
+                        alert('Error updating pinned status: Network error - ' + error);
                     }
                 });
             });
@@ -2739,9 +2786,20 @@ class Grove_Admin {
                         if (response.success) {
                             currentData = response.data;
                             filteredData = currentData;
+                            
+                            // Debug: Log the first service's toggle field values
+                            if (currentData.length > 0) {
+                                console.log('Debug - First service toggle values:');
+                                console.log('is_active_service:', currentData[0].is_active_service);
+                                console.log('is_pinned_service:', currentData[0].is_pinned_service);
+                                console.log('Full first service data:', currentData[0]);
+                            }
+                            
                             displayData();
                             // Initialize pagination displays after data is loaded
                             updatePaginationDisplays();
+                            // Apply column pagination styling (including sticky column blue styling)
+                            applyColumnPagination();
                         } else {
                             alert('Error loading services data: ' + response.data);
                         }
@@ -2768,15 +2826,19 @@ class Grove_Admin {
                     
                     // First 3 paginated columns in new order: description1_short, is_active_service, is_pinned_service
                     tr.append('<td class="for_db_table_zen_services" style="border: 1px solid #ddd; cursor: pointer;" data-field="description1_short" data-id="' + service.service_id + '"><div class="cell_inner_wrapper_div for_db_table_zen_services for_db_column_description1_short">' + (service.description1_short || '') + '</div></td>');
+                    
+                    // Debug log for toggle values
+                    console.log('Service ID ' + service.service_id + ' - is_active_service:', service.is_active_service, 'is_pinned_service:', service.is_pinned_service);
+                    
                     let isActiveToggle = '<td class="for_db_table_zen_services" style="border: 1px solid #ddd; text-align: center;"><div class="cell_inner_wrapper_div for_db_table_zen_services for_db_column_is_active_service">' +
-                        '<div class="grove-toggle-switch" data-service-id="' + service.service_id + '" style="position: relative; width: 50px; height: 24px; background: ' + (service.is_active_service ? '#4CAF50' : '#ccc') + '; border-radius: 12px; cursor: pointer; transition: background 0.3s; margin: 0 auto;">' +
-                        '<div class="grove-toggle-knob" style="position: absolute; top: 2px; ' + (service.is_active_service ? 'right: 2px;' : 'left: 2px;') + ' width: 20px; height: 20px; background: white; border-radius: 50%; transition: all 0.3s; box-shadow: 0 2px 4px rgba(0,0,0,0.2);"></div>' +
+                        '<div class="grove-toggle-switch' + (service.is_active_service == 0 ? ' off' : '') + '" data-service-id="' + service.service_id + '" style="position: relative; width: 50px; height: 24px; background: ' + (service.is_active_service == 1 ? '#4CAF50' : '#ccc') + '; border-radius: 12px; cursor: pointer; transition: background 0.3s; margin: 0 auto;">' +
+                        '<div class="grove-toggle-knob" style="position: absolute; top: 2px; ' + (service.is_active_service == 1 ? 'right: 2px;' : 'left: 2px;') + ' width: 20px; height: 20px; background: white; border-radius: 50%; transition: all 0.3s; box-shadow: 0 2px 4px rgba(0,0,0,0.2);"></div>' +
                         '</div>' +
                         '</div></td>';
                     tr.append(isActiveToggle);
                     let isPinnedToggle = '<td class="for_db_table_zen_services" style="border: 1px solid #ddd; text-align: center;"><div class="cell_inner_wrapper_div for_db_table_zen_services for_db_column_is_pinned_service">' +
-                        '<div class="grove-toggle-switch grove-pinned-toggle" data-service-id="' + service.service_id + '" style="position: relative; width: 50px; height: 24px; background: ' + (service.is_pinned_service ? '#4CAF50' : '#ccc') + '; border-radius: 12px; cursor: pointer; transition: background 0.3s; margin: 0 auto;">' +
-                        '<div class="grove-toggle-knob" style="position: absolute; top: 2px; ' + (service.is_pinned_service ? 'right: 2px;' : 'left: 2px;') + ' width: 20px; height: 20px; background: white; border-radius: 50%; transition: all 0.3s; box-shadow: 0 2px 4px rgba(0,0,0,0.2);"></div>' +
+                        '<div class="grove-toggle-switch grove-pinned-toggle' + (service.is_pinned_service == 0 ? ' off' : '') + '" data-service-id="' + service.service_id + '" style="position: relative; width: 50px; height: 24px; background: ' + (service.is_pinned_service == 1 ? '#4CAF50' : '#ccc') + '; border-radius: 12px; cursor: pointer; transition: background 0.3s; margin: 0 auto;">' +
+                        '<div class="grove-toggle-knob" style="position: absolute; top: 2px; ' + (service.is_pinned_service == 1 ? 'right: 2px;' : 'left: 2px;') + ' width: 20px; height: 20px; background: white; border-radius: 50%; transition: all 0.3s; box-shadow: 0 2px 4px rgba(0,0,0,0.2);"></div>' +
                         '</div>' +
                         '</div></td>';
                     tr.append(isPinnedToggle);
@@ -2825,7 +2887,7 @@ class Grove_Admin {
                     // Image alternative display method column
                     let altImageCell = '<td class="for_db_table_abstract_images_according_to_rel_image1_id" style="border: 1px solid #ddd; text-align: center;"><div class="cell_inner_wrapper_div for_db_table_abstract_images_according_to_rel_image1_id">';
                     if (service.rel_image1_id && service.rel_image1_id > 0) {
-                        altImageCell += '<img src="/wp-content/uploads/' + service.rel_image1_id + '.jpg" style="height: 60px; max-width: 100px; object-fit: contain;" onerror="this.src=\'/wp-admin/admin-ajax.php?action=wp_get_attachment_image&attachment_id=' + service.rel_image1_id + '&size=thumbnail\';">';
+                        altImageCell += '<img src="/wp-content/uploads/' + service.rel_image1_id + '.jpg" style="height: 60px; max-width: 100px; object-fit: contain;" onerror="this.style.display=\'none\'; this.parentNode.innerHTML=\'<span style=color:#999;font-size:12px>Image not found</span>\';">';
                     } else {
                         altImageCell += '-';
                     }
@@ -3865,8 +3927,8 @@ class Grove_Admin {
             // PAGINATION FUNCTIONALITY FOR ROCKET CHAMBER
             
             // Global pagination state
-            let currentRowsPerPage = 5;
-            let currentColsPerPage = 15;
+            let currentRowsPerPage = 10;
+            let currentColsPerPage = 4;  // ⚠️ IMPORTANT: Must match the HTML button with class "active" around line 2345! If you change this, update the HTML too!
             let currentRowPage = 1;
             let currentColPage = 1;
             let totalRowPages = 1;
