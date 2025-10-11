@@ -12,7 +12,7 @@ if (file_exists(dirname(dirname(dirname(__FILE__))) . '/shenzi-shared-db-schema/
  */
 class Grove_Database {
     
-    const ZEN_DB_VERSION = '1.9';
+    const ZEN_DB_VERSION = '2.0';
     
     public function __construct() {
         // Check and create tables on initialization
@@ -328,8 +328,6 @@ class Grove_Database {
             service_moniker varchar(255) DEFAULT NULL,
             description1_short text DEFAULT NULL,
             description1_long text DEFAULT NULL,
-            service_image_url text DEFAULT NULL,
-            service_image_id int(11) DEFAULT NULL,
             rel_icon_image_id int(11) DEFAULT NULL,
             is_pinned_service tinyint(1) DEFAULT 0,
             is_active_service tinyint(1) DEFAULT 1,

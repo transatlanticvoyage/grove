@@ -2408,7 +2408,8 @@ class Grove_Admin {
                                 <th class="for_db_table_abstract_images_according_to_rel_image1_id" style="border: 1px solid #ddd; font-weight: bold; text-transform: lowercase; background: #e0e0e0;"><div class="cell_inner_wrapper_div for_db_table_abstract_images_according_to_rel_image1_id">media</div></th>
                                 <th class="for_db_table_abstract_images_according_to_rel_image1_id" style="border: 1px solid #ddd; font-weight: bold; text-transform: lowercase; background: #e0e0e0;"><div class="cell_inner_wrapper_div for_db_table_abstract_images_according_to_rel_image1_id">media</div></th>
                                 <th class="for_db_table_abstract_images_according_to_rel_image1_id" style="border: 1px solid #ddd; font-weight: bold; text-transform: lowercase; background: #e0e0e0;"><div class="cell_inner_wrapper_div for_db_table_abstract_images_according_to_rel_image1_id">media</div></th>
-                                <th class="for_db_table_abstract_images_according_to_rel_image1_id" style="border: 1px solid #ddd; font-weight: bold; text-transform: lowercase; background: #e0e0e0;"><div class="cell_inner_wrapper_div for_db_table_abstract_images_according_to_rel_image1_id">media</div></th>
+                                <th class="for_db_table_zen_services" style="border: 1px solid #ddd; font-weight: bold; text-transform: lowercase; background: #e0e0e0;"><div class="cell_inner_wrapper_div for_db_table_zen_services for_db_column_rel_icon_image_id">wp_zen_services</div></th>
+                                <th class="for_db_table_abstract_images_according_to_rel_icon_image_id" style="border: 1px solid #ddd; font-weight: bold; text-transform: lowercase; background: #e0e0e0;"><div class="cell_inner_wrapper_div for_db_table_abstract_images_according_to_rel_icon_image_id">media</div></th>
                                 <th class="for_db_table_zen_services" style="border: 1px solid #ddd; font-weight: bold; text-transform: lowercase; background: #e0e0e0;"><div class="cell_inner_wrapper_div for_db_table_zen_services for_db_column_asn_service_page_id">wp_zen_services</div></th>
                                 <th class="for_db_table_wp_posts_according_to_asn_service_page_id" style="border: 1px solid #ddd; font-weight: bold; text-transform: lowercase; background: #e0e0e0;"><div class="cell_inner_wrapper_div for_db_table_wp_posts_according_to_asn_service_page_id">wp_posts</div></th>
                                 <th class="for_db_table_wp_posts_according_to_asn_service_page_id" style="border: 1px solid #ddd; font-weight: bold; text-transform: lowercase; background: #e0e0e0;"><div class="cell_inner_wrapper_div for_db_table_wp_posts_according_to_asn_service_page_id">wp_posts</div></th>
@@ -2434,12 +2435,13 @@ class Grove_Admin {
                                 <th class="for_db_table_zen_services" data-sort="description1_long" style="border: 1px solid #ddd; font-weight: bold; text-transform: lowercase; cursor: pointer; background: #f8f9fa;"><div class="cell_inner_wrapper_div for_db_table_zen_services for_db_column_description1_long">description1_long</div></th>
                                 <th class="for_db_table_zen_services" data-sort="rel_image1_id" style="border: 1px solid #ddd; font-weight: bold; text-transform: lowercase; cursor: pointer; background: #f8f9fa;"><div class="cell_inner_wrapper_div for_db_table_zen_services for_db_column_rel_image1_id">rel_image1_id</div></th>
                                 <th class="for_db_table_abstract_images_according_to_rel_image1_id" style="border: 1px solid #ddd; font-weight: bold; text-transform: lowercase; background: #f8f9fa; text-align: left; white-space: nowrap;"><div class="cell_inner_wrapper_div for_db_table_abstract_images_according_to_rel_image1_id">image-main-display</div></th>
-                                <th class="for_db_table_abstract_images_according_to_rel_image1_id" style="border: 1px solid #ddd; font-weight: bold; font-size: 16px; text-transform: lowercase; background: #f8f9fa;"><div class="cell_inner_wrapper_div for_db_table_abstract_images_according_to_rel_image1_id">image-alternative-display-method</div></th>
                                 <th class="for_db_table_abstract_images_according_to_rel_image1_id" style="border: 1px solid #ddd; font-weight: bold; text-transform: lowercase; background: #f8f9fa;"><div class="cell_inner_wrapper_div for_db_table_abstract_images_according_to_rel_image1_id">width</div></th>
                                 <th class="for_db_table_abstract_images_according_to_rel_image1_id" style="border: 1px solid #ddd; font-weight: bold; text-transform: lowercase; background: #f8f9fa;"><div class="cell_inner_wrapper_div for_db_table_abstract_images_according_to_rel_image1_id">height</div></th>
                                 <th class="for_db_table_abstract_images_according_to_rel_image1_id" style="border: 1px solid #ddd; font-weight: bold; text-transform: lowercase; background: #f8f9fa;"><div class="cell_inner_wrapper_div for_db_table_abstract_images_according_to_rel_image1_id">file name</div></th>
                                 <th class="for_db_table_abstract_images_according_to_rel_image1_id" style="border: 1px solid #ddd; font-weight: bold; text-transform: lowercase; background: #f8f9fa;"><div class="cell_inner_wrapper_div for_db_table_abstract_images_according_to_rel_image1_id">img title</div></th>
                                 <th class="for_db_table_abstract_images_according_to_rel_image1_id" style="border: 1px solid #ddd; font-weight: bold; text-transform: lowercase; background: #f8f9fa;"><div class="cell_inner_wrapper_div for_db_table_abstract_images_according_to_rel_image1_id">alt text</div></th>
+                                <th class="for_db_table_zen_services" data-sort="rel_icon_image_id" style="border: 1px solid #ddd; font-weight: bold; text-transform: lowercase; cursor: pointer; background: #f8f9fa;"><div class="cell_inner_wrapper_div for_db_table_zen_services for_db_column_rel_icon_image_id">rel_icon_image_id</div></th>
+                                <th class="for_db_table_abstract_images_according_to_rel_icon_image_id" style="border: 1px solid #ddd; font-weight: bold; text-transform: lowercase; background: #f8f9fa; text-align: left; white-space: nowrap;"><div class="cell_inner_wrapper_div for_db_table_abstract_images_according_to_rel_icon_image_id">image-main-display</div></th>
                                 <th class="for_db_table_zen_services" style="border: 1px solid #ddd; font-weight: bold; text-transform: lowercase; background: #f8f9fa;"><div class="cell_inner_wrapper_div for_db_table_zen_services for_db_column_asn_service_page_id">asn_service_page_id</div></th>
                                 <th class="for_db_table_wp_posts_according_to_asn_service_page_id" style="border: 1px solid #ddd; font-weight: bold; text-transform: lowercase; background: #f8f9fa;"><div class="cell_inner_wrapper_div for_db_table_wp_posts_according_to_asn_service_page_id">post_title</div></th>
                                 <th class="for_db_table_wp_posts_according_to_asn_service_page_id" style="border: 1px solid #ddd; font-weight: bold; text-transform: lowercase; background: #f8f9fa;"><div class="cell_inner_wrapper_div for_db_table_wp_posts_according_to_asn_service_page_id">post_name</div></th>
@@ -2564,13 +2566,13 @@ class Grove_Admin {
             ];
             
             // Special columns that are always shown but not in wolf band
-            const specialColumns = ['image-main-display', 'image-alternative-display-method', 'width', 'height'];
+            const specialColumns = ['image-main-display', 'width', 'height'];
             
             // Load initial data
             loadServicesData();
             
             // Image button handlers (outside displayData to ensure they're always attached)
-            $(document).on('click', '.upload-image-btn, .edit-image-btn', function(e) {
+            $(document).on('click', '.upload-image-btn, .edit-image-btn, .upload-icon-image-btn, .edit-icon-image-btn', function(e) {
                 e.preventDefault();
                 e.stopPropagation();
                 
@@ -2578,8 +2580,9 @@ class Grove_Admin {
                 
                 let btn = $(this);
                 let id = btn.data('id');
+                let isIconImage = btn.hasClass('upload-icon-image-btn') || btn.hasClass('edit-icon-image-btn');
                 
-                console.log('Service ID:', id); // Debug
+                console.log('Service ID:', id, 'Icon Image:', isIconImage); // Debug
                 
                 // Check if wp.media is available
                 if (typeof wp === 'undefined' || typeof wp.media === 'undefined') {
@@ -2588,7 +2591,7 @@ class Grove_Admin {
                 }
                 
                 let mediaUploader = wp.media({
-                    title: 'Select Service Image',
+                    title: isIconImage ? 'Select Service Icon' : 'Select Service Image',
                     button: {
                         text: 'Use this image'
                     },
@@ -2598,7 +2601,11 @@ class Grove_Admin {
                 mediaUploader.on('select', function() {
                     let attachment = mediaUploader.state().get('selection').first().toJSON();
                     console.log('Selected attachment:', attachment); // Debug
-                    updateImageField(id, attachment.id);
+                    if (isIconImage) {
+                        updateIconImageField(id, attachment.id);
+                    } else {
+                        updateImageField(id, attachment.id);
+                    }
                 });
                 
                 mediaUploader.open();
@@ -2762,15 +2769,20 @@ class Grove_Admin {
                 });
             });
             
-            $(document).on('click', '.delete-image-btn', function(e) {
+            $(document).on('click', '.delete-image-btn, .delete-icon-image-btn', function(e) {
                 e.preventDefault();
                 e.stopPropagation();
                 
                 let btn = $(this);
                 let id = btn.data('id');
+                let isIconImage = btn.hasClass('delete-icon-image-btn');
                 
                 if (confirm('Are you sure you want to remove this image?')) {
-                    updateImageField(id, null);
+                    if (isIconImage) {
+                        updateIconImageField(id, null);
+                    } else {
+                        updateImageField(id, null);
+                    }
                 }
             });
             
@@ -2884,16 +2896,6 @@ class Grove_Admin {
                     mainImageCell += '</div></td>';
                     tr.append(mainImageCell);
                     
-                    // Image alternative display method column
-                    let altImageCell = '<td class="for_db_table_abstract_images_according_to_rel_image1_id" style="border: 1px solid #ddd; text-align: center;"><div class="cell_inner_wrapper_div for_db_table_abstract_images_according_to_rel_image1_id">';
-                    if (service.rel_image1_id && service.rel_image1_id > 0) {
-                        altImageCell += '<img src="/wp-content/uploads/' + service.rel_image1_id + '.jpg" style="height: 60px; max-width: 100px; object-fit: contain;" onerror="this.style.display=\'none\'; this.parentNode.innerHTML=\'<span style=color:#999;font-size:12px>Image not found</span>\';">';
-                    } else {
-                        altImageCell += '-';
-                    }
-                    altImageCell += '</div></td>';
-                    tr.append(altImageCell);
-                    
                     // Width column
                     let widthCell = '<td class="for_db_table_abstract_images_according_to_rel_image1_id image-width-cell" style="border: 1px solid #ddd; text-align: center;" data-attachment-id="' + (service.rel_image1_id || '') + '"><div class="cell_inner_wrapper_div for_db_table_abstract_images_according_to_rel_image1_id">';
                     if (service.rel_image1_id && service.rel_image1_id > 0) {
@@ -2948,9 +2950,47 @@ class Grove_Admin {
                     altTextCell += '</div></td>';
                     tr.append(altTextCell);
                     
+                    // Icon Image column with selector system
+                    let iconImageCell = '<td class="for_db_table_zen_services icon-image-cell" style="border: 1px solid #ddd; text-align: center;" data-id="' + service.service_id + '"><div class="cell_inner_wrapper_div for_db_table_zen_services for_db_column_rel_icon_image_id">';
+                    
+                    if (service.rel_icon_image_id && service.rel_icon_image_id > 0) {
+                        iconImageCell += '<div style="display: flex; flex-direction: column; gap: 2px; align-items: center;">';
+                        iconImageCell += '<span style="color: green; font-size: 10px;">ID: ' + service.rel_icon_image_id + '</span>';
+                        iconImageCell += '<div style="display: flex; gap: 4px;">';
+                        iconImageCell += '<button class="button button-small edit-icon-image-btn" data-id="' + service.service_id + '" data-image="' + service.rel_icon_image_id + '" style="font-size: 11px; padding: 2px 6px;">Edit</button>';
+                        iconImageCell += '<button class="button button-small delete-icon-image-btn" data-id="' + service.service_id + '" style="font-size: 11px; padding: 2px 6px; background: #dc3545; color: white; border-color: #dc3545;">Clear</button>';
+                        iconImageCell += '</div>';
+                        iconImageCell += '</div>';
+                    } else {
+                        iconImageCell += '<div style="display: flex; flex-direction: column; gap: 2px; align-items: center;">';
+                        iconImageCell += '<span style="color: #999; font-size: 10px;">No icon</span>';
+                        iconImageCell += '<button class="button button-small upload-icon-image-btn" data-id="' + service.service_id + '" style="font-size: 11px; padding: 2px 6px;">Select</button>';
+                        iconImageCell += '</div>';
+                    }
+                    
+                    iconImageCell += '</div></td>';
+                    tr.append(iconImageCell);
+                    
+                    // Icon Image main display column
+                    let mainIconImageCell = '<td class="for_db_table_abstract_images_according_to_rel_icon_image_id" style="border: 1px solid #ddd; text-align: left; white-space: nowrap;"><div class="cell_inner_wrapper_div for_db_table_abstract_images_according_to_rel_icon_image_id">';
+                    if (service.rel_icon_image_id && service.rel_icon_image_id > 0) {
+                        mainIconImageCell += '<div class="icon-image-preview-container" data-attachment-id="' + service.rel_icon_image_id + '" style="height: 60px; min-width: 80px; display: inline-flex; align-items: center; justify-content: flex-start; border: 1px solid #ddd; background: #f9f9f9;">';
+                        mainIconImageCell += '<span style="color: #666; font-size: 12px; padding: 0 8px;">Loading...</span>';
+                        mainIconImageCell += '</div>';
+                    } else {
+                        mainIconImageCell += '<div style="height: 60px; min-width: 80px; display: inline-flex; align-items: center; justify-content: flex-start; border: 1px solid #ddd; background: #f9f9f9;">';
+                        mainIconImageCell += '<span style="color: #999; font-size: 12px; padding: 0 8px;">No icon</span>';
+                        mainIconImageCell += '</div>';
+                    }
+                    mainIconImageCell += '</div></td>';
+                    tr.append(mainIconImageCell);
+                    
                     // ASN Service Page ID column
                     let pageCell = '<td class="for_db_table_zen_services" style="border: 1px solid #ddd;"><div class="cell_inner_wrapper_div for_db_table_zen_services for_db_column_asn_service_page_id">';
                     pageCell += '<button class="button button-small choose-page-btn" data-service-id="' + service.service_id + '" style="margin-right: 8px;">Choose Page</button>';
+                    if (service.asn_service_page_id) {
+                        pageCell += '<button class="button button-small clear-page-btn" data-service-id="' + service.service_id + '" style="margin-right: 8px; font-size: 11px; padding: 2px 6px; background: #dc3545; color: white; border-color: #dc3545;">Clear</button>';
+                    }
                     if (service.asn_service_page_id) {
                         pageCell += '<span class="page-info" data-page-id="' + service.asn_service_page_id + '">';
                         pageCell += '(' + service.asn_service_page_id + ') | <span class="page-title-text">Loading...</span>';
@@ -3083,8 +3123,33 @@ class Grove_Admin {
                 });
             }
             
+            function updateIconImageField(id, imageId) {
+                $.ajax({
+                    url: ajaxurl,
+                    type: 'POST',
+                    data: {
+                        action: 'grove_services_update_field',
+                        nonce: '<?php echo wp_create_nonce('grove_services_nonce'); ?>',
+                        id: id,
+                        field: 'rel_icon_image_id',
+                        value: imageId || ''
+                    },
+                    success: function(response) {
+                        if (response.success) {
+                            // Refresh the data to update the button display
+                            loadServicesData();
+                        } else {
+                            alert('Error updating icon image: ' + response.data);
+                        }
+                    },
+                    error: function() {
+                        alert('Error updating icon image');
+                    }
+                });
+            }
+            
             function loadImagePreviews() {
-                $('.image-preview-container').each(function() {
+                $('.image-preview-container, .icon-image-preview-container').each(function() {
                     let container = $(this);
                     let attachmentId = container.data('attachment-id');
                     
@@ -3109,12 +3174,13 @@ class Grove_Admin {
                                     let title = response.data.title || '';
                                     let altText = response.data.alt_text || '';
                                     
-                                    // Calculate aspect ratio for 100px height
+                                    // Calculate aspect ratio and display size based on container type
                                     let aspectRatio = width / height;
-                                    let displayWidth = Math.round(100 * aspectRatio);
+                                    let displayHeight = container.hasClass('icon-image-preview-container') ? 60 : 100;
+                                    let displayWidth = Math.round(displayHeight * aspectRatio);
                                     
                                     // Update image preview
-                                    container.html('<img src="' + imageUrl + '" style="height: 100px; width: ' + displayWidth + 'px; object-fit: contain;">');
+                                    container.html('<img src="' + imageUrl + '" style="height: ' + displayHeight + 'px; width: ' + displayWidth + 'px; object-fit: contain;">');
                                     
                                     // Update width and height columns
                                     $('.image-width-cell[data-attachment-id="' + attachmentId + '"] .width-value').text(width + 'px');
@@ -3590,6 +3656,36 @@ class Grove_Admin {
                         }
                     }
                 });
+            });
+            
+            // Clear page assignment
+            $(document).on('click', '.clear-page-btn', function() {
+                let serviceId = $(this).data('service-id');
+                
+                if (confirm('Are you sure you want to clear the page assignment for this service?')) {
+                    $.ajax({
+                        url: ajaxurl,
+                        type: 'POST',
+                        data: {
+                            action: 'grove_services_update_field',
+                            nonce: '<?php echo wp_create_nonce('grove_services_nonce'); ?>',
+                            id: serviceId,
+                            field: 'asn_service_page_id',
+                            value: ''
+                        },
+                        success: function(response) {
+                            if (response.success) {
+                                // Refresh the data to update the display
+                                loadServicesData();
+                            } else {
+                                alert('Error clearing page assignment: ' + response.data);
+                            }
+                        },
+                        error: function() {
+                            alert('Error clearing page assignment');
+                        }
+                    });
+                }
             });
             
             // Display pages in the modal table
@@ -4856,7 +4952,7 @@ class Grove_Admin {
         $id = intval($_POST['id']);
         $field = sanitize_text_field($_POST['field']);
         
-        $allowed_fields = ['service_name', 'suggested_url_slug', 'service_placard', 'service_moniker', 'service_sobriquet', 'description1_short', 'description1_long', 'rel_image1_id', 'service_slug_id', 'asn_service_page_id'];
+        $allowed_fields = ['service_name', 'suggested_url_slug', 'service_placard', 'service_moniker', 'service_sobriquet', 'description1_short', 'description1_long', 'rel_image1_id', 'rel_icon_image_id', 'service_slug_id', 'asn_service_page_id'];
         
         if (!in_array($field, $allowed_fields)) {
             wp_send_json_error('Invalid field name');
