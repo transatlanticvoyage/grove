@@ -188,6 +188,15 @@ class Grove_Admin {
         
         add_submenu_page(
             'grovehub',
+            'Grove Hour Glass',
+            'grovehourglass',
+            'manage_options',
+            'grovehourglass',
+            array($this, 'grovehourglass_page')
+        );
+        
+        add_submenu_page(
+            'grovehub',
             'Grove Cache Manager',
             'grove_cache_manager',
             'manage_options',
@@ -2647,6 +2656,7 @@ class Grove_Admin {
                             <th style="padding: 8px; border: 1px solid #ddd; background: #f8f9fa; font-weight: bold;">basic link list 1</th>
                             <th style="padding: 8px; border: 1px solid #ddd; background: #f8f9fa; font-weight: bold;">hyena widget 1</th>
                             <th style="padding: 8px; border: 1px solid #ddd; background: #f8f9fa; font-weight: bold;">option list 1 for form</th>
+                            <th style="padding: 8px; border: 1px solid #ddd; background: #f8f9fa; font-weight: bold;">senegal buttons</th>
                         </tr>
                     </thead>
                     <tbody>
@@ -2662,6 +2672,9 @@ class Grove_Admin {
                             <td style="padding: 8px; border: 1px solid #ddd; text-align: center;">
                                 <button class="venmo-copy-btn option-list-copy" data-filter="active" data-pinned="any" style="padding: 4px 8px; background: #007cba; color: white; border: none; border-radius: 3px; cursor: pointer;">copy</button>
                             </td>
+                            <td style="padding: 8px; border: 1px solid #ddd; text-align: center;">
+                                <button class="venmo-copy-btn senegal-copy" style="padding: 4px 8px; background: #007cba; color: white; border: none; border-radius: 3px; cursor: pointer;">copy</button>
+                            </td>
                         </tr>
                         <tr>
                             <td style="padding: 8px; border: 1px solid #ddd; text-align: center;">yes</td>
@@ -2674,6 +2687,9 @@ class Grove_Admin {
                             </td>
                             <td style="padding: 8px; border: 1px solid #ddd; text-align: center;">
                                 <button class="venmo-copy-btn option-list-copy" data-filter="active" data-pinned="pinned" style="padding: 4px 8px; background: #007cba; color: white; border: none; border-radius: 3px; cursor: pointer;">copy</button>
+                            </td>
+                            <td style="padding: 8px; border: 1px solid #ddd; text-align: center;">
+                                <button class="venmo-copy-btn senegal-copy" style="padding: 4px 8px; background: #007cba; color: white; border: none; border-radius: 3px; cursor: pointer;">copy</button>
                             </td>
                         </tr>
                         <tr>
@@ -2688,6 +2704,9 @@ class Grove_Admin {
                             <td style="padding: 8px; border: 1px solid #ddd; text-align: center;">
                                 <button class="venmo-copy-btn option-list-copy" data-filter="active" data-pinned="not-pinned" style="padding: 4px 8px; background: #007cba; color: white; border: none; border-radius: 3px; cursor: pointer;">copy</button>
                             </td>
+                            <td style="padding: 8px; border: 1px solid #ddd; text-align: center;">
+                                <button class="venmo-copy-btn senegal-copy" style="padding: 4px 8px; background: #007cba; color: white; border: none; border-radius: 3px; cursor: pointer;">copy</button>
+                            </td>
                         </tr>
                         <tr>
                             <td style="padding: 8px; border: 1px solid #ddd; text-align: center;">no</td>
@@ -2699,7 +2718,10 @@ class Grove_Admin {
                                 <button class="venmo-copy-btn" style="padding: 4px 8px; background: #007cba; color: white; border: none; border-radius: 3px; cursor: pointer;">copy</button>
                             </td>
                             <td style="padding: 8px; border: 1px solid #ddd; text-align: center;">
-                                <button class="venmo-copy-btn option-list-copy" data-filter="inactive" data-pinned="any" style="padding: 4px 8px; background: #007cba; color: white; border: none; border-radius: 3px; cursor: pointer;">copy</button>
+                                <button class="venmo-copy-btn option-list-copy" data-filter="not-active" data-pinned="any" style="padding: 4px 8px; background: #007cba; color: white; border: none; border-radius: 3px; cursor: pointer;">copy</button>
+                            </td>
+                            <td style="padding: 8px; border: 1px solid #ddd; text-align: center;">
+                                <button class="venmo-copy-btn senegal-copy" style="padding: 4px 8px; background: #007cba; color: white; border: none; border-radius: 3px; cursor: pointer;">copy</button>
                             </td>
                         </tr>
                     </tbody>
@@ -3131,24 +3153,41 @@ class Grove_Admin {
                     return;
                 }
                 
-                // Get the row this button is in to determine filter type
-                let rowIndex = $(this).closest('tr').index();
+                // Get filter type - use data attributes for option list buttons, row mapping for others
                 let filterType = '';
                 
-                // Map table rows to filter types based on UI table structure
-                switch (rowIndex) {
-                    case 0: // yes, - row
+                if (isOptionList) {
+                    // Use data attributes for option list buttons
+                    let dataFilter = $(this).data('filter');
+                    let dataPinned = $(this).data('pinned');
+                    
+                    // Convert data attributes to filterType format
+                    if (dataFilter === 'active' && dataPinned === 'any') {
                         filterType = 'yes_dash';
-                        break;
-                    case 1: // yes, yes row
+                    } else if (dataFilter === 'active' && dataPinned === 'pinned') {
                         filterType = 'yes_yes';
-                        break;
-                    case 2: // yes, no row
+                    } else if (dataFilter === 'active' && dataPinned === 'not-pinned') {
                         filterType = 'yes_no';
-                        break;
-                    case 3: // no, - row
+                    } else if (dataFilter === 'not-active' && dataPinned === 'any') {
                         filterType = 'no_dash';
-                        break;
+                    }
+                } else {
+                    // Use row mapping for basic link list buttons
+                    let rowIndex = $(this).closest('tr').index();
+                    switch (rowIndex) {
+                        case 0: // yes, - row
+                            filterType = 'yes_dash';
+                            break;
+                        case 1: // yes, yes row
+                            filterType = 'yes_yes';
+                            break;
+                        case 2: // yes, no row
+                            filterType = 'yes_no';
+                            break;
+                        case 3: // no, - row
+                            filterType = 'no_dash';
+                            break;
+                    }
                 }
                 
                 // Get selected order option
@@ -9209,5 +9248,21 @@ class Grove_Admin {
             $log[] = '<div style="color: #d63638;">❌ Error: ' . $e->getMessage() . '</div>';
             wp_send_json_error(implode('', $log));
         }
+    }
+    
+    public function grovehourglass_page() {
+        // AGGRESSIVE NOTICE SUPPRESSION - Remove ALL WordPress admin notices
+        $this->suppress_all_admin_notices();
+        
+        ?>
+        <div class="wrap" style="margin: 0; padding: 0;">
+            <!-- Allow space for WordPress notices -->
+            <div style="height: 20px;"></div>
+            
+            <div style="padding: 20px;">
+                <h1 style="margin-bottom: 20px;">Grove Hour Glass</h1>
+            </div>
+        </div>
+        <?php
     }
 }
