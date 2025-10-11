@@ -12,7 +12,7 @@ if (file_exists(dirname(dirname(dirname(__FILE__))) . '/shenzi-shared-db-schema/
  */
 class Grove_Database {
     
-    const ZEN_DB_VERSION = '2.0';
+    const ZEN_DB_VERSION = '2.1';
     
     public function __construct() {
         // Check and create tables on initialization
@@ -329,15 +329,15 @@ class Grove_Database {
             description1_short text DEFAULT NULL,
             description1_long text DEFAULT NULL,
             rel_icon_image_id int(11) DEFAULT NULL,
-            is_pinned_service tinyint(1) DEFAULT 0,
-            is_active_service tinyint(1) DEFAULT 1,
+            is_pinned tinyint(1) DEFAULT 0,
+            is_active tinyint(1) DEFAULT 1,
             position_in_custom_order int(11) DEFAULT 0,
             created_at timestamp DEFAULT CURRENT_TIMESTAMP,
             updated_at timestamp DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
             PRIMARY KEY (service_id),
             INDEX idx_service_name (service_name),
-            INDEX idx_is_pinned (is_pinned_service),
-            INDEX idx_is_active (is_active_service),
+            INDEX idx_is_pinned (is_pinned),
+            INDEX idx_is_active (is_active),
             INDEX idx_position (position_in_custom_order)
         ) $charset_collate;";
         
@@ -566,7 +566,7 @@ class Grove_Database {
         
         // Add ORDER BY clause
         if ($args['pinned_first']) {
-            $sql .= " ORDER BY is_pinned_service DESC, " . esc_sql($args['orderby']) . " " . esc_sql($args['order']);
+            $sql .= " ORDER BY is_pinned DESC, " . esc_sql($args['orderby']) . " " . esc_sql($args['order']);
         } else {
             $sql .= " ORDER BY " . esc_sql($args['orderby']) . " " . esc_sql($args['order']);
         }

@@ -19,6 +19,7 @@ class Grove_Admin {
         add_action('wp_ajax_grove_locations_delete', array($this, 'grove_locations_delete'));
         add_action('wp_ajax_grove_locations_create', array($this, 'grove_locations_create'));
         add_action('wp_ajax_grove_services_get_data', array($this, 'grove_services_get_data'));
+        add_action('wp_ajax_grove_services_get_venmo_links', array($this, 'grove_services_get_venmo_links'));
         add_action('wp_ajax_grove_services_update_field', array($this, 'grove_services_update_field'));
         add_action('wp_ajax_grove_services_update_active_status', array($this, 'grove_services_update_active_status'));
         add_action('wp_ajax_grove_services_update_pinned_status', array($this, 'grove_services_update_pinned_status'));
@@ -2192,7 +2193,7 @@ class Grove_Admin {
                     <div style="border: 1px solid black; padding: 10px;">
                         <span style="font-size: 16px; font-weight: bold;">sinus_chamber</span>
                         <div style="margin-top: 10px;">
-                            <button id="copy-venmo" class="button">copy venmo</button>
+                            <button id="open-venmo-copy-system" class="button">open venmo copy system</button>
                         </div>
                     </div>
                 </div>
@@ -2390,10 +2391,11 @@ class Grove_Admin {
                                 <th class="for_db_table_zen_services" style="border: 1px solid #ddd; font-weight: bold; text-transform: lowercase; background: #e0e0e0;"><div class="cell_inner_wrapper_div for_db_table_zen_services for_db_column_service_id">wp_zen_services</div></th>
                                 <th class="for_db_table_zen_services" style="border: 1px solid #ddd; font-weight: bold; text-transform: lowercase; background: #e0e0e0;"><div class="cell_inner_wrapper_div for_db_table_zen_services for_db_column_service_name">wp_zen_services</div></th>
                                 
-                                <!-- First 3 paginated columns in new order: description1_short, is_active_service, is_pinned_service -->
+                                <!-- First 3 paginated columns in new order: description1_short, is_active, is_pinned -->
                                 <th class="for_db_table_zen_services" style="border: 1px solid #ddd; font-weight: bold; text-transform: lowercase; background: #e0e0e0;"><div class="cell_inner_wrapper_div for_db_table_zen_services for_db_column_description1_short">wp_zen_services</div></th>
-                                <th class="for_db_table_zen_services" style="border: 1px solid #ddd; font-weight: bold; text-transform: lowercase; background: #e0e0e0;"><div class="cell_inner_wrapper_div for_db_table_zen_services for_db_column_is_active_service">wp_zen_services</div></th>
-                                <th class="for_db_table_zen_services" style="border: 1px solid #ddd; font-weight: bold; text-transform: lowercase; background: #e0e0e0;"><div class="cell_inner_wrapper_div for_db_table_zen_services for_db_column_is_pinned_service">wp_zen_services</div></th>
+                                <th class="for_db_table_zen_services" style="border: 1px solid #ddd; font-weight: bold; text-transform: lowercase; background: #e0e0e0;"><div class="cell_inner_wrapper_div for_db_table_zen_services for_db_column_is_active">wp_zen_services</div></th>
+                                <th class="for_db_table_zen_services" style="border: 1px solid #ddd; font-weight: bold; text-transform: lowercase; background: #e0e0e0;"><div class="cell_inner_wrapper_div for_db_table_zen_services for_db_column_is_pinned">wp_zen_services</div></th>
+                                <th class="for_db_table_zen_services" style="border: 1px solid #ddd; font-weight: bold; text-transform: lowercase; background: #e0e0e0;"><div class="cell_inner_wrapper_div for_db_table_zen_services for_db_column_position_in_custom_order">wp_zen_services</div></th>
                                 
                                 <!-- Remaining columns in existing order -->
                                 <th class="for_db_table_zen_services" style="border: 1px solid #ddd; font-weight: bold; text-transform: lowercase; background: #e0e0e0;"><div class="cell_inner_wrapper_div for_db_table_zen_services for_db_column_suggested_url_slug">wp_zen_services</div></th>
@@ -2410,6 +2412,11 @@ class Grove_Admin {
                                 <th class="for_db_table_abstract_images_according_to_rel_image1_id" style="border: 1px solid #ddd; font-weight: bold; text-transform: lowercase; background: #e0e0e0;"><div class="cell_inner_wrapper_div for_db_table_abstract_images_according_to_rel_image1_id">media</div></th>
                                 <th class="for_db_table_zen_services" style="border: 1px solid #ddd; font-weight: bold; text-transform: lowercase; background: #e0e0e0;"><div class="cell_inner_wrapper_div for_db_table_zen_services for_db_column_rel_icon_image_id">wp_zen_services</div></th>
                                 <th class="for_db_table_abstract_images_according_to_rel_icon_image_id" style="border: 1px solid #ddd; font-weight: bold; text-transform: lowercase; background: #e0e0e0;"><div class="cell_inner_wrapper_div for_db_table_abstract_images_according_to_rel_icon_image_id">media</div></th>
+                                <th class="for_db_table_abstract_images_according_to_rel_icon_image_id" style="border: 1px solid #ddd; font-weight: bold; text-transform: lowercase; background: #e0e0e0;"><div class="cell_inner_wrapper_div for_db_table_abstract_images_according_to_rel_icon_image_id">media</div></th>
+                                <th class="for_db_table_abstract_images_according_to_rel_icon_image_id" style="border: 1px solid #ddd; font-weight: bold; text-transform: lowercase; background: #e0e0e0;"><div class="cell_inner_wrapper_div for_db_table_abstract_images_according_to_rel_icon_image_id">media</div></th>
+                                <th class="for_db_table_abstract_images_according_to_rel_icon_image_id" style="border: 1px solid #ddd; font-weight: bold; text-transform: lowercase; background: #e0e0e0;"><div class="cell_inner_wrapper_div for_db_table_abstract_images_according_to_rel_icon_image_id">media</div></th>
+                                <th class="for_db_table_abstract_images_according_to_rel_icon_image_id" style="border: 1px solid #ddd; font-weight: bold; text-transform: lowercase; background: #e0e0e0;"><div class="cell_inner_wrapper_div for_db_table_abstract_images_according_to_rel_icon_image_id">media</div></th>
+                                <th class="for_db_table_abstract_images_according_to_rel_icon_image_id" style="border: 1px solid #ddd; font-weight: bold; text-transform: lowercase; background: #e0e0e0;"><div class="cell_inner_wrapper_div for_db_table_abstract_images_according_to_rel_icon_image_id">media</div></th>
                                 <th class="for_db_table_zen_services" style="border: 1px solid #ddd; font-weight: bold; text-transform: lowercase; background: #e0e0e0;"><div class="cell_inner_wrapper_div for_db_table_zen_services for_db_column_asn_service_page_id">wp_zen_services</div></th>
                                 <th class="for_db_table_wp_posts_according_to_asn_service_page_id" style="border: 1px solid #ddd; font-weight: bold; text-transform: lowercase; background: #e0e0e0;"><div class="cell_inner_wrapper_div for_db_table_wp_posts_according_to_asn_service_page_id">wp_posts</div></th>
                                 <th class="for_db_table_wp_posts_according_to_asn_service_page_id" style="border: 1px solid #ddd; font-weight: bold; text-transform: lowercase; background: #e0e0e0;"><div class="cell_inner_wrapper_div for_db_table_wp_posts_according_to_asn_service_page_id">wp_posts</div></th>
@@ -2422,10 +2429,11 @@ class Grove_Admin {
                                 <th class="for_db_table_zen_services" data-sort="service_id" style="border: 1px solid #ddd; font-weight: bold; text-transform: lowercase; cursor: pointer; background: #f8f9fa;"><div class="cell_inner_wrapper_div for_db_table_zen_services for_db_column_service_id">service_id</div></th>
                                 <th class="for_db_table_zen_services" data-sort="service_name" style="border: 1px solid #ddd; font-weight: bold; text-transform: lowercase; cursor: pointer; background: #f8f9fa;"><div class="cell_inner_wrapper_div for_db_table_zen_services for_db_column_service_name">service_name</div></th>
                                 
-                                <!-- First 3 paginated columns in new order: description1_short, is_active_service, is_pinned_service -->
+                                <!-- First 3 paginated columns in new order: description1_short, is_active, is_pinned -->
                                 <th class="for_db_table_zen_services" data-sort="description1_short" style="border: 1px solid #ddd; font-weight: bold; text-transform: lowercase; cursor: pointer; background: #f8f9fa;"><div class="cell_inner_wrapper_div for_db_table_zen_services for_db_column_description1_short">description1_short</div></th>
-                                <th class="for_db_table_zen_services" data-sort="is_active_service" style="border: 1px solid #ddd; font-weight: bold; text-transform: lowercase; cursor: pointer; background: #f8f9fa;"><div class="cell_inner_wrapper_div for_db_table_zen_services for_db_column_is_active_service">is_active_service</div></th>
-                                <th class="for_db_table_zen_services" data-sort="is_pinned_service" style="border: 1px solid #ddd; font-weight: bold; text-transform: lowercase; cursor: pointer; background: #f8f9fa;"><div class="cell_inner_wrapper_div for_db_table_zen_services for_db_column_is_pinned_service">is_pinned_service</div></th>
+                                <th class="for_db_table_zen_services" data-sort="is_active" style="border: 1px solid #ddd; font-weight: bold; text-transform: lowercase; cursor: pointer; background: #f8f9fa;"><div class="cell_inner_wrapper_div for_db_table_zen_services for_db_column_is_active">is_active</div></th>
+                                <th class="for_db_table_zen_services" data-sort="is_pinned" style="border: 1px solid #ddd; font-weight: bold; text-transform: lowercase; cursor: pointer; background: #f8f9fa;"><div class="cell_inner_wrapper_div for_db_table_zen_services for_db_column_is_pinned">is_pinned</div></th>
+                                <th class="for_db_table_zen_services" data-sort="position_in_custom_order" style="border: 1px solid #ddd; font-weight: bold; text-transform: lowercase; cursor: pointer; background: #f8f9fa;"><div class="cell_inner_wrapper_div for_db_table_zen_services for_db_column_position_in_custom_order">position_in_custom_order</div></th>
                                 
                                 <!-- Remaining columns in existing order -->
                                 <th class="for_db_table_zen_services" data-sort="suggested_url_slug" style="border: 1px solid #ddd; font-weight: bold; text-transform: lowercase; cursor: pointer; background: #f8f9fa;"><div class="cell_inner_wrapper_div for_db_table_zen_services for_db_column_suggested_url_slug">suggested_url_slug</div></th>
@@ -2442,6 +2450,11 @@ class Grove_Admin {
                                 <th class="for_db_table_abstract_images_according_to_rel_image1_id" style="border: 1px solid #ddd; font-weight: bold; text-transform: lowercase; background: #f8f9fa;"><div class="cell_inner_wrapper_div for_db_table_abstract_images_according_to_rel_image1_id">alt text</div></th>
                                 <th class="for_db_table_zen_services" data-sort="rel_icon_image_id" style="border: 1px solid #ddd; font-weight: bold; text-transform: lowercase; cursor: pointer; background: #f8f9fa;"><div class="cell_inner_wrapper_div for_db_table_zen_services for_db_column_rel_icon_image_id">rel_icon_image_id</div></th>
                                 <th class="for_db_table_abstract_images_according_to_rel_icon_image_id" style="border: 1px solid #ddd; font-weight: bold; text-transform: lowercase; background: #f8f9fa; text-align: left; white-space: nowrap;"><div class="cell_inner_wrapper_div for_db_table_abstract_images_according_to_rel_icon_image_id">image-main-display</div></th>
+                                <th class="for_db_table_abstract_images_according_to_rel_icon_image_id" style="border: 1px solid #ddd; font-weight: bold; text-transform: lowercase;"><div class="cell_inner_wrapper_div for_db_table_abstract_images_according_to_rel_icon_image_id">width</div></th>
+                                <th class="for_db_table_abstract_images_according_to_rel_icon_image_id" style="border: 1px solid #ddd; font-weight: bold; text-transform: lowercase;"><div class="cell_inner_wrapper_div for_db_table_abstract_images_according_to_rel_icon_image_id">height</div></th>
+                                <th class="for_db_table_abstract_images_according_to_rel_icon_image_id" style="border: 1px solid #ddd; font-weight: bold; text-transform: lowercase;"><div class="cell_inner_wrapper_div for_db_table_abstract_images_according_to_rel_icon_image_id">file name</div></th>
+                                <th class="for_db_table_abstract_images_according_to_rel_icon_image_id" style="border: 1px solid #ddd; font-weight: bold; text-transform: lowercase;"><div class="cell_inner_wrapper_div for_db_table_abstract_images_according_to_rel_icon_image_id">img title</div></th>
+                                <th class="for_db_table_abstract_images_according_to_rel_icon_image_id" style="border: 1px solid #ddd; font-weight: bold; text-transform: lowercase;"><div class="cell_inner_wrapper_div for_db_table_abstract_images_according_to_rel_icon_image_id">alt text</div></th>
                                 <th class="for_db_table_zen_services" style="border: 1px solid #ddd; font-weight: bold; text-transform: lowercase; background: #f8f9fa;"><div class="cell_inner_wrapper_div for_db_table_zen_services for_db_column_asn_service_page_id">asn_service_page_id</div></th>
                                 <th class="for_db_table_wp_posts_according_to_asn_service_page_id" style="border: 1px solid #ddd; font-weight: bold; text-transform: lowercase; background: #f8f9fa;"><div class="cell_inner_wrapper_div for_db_table_wp_posts_according_to_asn_service_page_id">post_title</div></th>
                                 <th class="for_db_table_wp_posts_according_to_asn_service_page_id" style="border: 1px solid #ddd; font-weight: bold; text-transform: lowercase; background: #f8f9fa;"><div class="cell_inner_wrapper_div for_db_table_wp_posts_according_to_asn_service_page_id">post_name</div></th>
@@ -2549,6 +2562,108 @@ class Grove_Admin {
                 <input type="hidden" id="current-service-id" value="">
             </div>
         </div>
+
+        <!-- Venmo Copy System Popup -->
+        <div id="venmo-copy-popup" style="display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.5); z-index: 10000;">
+            <div style="position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); background: white; padding: 30px; border-radius: 8px; width: 80%; max-width: 800px; max-height: 80%; overflow-y: auto;">
+                <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px; border-bottom: 1px solid #ddd; padding-bottom: 10px;">
+                    <h2 style="margin: 0;">Venmo Copy System</h2>
+                    <button id="close-venmo-popup" style="background: none; border: none; font-size: 20px; cursor: pointer;">&times;</button>
+                </div>
+
+                <!-- Options Table -->
+                <h3>Select Order Option:</h3>
+                <table id="venmo-options-table" style="width: 100%; border-collapse: collapse; margin-bottom: 30px;">
+                    <tr class="venmo-option-row selected" data-option="position_asc" style="cursor: pointer; background: #e6f3ff;">
+                        <td style="width: 30px; padding: 8px; border: 1px solid #ddd; text-align: center;">
+                            <input type="radio" name="venmo-order" value="position_asc" checked>
+                        </td>
+                        <td style="padding: 8px; border: 1px solid #ddd;">
+                            order using position_in_custom_order (ascending)
+                        </td>
+                    </tr>
+                    <tr class="venmo-option-row" data-option="position_desc" style="cursor: pointer;">
+                        <td style="width: 30px; padding: 8px; border: 1px solid #ddd; text-align: center;">
+                            <input type="radio" name="venmo-order" value="position_desc">
+                        </td>
+                        <td style="padding: 8px; border: 1px solid #ddd;">
+                            order using position_in_custom_order (descending)
+                        </td>
+                    </tr>
+                    <tr class="venmo-option-row" data-option="service_id_asc" style="cursor: pointer;">
+                        <td style="width: 30px; padding: 8px; border: 1px solid #ddd; text-align: center;">
+                            <input type="radio" name="venmo-order" value="service_id_asc">
+                        </td>
+                        <td style="padding: 8px; border: 1px solid #ddd;">
+                            order using service_id (ascending)
+                        </td>
+                    </tr>
+                    <tr class="venmo-option-row" data-option="service_name_alpha" style="cursor: pointer;">
+                        <td style="width: 30px; padding: 8px; border: 1px solid #ddd; text-align: center;">
+                            <input type="radio" name="venmo-order" value="service_name_alpha">
+                        </td>
+                        <td style="padding: 8px; border: 1px solid #ddd;">
+                            order using service_name (alphabetical)
+                        </td>
+                    </tr>
+                </table>
+
+                <!-- Data Table -->
+                <h3>Data Table:</h3>
+                <table style="width: 100%; border-collapse: collapse;">
+                    <thead>
+                        <tr>
+                            <th style="padding: 8px; border: 1px solid #ddd; background: #f8f9fa; font-weight: bold;">is_active</th>
+                            <th style="padding: 8px; border: 1px solid #ddd; background: #f8f9fa; font-weight: bold;">is_pinned</th>
+                            <th style="padding: 8px; border: 1px solid #ddd; background: #f8f9fa; font-weight: bold;">basic link list 1</th>
+                            <th style="padding: 8px; border: 1px solid #ddd; background: #f8f9fa; font-weight: bold;">hyena widget 1</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td style="padding: 8px; border: 1px solid #ddd; text-align: center;">yes</td>
+                            <td style="padding: 8px; border: 1px solid #ddd; text-align: center;">-</td>
+                            <td style="padding: 8px; border: 1px solid #ddd; text-align: center;">
+                                <button class="venmo-copy-btn" style="padding: 4px 8px; background: #007cba; color: white; border: none; border-radius: 3px; cursor: pointer;">copy</button>
+                            </td>
+                            <td style="padding: 8px; border: 1px solid #ddd; text-align: center;">
+                                <button class="venmo-copy-btn" style="padding: 4px 8px; background: #007cba; color: white; border: none; border-radius: 3px; cursor: pointer;">copy</button>
+                            </td>
+                        </tr>
+                        <tr>
+                            <td style="padding: 8px; border: 1px solid #ddd; text-align: center;">yes</td>
+                            <td style="padding: 8px; border: 1px solid #ddd; text-align: center;">yes</td>
+                            <td style="padding: 8px; border: 1px solid #ddd; text-align: center;">
+                                <button class="venmo-copy-btn" style="padding: 4px 8px; background: #007cba; color: white; border: none; border-radius: 3px; cursor: pointer;">copy</button>
+                            </td>
+                            <td style="padding: 8px; border: 1px solid #ddd; text-align: center;">
+                                <button class="venmo-copy-btn" style="padding: 4px 8px; background: #007cba; color: white; border: none; border-radius: 3px; cursor: pointer;">copy</button>
+                            </td>
+                        </tr>
+                        <tr>
+                            <td style="padding: 8px; border: 1px solid #ddd; text-align: center;">yes</td>
+                            <td style="padding: 8px; border: 1px solid #ddd; text-align: center;">no</td>
+                            <td style="padding: 8px; border: 1px solid #ddd; text-align: center;">
+                                <button class="venmo-copy-btn" style="padding: 4px 8px; background: #007cba; color: white; border: none; border-radius: 3px; cursor: pointer;">copy</button>
+                            </td>
+                            <td style="padding: 8px; border: 1px solid #ddd; text-align: center;">
+                                <button class="venmo-copy-btn" style="padding: 4px 8px; background: #007cba; color: white; border: none; border-radius: 3px; cursor: pointer;">copy</button>
+                            </td>
+                        </tr>
+                        <tr>
+                            <td style="padding: 8px; border: 1px solid #ddd; text-align: center;">no</td>
+                            <td style="padding: 8px; border: 1px solid #ddd; text-align: center;">-</td>
+                            <td style="padding: 8px; border: 1px solid #ddd; text-align: center;">
+                                <button class="venmo-copy-btn" style="padding: 4px 8px; background: #007cba; color: white; border: none; border-radius: 3px; cursor: pointer;">copy</button>
+                            </td>
+                            <td style="padding: 8px; border: 1px solid #ddd; text-align: center;">
+                                <button class="venmo-copy-btn" style="padding: 4px 8px; background: #007cba; color: white; border: none; border-radius: 3px; cursor: pointer;">copy</button>
+                            </td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
         
         <script type="text/javascript">
         jQuery(document).ready(function($) {
@@ -2562,11 +2677,14 @@ class Grove_Admin {
             const paginatedColumns = [
                 'service_placard', 'service_moniker', 'service_slug_id', 
                 'description1_short', 'description1_long', 'rel_image1_id',
-                'asn_service_page_id', 'is_pinned_service'
+                'asn_service_page_id', 'is_pinned'
             ];
             
             // Special columns that are always shown but not in wolf band
-            const specialColumns = ['image-main-display', 'width', 'height'];
+            const specialColumns = [
+                'image-main-display', 'width', 'height', 'file name', 'img title', 'alt text',
+                'image-main-display', 'width', 'height', 'file name', 'img title', 'alt text'
+            ];
             
             // Load initial data
             loadServicesData();
@@ -2618,7 +2736,7 @@ class Grove_Admin {
                 }
             });
             
-            // Handle toggle switch for is_active_service (only those without grove-pinned-toggle class)
+            // Handle toggle switch for is_active (only those without grove-pinned-toggle class)
             $(document).on('click', '.grove-toggle-switch:not(.grove-pinned-toggle)', function(e) {
                 console.log('Active toggle clicked!'); // Debug
                 e.preventDefault();
@@ -2677,7 +2795,7 @@ class Grove_Admin {
                             // Update the current data array to reflect the change
                             let serviceIndex = currentData.findIndex(s => s.service_id == serviceId);
                             if (serviceIndex !== -1) {
-                                currentData[serviceIndex].is_active_service = newActiveState;
+                                currentData[serviceIndex].is_active = newActiveState;
                             }
                         } else {
                             // Update failed - re-enable toggle and show error
@@ -2694,7 +2812,7 @@ class Grove_Admin {
                 });
             });
             
-            // Handle toggle switch for is_pinned_service
+            // Handle toggle switch for is_pinned
             $(document).on('click', '.grove-pinned-toggle', function(e) {
                 e.preventDefault();
                 e.stopPropagation();
@@ -2752,7 +2870,7 @@ class Grove_Admin {
                             // Update the current data array to reflect the change
                             let serviceIndex = currentData.findIndex(s => s.service_id == serviceId);
                             if (serviceIndex !== -1) {
-                                currentData[serviceIndex].is_pinned_service = newPinnedState;
+                                currentData[serviceIndex].is_pinned = newPinnedState;
                             }
                         } else {
                             // Update failed - re-enable toggle and show error
@@ -2768,6 +2886,303 @@ class Grove_Admin {
                     }
                 });
             });
+            
+            // Handle position_in_custom_order input changes
+            $(document).on('blur', '.position-input', function() {
+                let input = $(this);
+                let serviceId = input.data('service-id');
+                let newPosition = parseInt(input.val()) || 0;
+                let originalValue = input.data('original-value');
+                
+                // Store original value on first focus if not set
+                if (originalValue === undefined) {
+                    input.data('original-value', newPosition);
+                    originalValue = newPosition;
+                }
+                
+                // Only update if value actually changed
+                if (newPosition == originalValue) {
+                    return;
+                }
+                
+                // Check if another row is using this position
+                let duplicate = false;
+                $('.position-input').each(function() {
+                    if ($(this).data('service-id') != serviceId && parseInt($(this).val()) == newPosition && newPosition != 0) {
+                        duplicate = true;
+                        return false;
+                    }
+                });
+                
+                if (duplicate) {
+                    alert('Position ' + newPosition + ' is already in use by another service. Please choose a different position.');
+                    input.val(originalValue);
+                    return;
+                }
+                
+                // Disable input during update
+                input.prop('disabled', true);
+                
+                $.ajax({
+                    url: ajaxurl,
+                    type: 'POST',
+                    data: {
+                        action: 'grove_services_update_field',
+                        service_id: serviceId,
+                        field: 'position_in_custom_order',
+                        value: newPosition,
+                        nonce: '<?php echo wp_create_nonce('grove_services_nonce'); ?>'
+                    },
+                    success: function(response) {
+                        if (response.success) {
+                            // Update successful - store new original value
+                            input.data('original-value', newPosition);
+                            
+                            // Update data in currentData array if it exists
+                            if (typeof currentData !== 'undefined') {
+                                let serviceIndex = currentData.findIndex(s => s.service_id == serviceId);
+                                if (serviceIndex !== -1) {
+                                    currentData[serviceIndex].position_in_custom_order = newPosition;
+                                }
+                            }
+                            
+                            // Flash green background
+                            input.css('background-color', '#d4edda');
+                            setTimeout(function() {
+                                input.css('background-color', '');
+                            }, 500);
+                        } else {
+                            alert('Error updating position: ' + (response.data || 'Unknown error'));
+                            input.val(originalValue);
+                        }
+                        input.prop('disabled', false);
+                    },
+                    error: function(xhr, status, error) {
+                        input.prop('disabled', false);
+                        alert('Error updating position: Network error - ' + error);
+                        input.val(originalValue);
+                    }
+                });
+            });
+            
+            // Store original value on focus
+            $(document).on('focus', '.position-input', function() {
+                let input = $(this);
+                if (!input.data('original-value')) {
+                    input.data('original-value', parseInt(input.val()) || 0);
+                }
+            });
+            
+            // Handle position clear button clicks
+            $(document).on('click', '.position-clear-btn', function(e) {
+                e.preventDefault();
+                e.stopPropagation();
+                
+                let btn = $(this);
+                let serviceId = btn.data('service-id');
+                let input = btn.siblings('.position-input');
+                
+                // Disable button and input during update
+                btn.prop('disabled', true);
+                input.prop('disabled', true);
+                
+                $.ajax({
+                    url: ajaxurl,
+                    type: 'POST',
+                    data: {
+                        action: 'grove_services_update_field',
+                        service_id: serviceId,
+                        field: 'position_in_custom_order',
+                        value: 0,
+                        nonce: '<?php echo wp_create_nonce('grove_services_nonce'); ?>'
+                    },
+                    success: function(response) {
+                        if (response.success) {
+                            // Update successful - set input to 0
+                            input.val(0);
+                            input.data('original-value', 0);
+                            
+                            // Update data in currentData array if it exists
+                            if (typeof currentData !== 'undefined') {
+                                let serviceIndex = currentData.findIndex(s => s.service_id == serviceId);
+                                if (serviceIndex !== -1) {
+                                    currentData[serviceIndex].position_in_custom_order = 0;
+                                }
+                            }
+                            
+                            // Flash green background on input
+                            input.css('background-color', '#d4edda');
+                            setTimeout(function() {
+                                input.css('background-color', '');
+                            }, 500);
+                        } else {
+                            alert('Error clearing position: ' + (response.data || 'Unknown error'));
+                        }
+                        btn.prop('disabled', false);
+                        input.prop('disabled', false);
+                    },
+                    error: function(xhr, status, error) {
+                        btn.prop('disabled', false);
+                        input.prop('disabled', false);
+                        alert('Error clearing position: Network error - ' + error);
+                    }
+                });
+            });
+            
+            // Venmo Copy System Popup handlers
+            $(document).on('click', '#open-venmo-copy-system', function(e) {
+                e.preventDefault();
+                $('#venmo-copy-popup').show();
+            });
+            
+            $(document).on('click', '#close-venmo-popup', function(e) {
+                e.preventDefault();
+                $('#venmo-copy-popup').hide();
+            });
+            
+            // Close popup when clicking outside the modal content
+            $(document).on('click', '#venmo-copy-popup', function(e) {
+                if (e.target === this) {
+                    $('#venmo-copy-popup').hide();
+                }
+            });
+            
+            // Handle option row selection
+            $(document).on('click', '.venmo-option-row', function(e) {
+                // Remove selected class and background from all rows
+                $('.venmo-option-row').removeClass('selected').css('background', '');
+                
+                // Add selected class and light blue background to clicked row
+                $(this).addClass('selected').css('background', '#e6f3ff');
+                
+                // Check the radio button in this row
+                $(this).find('input[type="radio"]').prop('checked', true);
+            });
+            
+            // Handle radio button clicks (prevent double event)
+            $(document).on('click', '.venmo-option-row input[type="radio"]', function(e) {
+                e.stopPropagation();
+                
+                // Remove selected class and background from all rows
+                $('.venmo-option-row').removeClass('selected').css('background', '');
+                
+                // Add selected class and light blue background to parent row
+                $(this).closest('.venmo-option-row').addClass('selected').css('background', '#e6f3ff');
+            });
+            
+            // Handle venmo copy button clicks for basic link list column
+            $(document).on('click', '.venmo-copy-btn', function(e) {
+                e.preventDefault();
+                
+                // Check if this is a basic link list copy button (not hyena widget)
+                let isBasicLinkList = $(this).closest('td').index() === 2; // 3rd column (0-indexed)
+                
+                if (!isBasicLinkList) {
+                    // Hyena widget functionality not implemented yet
+                    alert('Hyena widget functionality not implemented yet');
+                    return;
+                }
+                
+                // Get the row this button is in to determine filter type
+                let rowIndex = $(this).closest('tr').index();
+                let filterType = '';
+                
+                // Map table rows to filter types based on UI table structure
+                switch (rowIndex) {
+                    case 0: // yes, - row
+                        filterType = 'yes_dash';
+                        break;
+                    case 1: // yes, yes row
+                        filterType = 'yes_yes';
+                        break;
+                    case 2: // yes, no row
+                        filterType = 'yes_no';
+                        break;
+                    case 3: // no, - row
+                        filterType = 'no_dash';
+                        break;
+                }
+                
+                // Get selected order option
+                let orderBy = $('input[name="venmo-order"]:checked').val();
+                
+                // Disable button during request
+                let btn = $(this);
+                btn.prop('disabled', true).text('Loading...');
+                
+                // Make AJAX request to get filtered/ordered services
+                $.ajax({
+                    url: ajaxurl,
+                    type: 'POST',
+                    data: {
+                        action: 'grove_services_get_venmo_links',
+                        filter_type: filterType,
+                        order_by: orderBy,
+                        nonce: '<?php echo wp_create_nonce('grove_services_nonce'); ?>'
+                    },
+                    success: function(response) {
+                        if (response.success) {
+                            // Build the HTML string from all the links
+                            let htmlString = '';
+                            response.data.forEach(function(link) {
+                                htmlString += link.html;
+                            });
+                            
+                            // Copy to clipboard
+                            if (navigator.clipboard && window.isSecureContext) {
+                                // Modern async clipboard API
+                                navigator.clipboard.writeText(htmlString).then(function() {
+                                    alert('Links copied to clipboard! (' + response.data.length + ' links)');
+                                }).catch(function(err) {
+                                    console.error('Failed to copy: ', err);
+                                    fallbackCopyTextToClipboard(htmlString);
+                                });
+                            } else {
+                                // Fallback for older browsers
+                                fallbackCopyTextToClipboard(htmlString);
+                            }
+                        } else {
+                            alert('Error generating links: ' + (response.data || 'Unknown error'));
+                        }
+                        
+                        // Re-enable button
+                        btn.prop('disabled', false).text('copy');
+                    },
+                    error: function(xhr, status, error) {
+                        alert('Error generating links: Network error - ' + error);
+                        btn.prop('disabled', false).text('copy');
+                    }
+                });
+            });
+            
+            // Fallback function for copying to clipboard
+            function fallbackCopyTextToClipboard(text) {
+                let textArea = document.createElement("textarea");
+                textArea.value = text;
+                
+                // Avoid scrolling to bottom
+                textArea.style.top = "0";
+                textArea.style.left = "0";
+                textArea.style.position = "fixed";
+                
+                document.body.appendChild(textArea);
+                textArea.focus();
+                textArea.select();
+                
+                try {
+                    let successful = document.execCommand('copy');
+                    if (successful) {
+                        alert('Links copied to clipboard!');
+                    } else {
+                        alert('Failed to copy links to clipboard');
+                    }
+                } catch (err) {
+                    console.error('Fallback: Oops, unable to copy', err);
+                    alert('Failed to copy links to clipboard');
+                }
+                
+                document.body.removeChild(textArea);
+            }
             
             $(document).on('click', '.delete-image-btn, .delete-icon-image-btn', function(e) {
                 e.preventDefault();
@@ -2802,8 +3217,8 @@ class Grove_Admin {
                             // Debug: Log the first service's toggle field values
                             if (currentData.length > 0) {
                                 console.log('Debug - First service toggle values:');
-                                console.log('is_active_service:', currentData[0].is_active_service);
-                                console.log('is_pinned_service:', currentData[0].is_pinned_service);
+                                console.log('is_active:', currentData[0].is_active);
+                                console.log('is_pinned:', currentData[0].is_pinned);
                                 console.log('Full first service data:', currentData[0]);
                             }
                             
@@ -2836,24 +3251,33 @@ class Grove_Admin {
                     tr.append('<td class="for_db_table_zen_services" style="border: 1px solid #ddd;"><div class="cell_inner_wrapper_div for_db_table_zen_services for_db_column_service_id">' + (service.service_id || '') + '</div></td>');
                     tr.append('<td class="for_db_table_zen_services" style="border: 1px solid #ddd; cursor: pointer;" data-field="service_name" data-id="' + service.service_id + '"><div class="cell_inner_wrapper_div for_db_table_zen_services for_db_column_service_name">' + (service.service_name || '') + '</div></td>');
                     
-                    // First 3 paginated columns in new order: description1_short, is_active_service, is_pinned_service
+                    // First 3 paginated columns in new order: description1_short, is_active, is_pinned
                     tr.append('<td class="for_db_table_zen_services" style="border: 1px solid #ddd; cursor: pointer;" data-field="description1_short" data-id="' + service.service_id + '"><div class="cell_inner_wrapper_div for_db_table_zen_services for_db_column_description1_short">' + (service.description1_short || '') + '</div></td>');
                     
                     // Debug log for toggle values
-                    console.log('Service ID ' + service.service_id + ' - is_active_service:', service.is_active_service, 'is_pinned_service:', service.is_pinned_service);
+                    console.log('Service ID ' + service.service_id + ' - is_active:', service.is_active, 'is_pinned:', service.is_pinned);
                     
-                    let isActiveToggle = '<td class="for_db_table_zen_services" style="border: 1px solid #ddd; text-align: center;"><div class="cell_inner_wrapper_div for_db_table_zen_services for_db_column_is_active_service">' +
-                        '<div class="grove-toggle-switch' + (service.is_active_service == 0 ? ' off' : '') + '" data-service-id="' + service.service_id + '" style="position: relative; width: 50px; height: 24px; background: ' + (service.is_active_service == 1 ? '#4CAF50' : '#ccc') + '; border-radius: 12px; cursor: pointer; transition: background 0.3s; margin: 0 auto;">' +
-                        '<div class="grove-toggle-knob" style="position: absolute; top: 2px; ' + (service.is_active_service == 1 ? 'right: 2px;' : 'left: 2px;') + ' width: 20px; height: 20px; background: white; border-radius: 50%; transition: all 0.3s; box-shadow: 0 2px 4px rgba(0,0,0,0.2);"></div>' +
+                    let isActiveToggle = '<td class="for_db_table_zen_services" style="border: 1px solid #ddd; text-align: center;"><div class="cell_inner_wrapper_div for_db_table_zen_services for_db_column_is_active">' +
+                        '<div class="grove-toggle-switch' + (service.is_active == 0 ? ' off' : '') + '" data-service-id="' + service.service_id + '" style="position: relative; width: 50px; height: 24px; background: ' + (service.is_active == 1 ? '#4CAF50' : '#ccc') + '; border-radius: 12px; cursor: pointer; transition: background 0.3s; margin: 0 auto;">' +
+                        '<div class="grove-toggle-knob" style="position: absolute; top: 2px; ' + (service.is_active == 1 ? 'right: 2px;' : 'left: 2px;') + ' width: 20px; height: 20px; background: white; border-radius: 50%; transition: all 0.3s; box-shadow: 0 2px 4px rgba(0,0,0,0.2);"></div>' +
                         '</div>' +
                         '</div></td>';
                     tr.append(isActiveToggle);
-                    let isPinnedToggle = '<td class="for_db_table_zen_services" style="border: 1px solid #ddd; text-align: center;"><div class="cell_inner_wrapper_div for_db_table_zen_services for_db_column_is_pinned_service">' +
-                        '<div class="grove-toggle-switch grove-pinned-toggle' + (service.is_pinned_service == 0 ? ' off' : '') + '" data-service-id="' + service.service_id + '" style="position: relative; width: 50px; height: 24px; background: ' + (service.is_pinned_service == 1 ? '#4CAF50' : '#ccc') + '; border-radius: 12px; cursor: pointer; transition: background 0.3s; margin: 0 auto;">' +
-                        '<div class="grove-toggle-knob" style="position: absolute; top: 2px; ' + (service.is_pinned_service == 1 ? 'right: 2px;' : 'left: 2px;') + ' width: 20px; height: 20px; background: white; border-radius: 50%; transition: all 0.3s; box-shadow: 0 2px 4px rgba(0,0,0,0.2);"></div>' +
+                    let isPinnedToggle = '<td class="for_db_table_zen_services" style="border: 1px solid #ddd; text-align: center;"><div class="cell_inner_wrapper_div for_db_table_zen_services for_db_column_is_pinned">' +
+                        '<div class="grove-toggle-switch grove-pinned-toggle' + (service.is_pinned == 0 ? ' off' : '') + '" data-service-id="' + service.service_id + '" style="position: relative; width: 50px; height: 24px; background: ' + (service.is_pinned == 1 ? '#4CAF50' : '#ccc') + '; border-radius: 12px; cursor: pointer; transition: background 0.3s; margin: 0 auto;">' +
+                        '<div class="grove-toggle-knob" style="position: absolute; top: 2px; ' + (service.is_pinned == 1 ? 'right: 2px;' : 'left: 2px;') + ' width: 20px; height: 20px; background: white; border-radius: 50%; transition: all 0.3s; box-shadow: 0 2px 4px rgba(0,0,0,0.2);"></div>' +
                         '</div>' +
                         '</div></td>';
                     tr.append(isPinnedToggle);
+                    
+                    // Position in custom order column with editable input
+                    let positionCell = '<td class="for_db_table_zen_services" style="border: 1px solid #ddd; text-align: center;"><div class="cell_inner_wrapper_div for_db_table_zen_services for_db_column_position_in_custom_order">' +
+                        '<div style="display: flex; align-items: center; justify-content: center; gap: 4px;">' +
+                        '<input type="number" class="position-input" data-service-id="' + service.service_id + '" value="0" style="width: 60px; padding: 4px; border: 1px solid #ddd; border-radius: 3px; text-align: center;">' +
+                        '<button class="position-clear-btn" data-service-id="' + service.service_id + '" style="padding: 4px 6px; background: #fffacd; border: 1px solid #ddd; border-radius: 3px; font-size: 11px; cursor: pointer;">CL</button>' +
+                        '</div>' +
+                        '</div></td>';
+                    tr.append(positionCell);
                     
                     // Remaining columns in existing order
                     tr.append('<td class="for_db_table_zen_services" style="border: 1px solid #ddd; cursor: pointer;" data-field="suggested_url_slug" data-id="' + service.service_id + '"><div class="cell_inner_wrapper_div for_db_table_zen_services for_db_column_suggested_url_slug">' + (service.suggested_url_slug || '') + '</div></td>');
@@ -2984,6 +3408,60 @@ class Grove_Admin {
                     }
                     mainIconImageCell += '</div></td>';
                     tr.append(mainIconImageCell);
+                    
+                    // Icon Width column
+                    let iconWidthCell = '<td class="for_db_table_abstract_images_according_to_rel_icon_image_id image-width-cell" style="border: 1px solid #ddd; text-align: center;" data-attachment-id="' + (service.rel_icon_image_id || '') + '"><div class="cell_inner_wrapper_div for_db_table_abstract_images_according_to_rel_icon_image_id">';
+                    if (service.rel_icon_image_id && service.rel_icon_image_id > 0) {
+                        iconWidthCell += '<span class="width-value">-</span>';
+                    } else {
+                        iconWidthCell += '-';
+                    }
+                    iconWidthCell += '</div></td>';
+                    tr.append(iconWidthCell);
+                    
+                    // Icon Height column  
+                    let iconHeightCell = '<td class="for_db_table_abstract_images_according_to_rel_icon_image_id image-height-cell" style="border: 1px solid #ddd; text-align: center;" data-attachment-id="' + (service.rel_icon_image_id || '') + '"><div class="cell_inner_wrapper_div for_db_table_abstract_images_according_to_rel_icon_image_id">';
+                    if (service.rel_icon_image_id && service.rel_icon_image_id > 0) {
+                        iconHeightCell += '<span class="height-value">-</span>';
+                    } else {
+                        iconHeightCell += '-';
+                    }
+                    iconHeightCell += '</div></td>';
+                    tr.append(iconHeightCell);
+                    
+                    // Icon File Name column with special editing
+                    let iconFileNameCell = '<td class="for_db_table_abstract_images_according_to_rel_icon_image_id filename-cell" style="border: 1px solid #ddd; text-align: left;" data-attachment-id="' + (service.rel_icon_image_id || '') + '"><div class="cell_inner_wrapper_div for_db_table_abstract_images_according_to_rel_icon_image_id">';
+                    if (service.rel_icon_image_id && service.rel_icon_image_id > 0) {
+                        iconFileNameCell += '<div class="filename-editor-container" style="display: flex; align-items: center; gap: 4px;">';
+                        iconFileNameCell += '<button class="button button-small filename-change-btn" style="font-size: 11px; padding: 2px 6px;">Change</button>';
+                        iconFileNameCell += '<input type="text" class="filename-input" data-attachment-id="' + service.rel_icon_image_id + '" value="Loading..." style="flex: 1; padding: 4px; border: 1px solid #ddd; border-radius: 3px; background: #f9f9f9;" readonly>';
+                        iconFileNameCell += '<button class="button button-small filename-save-btn" style="font-size: 11px; padding: 2px 6px; background: #ccc; color: #666; display: none;" disabled>Save</button>';
+                        iconFileNameCell += '</div>';
+                    } else {
+                        iconFileNameCell += '<span style="color: #999;">-</span>';
+                    }
+                    iconFileNameCell += '</div></td>';
+                    tr.append(iconFileNameCell);
+                    
+                    // Icon Image Title column
+                    let iconImgTitleCell = '<td class="for_db_table_abstract_images_according_to_rel_icon_image_id img-title-cell" style="border: 1px solid #ddd; text-align: left;" data-attachment-id="' + (service.rel_icon_image_id || '') + '"><div class="cell_inner_wrapper_div for_db_table_abstract_images_according_to_rel_icon_image_id">';
+                    if (service.rel_icon_image_id && service.rel_icon_image_id > 0) {
+                        iconImgTitleCell += '<input type="text" class="img-title-input" data-attachment-id="' + service.rel_icon_image_id + '" value="Loading..." style="width: 100%; padding: 4px; border: 1px solid #ddd; border-radius: 3px;">';
+                    } else {
+                        iconImgTitleCell += '<span style="color: #999;">-</span>';
+                    }
+                    iconImgTitleCell += '</div></td>';
+                    tr.append(iconImgTitleCell);
+                    
+                    // Icon Alt Text column
+                    let iconAltTextCell = '<td class="for_db_table_abstract_images_according_to_rel_icon_image_id alt-text-cell" style="border: 1px solid #ddd; text-align: left;" data-attachment-id="' + (service.rel_icon_image_id || '') + '"><div class="cell_inner_wrapper_div for_db_table_abstract_images_according_to_rel_icon_image_id">';
+                    if (service.rel_icon_image_id && service.rel_icon_image_id > 0) {
+                        iconAltTextCell += '<input type="text" class="alt-text-input" data-attachment-id="' + service.rel_icon_image_id + '" value="Loading..." style="width: 100%; padding: 4px; border: 1px solid #ddd; border-radius: 3px;">';
+                    } else {
+                        iconAltTextCell += '<span style="color: #999;">-</span>';
+                    }
+                    iconAltTextCell += '</div></td>';
+                    tr.append(iconAltTextCell);
                     
                     // ASN Service Page ID column
                     let pageCell = '<td class="for_db_table_zen_services" style="border: 1px solid #ddd;"><div class="cell_inner_wrapper_div for_db_table_zen_services for_db_column_asn_service_page_id">';
@@ -3225,7 +3703,7 @@ class Grove_Admin {
                 markdownContent += '|------------|--------------|-------------------|-----------------|-----------------|-----------------|-------------------|------------------|-----------|-----------|----------|---------------------|\n';
                 
                 currentData.forEach(function(service) {
-                    markdownContent += `| ${service.service_id || ''} | ${service.service_name || ''} | ${service.suggested_url_slug || ''} | ${service.service_placard || ''} | ${service.service_moniker || ''} | ${service.service_slug_id || ''} | ${service.description1_short || ''} | ${service.description1_long || ''} | ${service.is_active_service ? 'Yes' : 'No'} | ${service.is_pinned_service ? 'Yes' : 'No'} | ${service.rel_image1_id || ''} | ${service.asn_service_page_id || ''} |\n`;
+                    markdownContent += `| ${service.service_id || ''} | ${service.service_name || ''} | ${service.suggested_url_slug || ''} | ${service.service_placard || ''} | ${service.service_moniker || ''} | ${service.service_slug_id || ''} | ${service.description1_short || ''} | ${service.description1_long || ''} | ${service.is_active ? 'Yes' : 'No'} | ${service.is_pinned ? 'Yes' : 'No'} | ${service.rel_image1_id || ''} | ${service.asn_service_page_id || ''} |\n`;
                 });
                 
                 downloadFile(markdownContent, 'grove-services-export.md', 'text/markdown');
@@ -3235,7 +3713,7 @@ class Grove_Admin {
                 let xlsContent = 'Service ID\tService Name\tSuggested URL Slug\tService Placard\tService Moniker\tService Slug ID\tDescription Short\tDescription Long\tIs Active\tIs Pinned\tImage ID\tASN Service Page ID\n';
                 
                 currentData.forEach(function(service) {
-                    xlsContent += `${service.service_id || ''}\t${service.service_name || ''}\t${service.suggested_url_slug || ''}\t${service.service_placard || ''}\t${service.service_moniker || ''}\t${service.service_slug_id || ''}\t${service.description1_short || ''}\t${service.description1_long || ''}\t${service.is_active_service ? 'Yes' : 'No'}\t${service.is_pinned_service ? 'Yes' : 'No'}\t${service.rel_image1_id || ''}\t${service.asn_service_page_id || ''}\n`;
+                    xlsContent += `${service.service_id || ''}\t${service.service_name || ''}\t${service.suggested_url_slug || ''}\t${service.service_placard || ''}\t${service.service_moniker || ''}\t${service.service_slug_id || ''}\t${service.description1_short || ''}\t${service.description1_long || ''}\t${service.is_active ? 'Yes' : 'No'}\t${service.is_pinned ? 'Yes' : 'No'}\t${service.rel_image1_id || ''}\t${service.asn_service_page_id || ''}\n`;
                 });
                 
                 navigator.clipboard.writeText(xlsContent).then(function() {
@@ -3256,14 +3734,14 @@ class Grove_Admin {
                 sqlContent += '  service_slug_id INT,\n';
                 sqlContent += '  description1_short TEXT,\n';
                 sqlContent += '  description1_long TEXT,\n';
-                sqlContent += '  is_active_service BOOLEAN,\n';
-                sqlContent += '  is_pinned_service BOOLEAN,\n';
+                sqlContent += '  is_active BOOLEAN,\n';
+                sqlContent += '  is_pinned BOOLEAN,\n';
                 sqlContent += '  rel_image1_id INT,\n';
                 sqlContent += '  asn_service_page_id INT\n';
                 sqlContent += ');\n\n';
                 
                 currentData.forEach(function(service) {
-                    sqlContent += `INSERT INTO grove_services_export VALUES (${service.service_id || 'NULL'}, '${(service.service_name || '').replace(/'/g, "''")}', '${(service.suggested_url_slug || '').replace(/'/g, "''")}', '${(service.service_placard || '').replace(/'/g, "''")}', '${(service.service_moniker || '').replace(/'/g, "''")}', ${service.service_slug_id || 'NULL'}, '${(service.description1_short || '').replace(/'/g, "''")}', '${(service.description1_long || '').replace(/'/g, "''")}', ${service.is_active_service ? 'TRUE' : 'FALSE'}, ${service.is_pinned_service ? 'TRUE' : 'FALSE'}, ${service.rel_image1_id || 'NULL'}, ${service.asn_service_page_id || 'NULL'});\n`;
+                    sqlContent += `INSERT INTO grove_services_export VALUES (${service.service_id || 'NULL'}, '${(service.service_name || '').replace(/'/g, "''")}', '${(service.suggested_url_slug || '').replace(/'/g, "''")}', '${(service.service_placard || '').replace(/'/g, "''")}', '${(service.service_moniker || '').replace(/'/g, "''")}', ${service.service_slug_id || 'NULL'}, '${(service.description1_short || '').replace(/'/g, "''")}', '${(service.description1_long || '').replace(/'/g, "''")}', ${service.is_active ? 'TRUE' : 'FALSE'}, ${service.is_pinned ? 'TRUE' : 'FALSE'}, ${service.rel_image1_id || 'NULL'}, ${service.asn_service_page_id || 'NULL'});\n`;
                 });
                 
                 downloadFile(sqlContent, 'grove-services-export.sql', 'text/sql');
@@ -4940,6 +5418,87 @@ class Grove_Admin {
     }
     
     /**
+     * AJAX: Get filtered and ordered services for venmo copy functionality
+     */
+    public function grove_services_get_venmo_links() {
+        check_ajax_referer('grove_services_nonce', 'nonce');
+        
+        if (!current_user_can('manage_options')) {
+            wp_die('Unauthorized');
+        }
+        
+        try {
+            $filter_type = sanitize_text_field($_POST['filter_type']); // yes_dash, yes_yes, yes_no, no_dash
+            $order_by = sanitize_text_field($_POST['order_by']); // position_asc, position_desc, service_id_asc, service_name_alpha
+            
+            global $wpdb;
+            $table_name = $wpdb->prefix . 'zen_services';
+            
+            // Build WHERE clause based on filter_type
+            $where_conditions = array();
+            
+            switch ($filter_type) {
+                case 'yes_dash': // is_active = yes, is_pinned = - (any)
+                    $where_conditions[] = "is_active = 1";
+                    break;
+                case 'yes_yes': // is_active = yes, is_pinned = yes
+                    $where_conditions[] = "is_active = 1";
+                    $where_conditions[] = "is_pinned = 1";
+                    break;
+                case 'yes_no': // is_active = yes, is_pinned = no
+                    $where_conditions[] = "is_active = 1";
+                    $where_conditions[] = "is_pinned = 0";
+                    break;
+                case 'no_dash': // is_active = no, is_pinned = - (any)
+                    $where_conditions[] = "is_active = 0";
+                    break;
+            }
+            
+            $where_clause = !empty($where_conditions) ? 'WHERE ' . implode(' AND ', $where_conditions) : '';
+            
+            // Build ORDER BY clause
+            $order_clause = '';
+            switch ($order_by) {
+                case 'position_asc':
+                    $order_clause = 'ORDER BY position_in_custom_order ASC';
+                    break;
+                case 'position_desc':
+                    $order_clause = 'ORDER BY position_in_custom_order DESC';
+                    break;
+                case 'service_id_asc':
+                    $order_clause = 'ORDER BY service_id ASC';
+                    break;
+                case 'service_name_alpha':
+                    $order_clause = 'ORDER BY service_name ASC';
+                    break;
+            }
+            
+            $sql = "SELECT service_id, service_name, asn_service_page_id FROM $table_name $where_clause $order_clause";
+            $results = $wpdb->get_results($sql);
+            
+            $links = array();
+            foreach ($results as $service) {
+                $permalink = '';
+                if ($service->asn_service_page_id) {
+                    $permalink = get_permalink($service->asn_service_page_id);
+                }
+                
+                $links[] = array(
+                    'service_id' => $service->service_id,
+                    'service_name' => $service->service_name,
+                    'permalink' => $permalink,
+                    'html' => '<a href="' . esc_url($permalink) . '">' . esc_html($service->service_name) . '</a><br>' . "\n"
+                );
+            }
+            
+            wp_send_json_success($links);
+            
+        } catch (Exception $e) {
+            wp_send_json_error('Error generating venmo links: ' . $e->getMessage());
+        }
+    }
+    
+    /**
      * AJAX: Update services field
      */
     public function grove_services_update_field() {
@@ -4952,7 +5511,7 @@ class Grove_Admin {
         $id = intval($_POST['id']);
         $field = sanitize_text_field($_POST['field']);
         
-        $allowed_fields = ['service_name', 'suggested_url_slug', 'service_placard', 'service_moniker', 'service_sobriquet', 'description1_short', 'description1_long', 'rel_image1_id', 'rel_icon_image_id', 'service_slug_id', 'asn_service_page_id'];
+        $allowed_fields = ['service_name', 'suggested_url_slug', 'service_placard', 'service_moniker', 'service_sobriquet', 'description1_short', 'description1_long', 'rel_image1_id', 'rel_icon_image_id', 'service_slug_id', 'asn_service_page_id', 'position_in_custom_order'];
         
         if (!in_array($field, $allowed_fields)) {
             wp_send_json_error('Invalid field name');
@@ -4960,7 +5519,7 @@ class Grove_Admin {
         }
         
         // Handle different data types
-        if ($field === 'rel_image1_id') {
+        if ($field === 'rel_image1_id' || $field === 'rel_icon_image_id' || $field === 'position_in_custom_order') {
             $value = !empty($_POST['value']) ? intval($_POST['value']) : null;
             $format = '%d';
         } else {
@@ -5020,7 +5579,7 @@ class Grove_Admin {
         try {
             $result = $wpdb->update(
                 $table_name,
-                array('is_active_service' => $is_active),
+                array('is_active' => $is_active),
                 array('service_id' => $service_id),
                 array('%d'),
                 array('%d')
@@ -5066,7 +5625,7 @@ class Grove_Admin {
         try {
             $result = $wpdb->update(
                 $table_name,
-                array('is_pinned_service' => $is_pinned),
+                array('is_pinned' => $is_pinned),
                 array('service_id' => $service_id),
                 array('%d'),
                 array('%d')
@@ -5104,7 +5663,7 @@ class Grove_Admin {
             'service_sobriquet' => sanitize_text_field($_POST['service_sobriquet']),
             'description1_short' => sanitize_textarea_field($_POST['description1_short']),
             'description1_long' => sanitize_textarea_field($_POST['description1_long']),
-            'is_pinned_service' => 0,
+            'is_pinned' => 0,
             'position_in_custom_order' => 0
         );
         
