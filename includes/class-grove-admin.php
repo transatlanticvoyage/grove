@@ -9863,8 +9863,8 @@ class Grove_Admin {
             1
         ), ARRAY_A);
         
-        // Set defaults if no data exists
-        $current_method = isset($raven_data['driggs_raven_method']) ? $raven_data['driggs_raven_method'] : 'short_path';
+        // Get current values (no defaults - user must set)
+        $current_method = isset($raven_data['driggs_raven_method']) ? $raven_data['driggs_raven_method'] : '';
         $current_short_path = isset($raven_data['driggs_raven_contact_short_path']) ? $raven_data['driggs_raven_contact_short_path'] : '';
         $current_long_url = isset($raven_data['driggs_raven_contact_long_url']) ? $raven_data['driggs_raven_contact_long_url'] : '';
         
@@ -9883,29 +9883,71 @@ class Grove_Admin {
                     
                     <!-- Method Selection -->
                     <div style="margin-bottom: 20px;">
-                        <label style="display: block; font-weight: bold; margin-bottom: 8px;">URL Generation Method:</label>
+                        <label style="display: block; font-weight: bold; margin-bottom: 8px;">
+                            <span style="font-weight: bold; font-size: 16px; color: #333;">driggs_raven_method</span> | URL Generation Method:
+                        </label>
                         <select id="raven-method" style="padding: 8px; border: 1px solid #ccc; border-radius: 4px; width: 200px;">
+                            <option value="" <?php echo (empty($current_method)) ? 'selected' : ''; ?>>-- Select Method --</option>
                             <option value="short_path" <?php echo ($current_method === 'short_path') ? 'selected' : ''; ?>>Short Path (Recommended)</option>
                             <option value="long_url" <?php echo ($current_method === 'long_url') ? 'selected' : ''; ?>>Full URL</option>
                         </select>
+                        <?php if (!empty($current_method)): ?>
+                            <span style="margin-left: 15px; font-weight: bold; color: <?php echo ($current_method === 'short_path') ? '#28a745' : '#007cba'; ?>;">
+                                Currently Active: <?php echo ($current_method === 'short_path') ? 'Short Path' : 'Full URL'; ?>
+                            </span>
+                        <?php else: ?>
+                            <span style="margin-left: 15px; font-weight: bold; color: #dc3545;">
+                                ⚠️ Not Configured - Please select a method and save
+                            </span>
+                        <?php endif; ?>
                     </div>
                     
-                    <!-- Short Path Input -->
-                    <div id="short-path-section" style="margin-bottom: 20px; <?php echo ($current_method === 'long_url') ? 'display: none;' : ''; ?>">
-                        <label for="raven-short-path" style="display: block; font-weight: bold; margin-bottom: 8px;">Contact Page Path:</label>
+                    <!-- Short Path Input - Always Visible -->
+                    <div id="short-path-section" style="margin-bottom: 20px; padding: 15px; border: 1px solid #ddd; border-radius: 4px; background: <?php echo ($current_method === 'short_path') ? '#f8fff8' : '#f5f5f5'; ?>;">
+                        <label for="raven-short-path" style="display: block; font-weight: bold; margin-bottom: 8px; color: <?php echo ($current_method === 'short_path') ? '#000' : '#666'; ?>;">
+                            <span style="font-weight: bold; font-size: 16px; color: #333;">driggs_raven_contact_short_path</span> | Contact Page Path: 
+                            <?php if ($current_method === 'short_path'): ?>
+                                <span style="color: #28a745;">(ACTIVE)</span>
+                            <?php elseif (empty($current_method)): ?>
+                                <span style="color: #dc3545;">(not configured)</span>
+                            <?php else: ?>
+                                <span style="color: #999;">(inactive)</span>
+                            <?php endif; ?>
+                        </label>
                         <div style="display: flex; align-items: center; gap: 10px; margin-bottom: 8px;">
                             <span style="color: #666; font-family: monospace;"><?php echo home_url(); ?>/</span>
-                            <input type="text" id="raven-short-path" value="<?php echo esc_attr($current_short_path); ?>" placeholder="contact-us" style="padding: 8px; border: 1px solid #ccc; border-radius: 4px; width: 200px;">
+                            <input type="text" id="raven-short-path" value="<?php echo esc_attr($current_short_path); ?>" placeholder="contact-us" style="padding: 8px; border: 1px solid #ccc; border-radius: 4px; width: 200px; opacity: <?php echo ($current_method === 'short_path') ? '1' : '0.7'; ?>;">
                             <span style="color: #666; font-family: monospace;">/</span>
                         </div>
-                        <p style="margin: 0; font-size: 12px; color: #666;">Example: "contact-us" becomes "<?php echo home_url(); ?>/contact-us/"</p>
+                        <p style="margin: 0; font-size: 12px; color: #666;">
+                            <?php if ($current_method === 'short_path'): ?>
+                                <strong>Current result:</strong> <?php echo !empty($current_short_path) ? home_url() . '/' . $current_short_path . '/' : 'No path set'; ?>
+                            <?php else: ?>
+                                Preview: "contact-us" becomes "<?php echo home_url(); ?>/contact-us/"
+                            <?php endif; ?>
+                        </p>
                     </div>
                     
-                    <!-- Long URL Input -->
-                    <div id="long-url-section" style="margin-bottom: 20px; <?php echo ($current_method === 'short_path') ? 'display: none;' : ''; ?>">
-                        <label for="raven-long-url" style="display: block; font-weight: bold; margin-bottom: 8px;">Full Contact URL:</label>
-                        <input type="text" id="raven-long-url" value="<?php echo esc_attr($current_long_url); ?>" placeholder="https://example.com/contact/" style="padding: 8px; border: 1px solid #ccc; border-radius: 4px; width: 400px;">
-                        <p style="margin: 8px 0 0 0; font-size: 12px; color: #666;">Enter the complete URL including protocol (https://)</p>
+                    <!-- Long URL Input - Always Visible -->
+                    <div id="long-url-section" style="margin-bottom: 20px; padding: 15px; border: 1px solid #ddd; border-radius: 4px; background: <?php echo ($current_method === 'long_url') ? '#f8fff8' : '#f5f5f5'; ?>;">
+                        <label for="raven-long-url" style="display: block; font-weight: bold; margin-bottom: 8px; color: <?php echo ($current_method === 'long_url') ? '#000' : '#666'; ?>;">
+                            <span style="font-weight: bold; font-size: 16px; color: #333;">driggs_raven_contact_long_url</span> | Full Contact URL: 
+                            <?php if ($current_method === 'long_url'): ?>
+                                <span style="color: #28a745;">(ACTIVE)</span>
+                            <?php elseif (empty($current_method)): ?>
+                                <span style="color: #dc3545;">(not configured)</span>
+                            <?php else: ?>
+                                <span style="color: #999;">(inactive)</span>
+                            <?php endif; ?>
+                        </label>
+                        <input type="text" id="raven-long-url" value="<?php echo esc_attr($current_long_url); ?>" placeholder="https://example.com/contact/" style="padding: 8px; border: 1px solid #ccc; border-radius: 4px; width: 400px; opacity: <?php echo ($current_method === 'long_url') ? '1' : '0.7'; ?>;">
+                        <p style="margin: 8px 0 0 0; font-size: 12px; color: #666;">
+                            <?php if ($current_method === 'long_url'): ?>
+                                <strong>Current result:</strong> <?php echo !empty($current_long_url) ? esc_html($current_long_url) : 'No URL set'; ?>
+                            <?php else: ?>
+                                Enter the complete URL including protocol (https://)
+                            <?php endif; ?>
+                        </p>
                     </div>
                     
                     <!-- Save Button -->
@@ -9930,15 +9972,36 @@ class Grove_Admin {
                 <!-- JavaScript for dynamic UI and AJAX -->
                 <script>
                 jQuery(document).ready(function($) {
-                    // Handle method selection changes
+                    // Handle method selection changes - update visual styling
                     $('#raven-method').on('change', function() {
                         var method = $(this).val();
+                        var $shortSection = $('#short-path-section');
+                        var $longSection = $('#long-url-section');
+                        var $shortInput = $('#raven-short-path');
+                        var $longInput = $('#raven-long-url');
+                        var $shortLabel = $shortSection.find('label');
+                        var $longLabel = $longSection.find('label');
+                        
                         if (method === 'short_path') {
-                            $('#short-path-section').show();
-                            $('#long-url-section').hide();
+                            // Activate short path
+                            $shortSection.css('background', '#f8fff8');
+                            $shortInput.css('opacity', '1');
+                            $shortLabel.css('color', '#000').html('<span style="font-weight: bold; font-size: 16px; color: #333;">driggs_raven_contact_short_path</span> | Contact Page Path: <span style="color: #28a745;">(ACTIVE)</span>');
+                            
+                            // Deactivate long URL
+                            $longSection.css('background', '#f5f5f5');
+                            $longInput.css('opacity', '0.7');
+                            $longLabel.css('color', '#666').html('<span style="font-weight: bold; font-size: 16px; color: #333;">driggs_raven_contact_long_url</span> | Full Contact URL: <span style="color: #999;">(inactive)</span>');
                         } else {
-                            $('#short-path-section').hide();
-                            $('#long-url-section').show();
+                            // Activate long URL
+                            $longSection.css('background', '#f8fff8');
+                            $longInput.css('opacity', '1');
+                            $longLabel.css('color', '#000').html('<span style="font-weight: bold; font-size: 16px; color: #333;">driggs_raven_contact_long_url</span> | Full Contact URL: <span style="color: #28a745;">(ACTIVE)</span>');
+                            
+                            // Deactivate short path
+                            $shortSection.css('background', '#f5f5f5');
+                            $shortInput.css('opacity', '0.7');
+                            $shortLabel.css('color', '#666').html('<span style="font-weight: bold; font-size: 16px; color: #333;">driggs_raven_contact_short_path</span> | Contact Page Path: <span style="color: #999;">(inactive)</span>');
                         }
                     });
                     

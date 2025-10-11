@@ -955,8 +955,13 @@ class Grove_Zen_Shortcodes {
             return '';
         }
         
-        // Get method (default to 'short_path' if not set)
-        $method = isset($sitespren->driggs_raven_method) ? $sitespren->driggs_raven_method : 'short_path';
+        // Get method (return empty if not set - user must configure)
+        $method = isset($sitespren->driggs_raven_method) ? $sitespren->driggs_raven_method : '';
+        
+        // If method not set, return empty (user must configure on misc options page)
+        if (empty($method)) {
+            return '';
+        }
         
         if ($method === 'long_url') {
             // Method 2: Return full URL directly
