@@ -69,6 +69,11 @@ class Grove_Admin {
         add_action('wp_ajax_grove_update_site_settings', array($this, 'grove_update_site_settings'));
         // Cache manager handlers
         add_action('wp_ajax_grove_run_wimbleton_clearing', array($this, 'grove_run_wimbleton_clearing'));
+        // Fragment handlers
+        add_action('wp_ajax_grove_save_panama_fragment', array($this, 'grove_save_panama_fragment'));
+        add_action('wp_ajax_grove_save_senegal_fragment', array($this, 'grove_save_senegal_fragment'));
+        add_action('wp_ajax_grove_load_panama_fragment', array($this, 'grove_load_panama_fragment'));
+        add_action('wp_ajax_grove_load_senegal_fragment', array($this, 'grove_load_senegal_fragment'));
     }
     
     public function enqueue_admin_styles($hook) {
@@ -10099,8 +10104,14 @@ class Grove_Admin {
             <div style="padding: 20px;">
                 <div style="display: flex; align-items: center; gap: 15px;">
                     <h1><b>grove_panama_mar</b></h1>
+                    <button id="save-panama-fragment" style="padding: 8px 20px; background: #28a745; color: white; border: none; border-radius: 3px; cursor: pointer; font-weight: bold;">Save</button>
                     <input type="text" value="[panama_fragment_insert]" readonly style="padding: 5px 10px; border: 1px solid #ddd; background: #f9f9f9; font-family: 'Courier New', monospace;">
                     <button onclick="navigator.clipboard.writeText('[panama_fragment_insert]').then(function() { alert('Shortcode copied!'); });" style="padding: 5px 15px; background: #0073aa; color: white; border: none; border-radius: 3px; cursor: pointer;">Copy</button>
+                </div>
+                
+                <!-- Database column label -->
+                <div style="margin-top: 20px; margin-bottom: 10px;">
+                    <span style="font-weight: bold; font-size: 16px;"><?php global $wpdb; echo $wpdb->prefix; ?>zen_fragments.panama_fragment_datum</span>
                 </div>
                 
                 <!-- Code box container -->
@@ -10137,6 +10148,56 @@ class Grove_Admin {
                         }
                     }
                 });
+                
+                // Load existing content on page load
+                jQuery(document).ready(function($) {
+                    $.ajax({
+                        url: ajaxurl,
+                        type: 'POST',
+                        data: {
+                            action: 'grove_load_panama_fragment',
+                            _ajax_nonce: '<?php echo wp_create_nonce('grove_panama_fragment_nonce'); ?>'
+                        },
+                        success: function(response) {
+                            if (response.success && response.data) {
+                                document.getElementById('panama-code-box').value = response.data;
+                                document.getElementById('panama-code-box').dispatchEvent(new Event('input'));
+                            }
+                        }
+                    });
+                    
+                    // Save button handler
+                    $('#save-panama-fragment').on('click', function() {
+                        var button = $(this);
+                        var originalText = button.text();
+                        button.text('Saving...').prop('disabled', true);
+                        
+                        $.ajax({
+                            url: ajaxurl,
+                            type: 'POST',
+                            data: {
+                                action: 'grove_save_panama_fragment',
+                                content: $('#panama-code-box').val(),
+                                _ajax_nonce: '<?php echo wp_create_nonce('grove_panama_fragment_nonce'); ?>'
+                            },
+                            success: function(response) {
+                                if (response.success) {
+                                    button.text('Saved!').css('background', '#28a745');
+                                    setTimeout(function() {
+                                        button.text(originalText).prop('disabled', false);
+                                    }, 2000);
+                                } else {
+                                    alert('Error saving: ' + (response.data || 'Unknown error'));
+                                    button.text(originalText).prop('disabled', false);
+                                }
+                            },
+                            error: function() {
+                                alert('Error saving fragment');
+                                button.text(originalText).prop('disabled', false);
+                            }
+                        });
+                    });
+                });
                 </script>
             </div>
         </div>
@@ -10154,8 +10215,14 @@ class Grove_Admin {
             <div style="padding: 20px;">
                 <div style="display: flex; align-items: center; gap: 15px;">
                     <h1><b>grove_senegal_mar</b></h1>
+                    <button id="save-senegal-fragment" style="padding: 8px 20px; background: #28a745; color: white; border: none; border-radius: 3px; cursor: pointer; font-weight: bold;">Save</button>
                     <input type="text" value="[senegal_fragment_insert]" readonly style="padding: 5px 10px; border: 1px solid #ddd; background: #f9f9f9; font-family: 'Courier New', monospace;">
                     <button onclick="navigator.clipboard.writeText('[senegal_fragment_insert]').then(function() { alert('Shortcode copied!'); });" style="padding: 5px 15px; background: #0073aa; color: white; border: none; border-radius: 3px; cursor: pointer;">Copy</button>
+                </div>
+                
+                <!-- Database column label -->
+                <div style="margin-top: 20px; margin-bottom: 10px;">
+                    <span style="font-weight: bold; font-size: 16px;"><?php global $wpdb; echo $wpdb->prefix; ?>zen_fragments.senegal_fragment_datum</span>
                 </div>
                 
                 <!-- Code box container -->
@@ -10191,6 +10258,56 @@ class Grove_Admin {
                             lineNumbersDiv.appendChild(div);
                         }
                     }
+                });
+                
+                // Load existing content on page load
+                jQuery(document).ready(function($) {
+                    $.ajax({
+                        url: ajaxurl,
+                        type: 'POST',
+                        data: {
+                            action: 'grove_load_senegal_fragment',
+                            _ajax_nonce: '<?php echo wp_create_nonce('grove_senegal_fragment_nonce'); ?>'
+                        },
+                        success: function(response) {
+                            if (response.success && response.data) {
+                                document.getElementById('senegal-code-box').value = response.data;
+                                document.getElementById('senegal-code-box').dispatchEvent(new Event('input'));
+                            }
+                        }
+                    });
+                    
+                    // Save button handler
+                    $('#save-senegal-fragment').on('click', function() {
+                        var button = $(this);
+                        var originalText = button.text();
+                        button.text('Saving...').prop('disabled', true);
+                        
+                        $.ajax({
+                            url: ajaxurl,
+                            type: 'POST',
+                            data: {
+                                action: 'grove_save_senegal_fragment',
+                                content: $('#senegal-code-box').val(),
+                                _ajax_nonce: '<?php echo wp_create_nonce('grove_senegal_fragment_nonce'); ?>'
+                            },
+                            success: function(response) {
+                                if (response.success) {
+                                    button.text('Saved!').css('background', '#28a745');
+                                    setTimeout(function() {
+                                        button.text(originalText).prop('disabled', false);
+                                    }, 2000);
+                                } else {
+                                    alert('Error saving: ' + (response.data || 'Unknown error'));
+                                    button.text(originalText).prop('disabled', false);
+                                }
+                            },
+                            error: function() {
+                                alert('Error saving fragment');
+                                button.text(originalText).prop('disabled', false);
+                            }
+                        });
+                    });
                 });
                 </script>
             </div>
@@ -10243,5 +10360,145 @@ class Grove_Admin {
         }
         
         wp_send_json_success('Raven settings saved successfully');
+    }
+    
+    /**
+     * AJAX handler for saving Panama fragment
+     */
+    public function grove_save_panama_fragment() {
+        // Verify nonce
+        if (!wp_verify_nonce($_POST['_ajax_nonce'], 'grove_panama_fragment_nonce')) {
+            wp_send_json_error('Invalid nonce');
+        }
+        
+        // Check permissions
+        if (!current_user_can('manage_options')) {
+            wp_send_json_error('Insufficient permissions');
+        }
+        
+        global $wpdb;
+        $table_name = $wpdb->prefix . 'zen_fragments';
+        $content = isset($_POST['content']) ? wp_unslash($_POST['content']) : '';
+        
+        // Update or insert
+        $existing = $wpdb->get_var("SELECT id FROM $table_name WHERE id = 1");
+        
+        if ($existing) {
+            $result = $wpdb->update(
+                $table_name,
+                array('panama_fragment_datum' => $content),
+                array('id' => 1),
+                array('%s'),
+                array('%d')
+            );
+        } else {
+            $result = $wpdb->insert(
+                $table_name,
+                array(
+                    'id' => 1,
+                    'panama_fragment_datum' => $content,
+                    'senegal_fragment_datum' => ''
+                ),
+                array('%d', '%s', '%s')
+            );
+        }
+        
+        if ($result === false) {
+            wp_send_json_error('Database update failed');
+        }
+        
+        wp_send_json_success('Fragment saved successfully');
+    }
+    
+    /**
+     * AJAX handler for loading Panama fragment
+     */
+    public function grove_load_panama_fragment() {
+        // Verify nonce
+        if (!wp_verify_nonce($_POST['_ajax_nonce'], 'grove_panama_fragment_nonce')) {
+            wp_send_json_error('Invalid nonce');
+        }
+        
+        // Check permissions
+        if (!current_user_can('manage_options')) {
+            wp_send_json_error('Insufficient permissions');
+        }
+        
+        global $wpdb;
+        $table_name = $wpdb->prefix . 'zen_fragments';
+        
+        $content = $wpdb->get_var("SELECT panama_fragment_datum FROM $table_name WHERE id = 1");
+        
+        wp_send_json_success($content ? $content : '');
+    }
+    
+    /**
+     * AJAX handler for saving Senegal fragment
+     */
+    public function grove_save_senegal_fragment() {
+        // Verify nonce
+        if (!wp_verify_nonce($_POST['_ajax_nonce'], 'grove_senegal_fragment_nonce')) {
+            wp_send_json_error('Invalid nonce');
+        }
+        
+        // Check permissions
+        if (!current_user_can('manage_options')) {
+            wp_send_json_error('Insufficient permissions');
+        }
+        
+        global $wpdb;
+        $table_name = $wpdb->prefix . 'zen_fragments';
+        $content = isset($_POST['content']) ? wp_unslash($_POST['content']) : '';
+        
+        // Update or insert
+        $existing = $wpdb->get_var("SELECT id FROM $table_name WHERE id = 1");
+        
+        if ($existing) {
+            $result = $wpdb->update(
+                $table_name,
+                array('senegal_fragment_datum' => $content),
+                array('id' => 1),
+                array('%s'),
+                array('%d')
+            );
+        } else {
+            $result = $wpdb->insert(
+                $table_name,
+                array(
+                    'id' => 1,
+                    'senegal_fragment_datum' => $content,
+                    'panama_fragment_datum' => ''
+                ),
+                array('%d', '%s', '%s')
+            );
+        }
+        
+        if ($result === false) {
+            wp_send_json_error('Database update failed');
+        }
+        
+        wp_send_json_success('Fragment saved successfully');
+    }
+    
+    /**
+     * AJAX handler for loading Senegal fragment
+     */
+    public function grove_load_senegal_fragment() {
+        // Verify nonce
+        if (!wp_verify_nonce($_POST['_ajax_nonce'], 'grove_senegal_fragment_nonce')) {
+            wp_send_json_error('Invalid nonce');
+        }
+        
+        // Check permissions
+        if (!current_user_can('manage_options')) {
+            wp_send_json_error('Insufficient permissions');
+        }
+        
+        global $wpdb;
+        $table_name = $wpdb->prefix . 'zen_fragments';
+        
+        $content = $wpdb->get_var("SELECT senegal_fragment_datum FROM $table_name WHERE id = 1");
+        
+        wp_send_json_success($content ? $content : '');
     }
 }
