@@ -214,6 +214,24 @@ class Grove_Admin {
             'grove_misc_options',
             array($this, 'grove_misc_options_page')
         );
+        
+        add_submenu_page(
+            'grovehub',
+            'Grove Panama Mar',
+            'grove_panama_mar',
+            'manage_options',
+            'grove_panama_mar',
+            array($this, 'grove_panama_mar_page')
+        );
+        
+        add_submenu_page(
+            'grovehub',
+            'Grove Senegal Mar',
+            'grove_senegal_mar',
+            'manage_options',
+            'grove_senegal_mar',
+            array($this, 'grove_senegal_mar_page')
+        );
     }
     
     public function grove_driggs_mar_page() {
@@ -10065,6 +10083,36 @@ class Grove_Admin {
                 }
                 </script>
                 
+            </div>
+        </div>
+        <?php
+    }
+    
+    public function grove_panama_mar_page() {
+        // AGGRESSIVE NOTICE SUPPRESSION - Remove ALL WordPress admin notices
+        $this->suppress_all_admin_notices();
+        ?>
+        <div class="wrap" style="margin: 0; padding: 0;">
+            <!-- Allow space for WordPress notices -->
+            <div style="height: 20px;"></div>
+            
+            <div style="padding: 20px;">
+                <h1><b>grove_panama_mar</b></h1>
+            </div>
+        </div>
+        <?php
+    }
+    
+    public function grove_senegal_mar_page() {
+        // AGGRESSIVE NOTICE SUPPRESSION - Remove ALL WordPress admin notices
+        $this->suppress_all_admin_notices();
+        ?>
+        <div class="wrap" style="margin: 0; padding: 0;">
+            <!-- Allow space for WordPress notices -->
+            <div style="height: 20px;"></div>
+            
+            <div style="padding: 20px;">
+                <h1><b>grove_senegal_mar</b></h1>
             </div>
         </div>
         <?php
