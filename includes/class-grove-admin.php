@@ -10097,7 +10097,47 @@ class Grove_Admin {
             <div style="height: 20px;"></div>
             
             <div style="padding: 20px;">
-                <h1><b>grove_panama_mar</b></h1>
+                <div style="display: flex; align-items: center; gap: 15px;">
+                    <h1><b>grove_panama_mar</b></h1>
+                    <input type="text" value="[panama_fragment_insert]" readonly style="padding: 5px 10px; border: 1px solid #ddd; background: #f9f9f9; font-family: 'Courier New', monospace;">
+                    <button onclick="navigator.clipboard.writeText('[panama_fragment_insert]').then(function() { alert('Shortcode copied!'); });" style="padding: 5px 15px; background: #0073aa; color: white; border: none; border-radius: 3px; cursor: pointer;">Copy</button>
+                </div>
+                
+                <!-- Code box container -->
+                <div style="margin-top: 20px;">
+                    <div style="display: flex; width: 1000px; height: 650px; border: 1px solid #ddd; background: #f9f9f9; font-family: 'Courier New', monospace; font-size: 14px;">
+                        <!-- Line numbers -->
+                        <div id="panama-line-numbers" style="width: 50px; background: #f0f0f0; border-right: 1px solid #ddd; padding: 10px 5px; text-align: right; color: #666; overflow: hidden; line-height: 20px;">
+                            <?php for($i = 1; $i <= 100; $i++): ?>
+                                <div><?php echo $i; ?></div>
+                            <?php endfor; ?>
+                        </div>
+                        <!-- Code textarea -->
+                        <textarea id="panama-code-box" style="flex: 1; padding: 10px; border: none; background: white; resize: none; outline: none; line-height: 20px; font-family: 'Courier New', monospace; font-size: 14px;" placeholder="Enter HTML code here..."></textarea>
+                    </div>
+                </div>
+                
+                <script>
+                // Sync scroll between textarea and line numbers
+                document.getElementById('panama-code-box').addEventListener('scroll', function() {
+                    document.getElementById('panama-line-numbers').scrollTop = this.scrollTop;
+                });
+                
+                // Update line numbers based on content
+                document.getElementById('panama-code-box').addEventListener('input', function() {
+                    var lines = this.value.split('\n').length;
+                    var lineNumbersDiv = document.getElementById('panama-line-numbers');
+                    var currentLines = lineNumbersDiv.children.length;
+                    
+                    if (lines > currentLines) {
+                        for (var i = currentLines + 1; i <= lines; i++) {
+                            var div = document.createElement('div');
+                            div.textContent = i;
+                            lineNumbersDiv.appendChild(div);
+                        }
+                    }
+                });
+                </script>
             </div>
         </div>
         <?php
@@ -10112,7 +10152,47 @@ class Grove_Admin {
             <div style="height: 20px;"></div>
             
             <div style="padding: 20px;">
-                <h1><b>grove_senegal_mar</b></h1>
+                <div style="display: flex; align-items: center; gap: 15px;">
+                    <h1><b>grove_senegal_mar</b></h1>
+                    <input type="text" value="[senegal_fragment_insert]" readonly style="padding: 5px 10px; border: 1px solid #ddd; background: #f9f9f9; font-family: 'Courier New', monospace;">
+                    <button onclick="navigator.clipboard.writeText('[senegal_fragment_insert]').then(function() { alert('Shortcode copied!'); });" style="padding: 5px 15px; background: #0073aa; color: white; border: none; border-radius: 3px; cursor: pointer;">Copy</button>
+                </div>
+                
+                <!-- Code box container -->
+                <div style="margin-top: 20px;">
+                    <div style="display: flex; width: 1000px; height: 650px; border: 1px solid #ddd; background: #f9f9f9; font-family: 'Courier New', monospace; font-size: 14px;">
+                        <!-- Line numbers -->
+                        <div id="senegal-line-numbers" style="width: 50px; background: #f0f0f0; border-right: 1px solid #ddd; padding: 10px 5px; text-align: right; color: #666; overflow: hidden; line-height: 20px;">
+                            <?php for($i = 1; $i <= 100; $i++): ?>
+                                <div><?php echo $i; ?></div>
+                            <?php endfor; ?>
+                        </div>
+                        <!-- Code textarea -->
+                        <textarea id="senegal-code-box" style="flex: 1; padding: 10px; border: none; background: white; resize: none; outline: none; line-height: 20px; font-family: 'Courier New', monospace; font-size: 14px;" placeholder="Enter HTML code here..."></textarea>
+                    </div>
+                </div>
+                
+                <script>
+                // Sync scroll between textarea and line numbers
+                document.getElementById('senegal-code-box').addEventListener('scroll', function() {
+                    document.getElementById('senegal-line-numbers').scrollTop = this.scrollTop;
+                });
+                
+                // Update line numbers based on content
+                document.getElementById('senegal-code-box').addEventListener('input', function() {
+                    var lines = this.value.split('\n').length;
+                    var lineNumbersDiv = document.getElementById('senegal-line-numbers');
+                    var currentLines = lineNumbersDiv.children.length;
+                    
+                    if (lines > currentLines) {
+                        for (var i = currentLines + 1; i <= lines; i++) {
+                            var div = document.createElement('div');
+                            div.textContent = i;
+                            lineNumbersDiv.appendChild(div);
+                        }
+                    }
+                });
+                </script>
             </div>
         </div>
         <?php

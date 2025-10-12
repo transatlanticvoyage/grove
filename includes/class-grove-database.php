@@ -12,7 +12,7 @@ if (file_exists(dirname(dirname(dirname(__FILE__))) . '/shenzi-shared-db-schema/
  */
 class Grove_Database {
     
-    const ZEN_DB_VERSION = '2.3';
+    const ZEN_DB_VERSION = '2.4';
     
     public function __construct() {
         // Check and create tables on initialization
@@ -79,6 +79,7 @@ class Grove_Database {
             $this->create_hoof_codes_table($charset_collate);
             $this->create_lighthouse_friendly_names_table($charset_collate);
             $this->create_general_shortcodes_table($charset_collate);
+            $this->create_fragments_table($charset_collate);
         }
     }
     
@@ -522,6 +523,38 @@ class Grove_Database {
         ) $charset_collate;";
         
         dbDelta($sql);
+    }
+    
+    /**
+     * Create zen_fragments table
+     */
+    private function create_fragments_table($charset_collate) {
+        global $wpdb;
+        require_once(ABSPATH . 'wp-admin/includes/upgrade.php');
+        
+        $table_name = $wpdb->prefix . 'zen_fragments';
+        
+        $sql = "CREATE TABLE $table_name (
+            id int(11) NOT NULL AUTO_INCREMENT,
+            senegal_fragment_datum text DEFAULT NULL,
+            panama_fragment_datum text DEFAULT NULL,
+            PRIMARY KEY (id)
+        ) $charset_collate;";
+        
+        dbDelta($sql);
+        
+        // Insert default row if table is empty
+        $existing_count = $wpdb->get_var("SELECT COUNT(*) FROM $table_name");
+        if ($existing_count == 0) {
+            $wpdb->insert(
+                $table_name,
+                array(
+                    'id' => 1,
+                    'senegal_fragment_datum' => '',
+                    'panama_fragment_datum' => ''
+                )
+            );
+        }
     }
     
     /**
