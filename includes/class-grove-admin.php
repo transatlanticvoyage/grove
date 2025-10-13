@@ -10125,53 +10125,10 @@ class Grove_Admin {
                 
                 <!-- Code box container -->
                 <div style="margin-top: 20px;">
-                    <div style="display: flex; width: 1000px; height: 650px; border: 1px solid #ddd; background: #ffffff; font-family: 'Courier New', monospace; font-size: 14px;">
-                        <!-- Line numbers -->
-                        <div id="panama-line-numbers" style="width: 50px; background: #f5f5f5; border-right: 1px solid #ddd; padding: 10px 5px; text-align: right; color: #666; overflow-y: auto; overflow-x: hidden; line-height: 20px;">
-                            <div>1</div>
-                        </div>
-                        <!-- Simple textarea -->
-                        <textarea id="panama-code-box" style="flex: 1; padding: 10px; border: none; background: #ffffff; color: #333; resize: none; outline: none; line-height: 20px; font-family: 'Courier New', monospace; font-size: 14px;" placeholder="Enter HTML code here..." spellcheck="false"></textarea>
-                    </div>
+                    <textarea id="panama-code-box" style="width: 1000px; height: 650px; padding: 10px; border: 1px solid #ddd; background: #ffffff; color: #333; resize: none; outline: none; line-height: 20px; font-family: 'Courier New', monospace; font-size: 14px;" placeholder="Enter HTML code here..." spellcheck="false"></textarea>
                 </div>
                 
                 <script>
-                // Sync scroll between textarea and line numbers
-                document.getElementById('panama-code-box').addEventListener('scroll', function() {
-                    document.getElementById('panama-line-numbers').scrollTop = this.scrollTop;
-                });
-                
-                // Function to calculate actual visual line numbers
-                function updatePanamaLineNumbers() {
-                    var textarea = document.getElementById('panama-code-box');
-                    var lineNumbersDiv = document.getElementById('panama-line-numbers');
-                    var content = textarea.value || '';
-                    
-                    // Clear existing line numbers
-                    lineNumbersDiv.innerHTML = '';
-                    
-                    if (!content) {
-                        // Empty content, show just line 1
-                        lineNumbersDiv.innerHTML = '<div>1</div>';
-                        return;
-                    }
-                    
-                    // Count actual line breaks in content
-                    var lines = content.split('\n');
-                    
-                    // Create line numbers for each actual line
-                    for (var i = 0; i < lines.length; i++) {
-                        var lineDiv = document.createElement('div');
-                        lineDiv.textContent = i + 1;
-                        lineNumbersDiv.appendChild(lineDiv);
-                    }
-                }
-                
-                // Update line numbers on input
-                document.getElementById('panama-code-box').addEventListener('input', function() {
-                    // Update line numbers to match actual content
-                    updatePanamaLineNumbers();
-                });
                 
                 // Load existing content on page load
                 jQuery(document).ready(function($) {
@@ -10185,10 +10142,6 @@ class Grove_Admin {
                         success: function(response) {
                             if (response.success && response.data) {
                                 document.getElementById('panama-code-box').value = response.data;
-                                updatePanamaLineNumbers();
-                            } else {
-                                // Initialize with empty state
-                                updatePanamaLineNumbers();
                             }
                         }
                     });
@@ -10254,52 +10207,10 @@ class Grove_Admin {
                 
                 <!-- Code box container -->
                 <div style="margin-top: 20px;">
-                    <div style="display: flex; width: 1000px; height: 650px; border: 1px solid #ddd; background: #ffffff; font-family: 'Courier New', monospace; font-size: 14px;">
-                        <!-- Line numbers -->
-                        <div id="senegal-line-numbers" style="width: 50px; background: #f5f5f5; border-right: 1px solid #ddd; padding: 10px 5px; text-align: right; color: #666; overflow-y: auto; overflow-x: hidden; line-height: 20px;">
-                            <div>1</div>
-                        </div>
-                        <!-- Simple textarea -->
-                        <textarea id="senegal-code-box" style="flex: 1; padding: 10px; border: none; background: #ffffff; color: #333; resize: none; outline: none; line-height: 20px; font-family: 'Courier New', monospace; font-size: 14px;" placeholder="Enter HTML code here..." spellcheck="false"></textarea>
-                    </div>
+                    <textarea id="senegal-code-box" style="width: 1000px; height: 650px; padding: 10px; border: 1px solid #ddd; background: #ffffff; color: #333; resize: none; outline: none; line-height: 20px; font-family: 'Courier New', monospace; font-size: 14px;" placeholder="Enter HTML code here..." spellcheck="false"></textarea>
                 </div>
                 
                 <script>
-                // Sync scroll between textarea and line numbers
-                document.getElementById('senegal-code-box').addEventListener('scroll', function() {
-                    document.getElementById('senegal-line-numbers').scrollTop = this.scrollTop;
-                });
-                
-                // Function to calculate actual visual line numbers for Senegal
-                function updateSenegalLineNumbers() {
-                    var textarea = document.getElementById('senegal-code-box');
-                    var lineNumbersDiv = document.getElementById('senegal-line-numbers');
-                    var content = textarea.value || '';
-                    
-                    // Clear existing line numbers
-                    lineNumbersDiv.innerHTML = '';
-                    
-                    if (!content) {
-                        // Empty content, show just line 1
-                        lineNumbersDiv.innerHTML = '<div>1</div>';
-                        return;
-                    }
-                    
-                    // Count actual line breaks in content
-                    var lines = content.split('\n');
-                    
-                    // Create line numbers for each actual line
-                    for (var i = 0; i < lines.length; i++) {
-                        var lineDiv = document.createElement('div');
-                        lineDiv.textContent = i + 1;
-                        lineNumbersDiv.appendChild(lineDiv);
-                    }
-                }
-                
-                // Update line numbers on input
-                document.getElementById('senegal-code-box').addEventListener('input', function() {
-                    updateSenegalLineNumbers();
-                });
                 
                 // Load existing content on page load
                 jQuery(document).ready(function($) {
@@ -10313,10 +10224,6 @@ class Grove_Admin {
                         success: function(response) {
                             if (response.success && response.data) {
                                 document.getElementById('senegal-code-box').value = response.data;
-                                updateSenegalLineNumbers();
-                            } else {
-                                // Initialize with empty state
-                                updateSenegalLineNumbers(); // Initialize line numbers
                             }
                         }
                     });
