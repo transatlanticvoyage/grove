@@ -85,6 +85,10 @@ class Grove_Zen_Shortcodes {
         // Factory codes shortcodes
         add_shortcode('sitespren_phone_link', array($this, 'render_sitespren_phone_link'));
         
+        // Fragment shortcodes  
+        add_shortcode('panama_fragment_insert', array($this, 'render_panama_fragment'));
+        add_shortcode('senegal_fragment_insert', array($this, 'render_senegal_fragment'));
+        
         // Register dynamic hoof shortcodes
         $this->register_hoof_shortcodes();
     }
@@ -1402,6 +1406,34 @@ class Grove_Zen_Shortcodes {
         
         // Re-register all active dynamic shortcodes
         $this->register_dynamic_shortcodes();
+    }
+    
+    /**
+     * Render panama fragment shortcode
+     */
+    public function render_panama_fragment($atts) {
+        global $wpdb;
+        
+        $table_name = $wpdb->prefix . 'zen_fragments';
+        
+        // Get panama fragment content from database
+        $result = $wpdb->get_var("SELECT panama_fragment_datum FROM $table_name WHERE id = 1");
+        
+        return $result ? $result : '';
+    }
+    
+    /**
+     * Render senegal fragment shortcode  
+     */
+    public function render_senegal_fragment($atts) {
+        global $wpdb;
+        
+        $table_name = $wpdb->prefix . 'zen_fragments';
+        
+        // Get senegal fragment content from database
+        $result = $wpdb->get_var("SELECT senegal_fragment_datum FROM $table_name WHERE id = 1");
+        
+        return $result ? $result : '';
     }
     
 }

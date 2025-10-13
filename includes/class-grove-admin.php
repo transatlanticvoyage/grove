@@ -10125,98 +10125,20 @@ class Grove_Admin {
                 
                 <!-- Code box container -->
                 <div style="margin-top: 20px;">
-                    <div style="display: flex; width: 1000px; height: 650px; border: 1px solid #3a3a3a; background: #1e1e1e; font-family: 'Courier New', monospace; font-size: 14px; position: relative;">
+                    <div style="display: flex; width: 1000px; height: 650px; border: 1px solid #ddd; background: #ffffff; font-family: 'Courier New', monospace; font-size: 14px;">
                         <!-- Line numbers -->
-                        <div id="panama-line-numbers" style="width: 50px; background: #2d2d30; border-right: 1px solid #3a3a3a; padding: 10px 5px; text-align: right; color: #858585; overflow: hidden; line-height: 20px;">
+                        <div id="panama-line-numbers" style="width: 50px; background: #f5f5f5; border-right: 1px solid #ddd; padding: 10px 5px; text-align: right; color: #666; overflow-y: auto; overflow-x: hidden; line-height: 20px;">
                             <div>1</div>
                         </div>
-                        <!-- Code display overlay for syntax highlighting -->
-                        <div id="panama-code-display" style="position: absolute; left: 50px; right: 0; top: 0; bottom: 0; padding: 10px; pointer-events: none; overflow: hidden; line-height: 20px; font-family: 'Courier New', monospace; font-size: 14px; white-space: pre; word-wrap: normal; letter-spacing: 0; word-spacing: 0;"></div>
-                        <!-- Code textarea -->
-                        <textarea id="panama-code-box" style="flex: 1; padding: 10px; border: none; background: transparent; color: transparent; caret-color: #f0f0f0; resize: none; outline: none; line-height: 20px; font-family: 'Courier New', monospace; font-size: 14px; position: relative; z-index: 1; white-space: pre; word-wrap: normal; letter-spacing: 0; word-spacing: 0;" placeholder="Enter HTML code here..." spellcheck="false"></textarea>
+                        <!-- Simple textarea -->
+                        <textarea id="panama-code-box" style="flex: 1; padding: 10px; border: none; background: #ffffff; color: #333; resize: none; outline: none; line-height: 20px; font-family: 'Courier New', monospace; font-size: 14px;" placeholder="Enter HTML code here..." spellcheck="false"></textarea>
                     </div>
                 </div>
                 
-                <style>
-                /* Dark mode syntax highlighting for Panama */
-                #panama-code-display .tag { color: #569cd6; }
-                #panama-code-display .tag-name { color: #4ec9b0; }
-                #panama-code-display .attribute { color: #9cdcfe; }
-                #panama-code-display .attribute-value { color: #ce9178; }
-                #panama-code-display .comment { color: #6a9955; font-style: italic; }
-                #panama-code-display .text { color: #ffffff; }
-                #panama-code-display .doctype { color: #c586c0; }
-                #panama-code-display .cdata { color: #e06c75; }
-                #panama-code-box::placeholder { color: #9cdcfe; }
-                </style>
-                
                 <script>
-                // HTML syntax highlighting function
-                function highlightHTML(code) {
-                    if (!code) return '';
-                    
-                    // Create a safe copy for processing without changing character count
-                    var result = '';
-                    var i = 0;
-                    var len = code.length;
-                    
-                    while (i < len) {
-                        var char = code[i];
-                        
-                        // Check for HTML comments
-                        if (code.substr(i, 4) === '<!--') {
-                            var commentEnd = code.indexOf('-->', i + 4);
-                            if (commentEnd !== -1) {
-                                var comment = code.substring(i, commentEnd + 3);
-                                result += '<span class="comment">' + escapeHtmlSafe(comment) + '</span>';
-                                i = commentEnd + 3;
-                                continue;
-                            }
-                        }
-                        
-                        // Check for HTML tags
-                        if (char === '<') {
-                            var tagEnd = code.indexOf('>', i);
-                            if (tagEnd !== -1) {
-                                var tag = code.substring(i, tagEnd + 1);
-                                result += highlightTag(tag);
-                                i = tagEnd + 1;
-                                continue;
-                            }
-                        }
-                        
-                        // Regular character
-                        result += escapeHtmlSafe(char);
-                        i++;
-                    }
-                    
-                    // Wrap ALL content in white text to prevent gray default
-                    return '<span style="color: #ffffff;">' + result + '</span>';
-                }
-                
-                // Helper function to escape HTML while preserving character positions
-                function escapeHtmlSafe(str) {
-                    var div = document.createElement('div');
-                    div.textContent = str;
-                    return div.innerHTML;
-                }
-                
-                // Helper function to highlight HTML tags
-                function highlightTag(tag) {
-                    var escaped = escapeHtmlSafe(tag);
-                    
-                    // Simple tag highlighting - maintain exact character positions
-                    if (tag.match(/^<\/?\w+.*>$/)) {
-                        return '<span class="tag">' + escaped + '</span>';
-                    }
-                    
-                    return escaped;
-                }
-                
-                // Sync scroll between textarea, display overlay, and line numbers
+                // Sync scroll between textarea and line numbers
                 document.getElementById('panama-code-box').addEventListener('scroll', function() {
                     document.getElementById('panama-line-numbers').scrollTop = this.scrollTop;
-                    document.getElementById('panama-code-display').scrollTop = this.scrollTop;
                 });
                 
                 // Function to calculate actual visual line numbers
@@ -10245,12 +10167,8 @@ class Grove_Admin {
                     }
                 }
                 
-                // Update syntax highlighting and line numbers on input
+                // Update line numbers on input
                 document.getElementById('panama-code-box').addEventListener('input', function() {
-                    // Update syntax highlighting
-                    var highlighted = highlightHTML(this.value);
-                    document.getElementById('panama-code-display').innerHTML = highlighted || '<span style="color: #9cdcfe;">Enter HTML code here...</span>';
-                    
                     // Update line numbers to match actual content
                     updatePanamaLineNumbers();
                 });
@@ -10267,11 +10185,10 @@ class Grove_Admin {
                         success: function(response) {
                             if (response.success && response.data) {
                                 document.getElementById('panama-code-box').value = response.data;
-                                document.getElementById('panama-code-box').dispatchEvent(new Event('input'));
+                                updatePanamaLineNumbers();
                             } else {
                                 // Initialize with empty state
-                                document.getElementById('panama-code-display').innerHTML = '<span style="color: #9cdcfe;">Enter HTML code here...</span>';
-                                updatePanamaLineNumbers(); // Initialize line numbers
+                                updatePanamaLineNumbers();
                             }
                         }
                     });
@@ -10337,98 +10254,20 @@ class Grove_Admin {
                 
                 <!-- Code box container -->
                 <div style="margin-top: 20px;">
-                    <div style="display: flex; width: 1000px; height: 650px; border: 1px solid #3a3a3a; background: #1e1e1e; font-family: 'Courier New', monospace; font-size: 14px; position: relative;">
+                    <div style="display: flex; width: 1000px; height: 650px; border: 1px solid #ddd; background: #ffffff; font-family: 'Courier New', monospace; font-size: 14px;">
                         <!-- Line numbers -->
-                        <div id="senegal-line-numbers" style="width: 50px; background: #2d2d30; border-right: 1px solid #3a3a3a; padding: 10px 5px; text-align: right; color: #858585; overflow: hidden; line-height: 20px;">
+                        <div id="senegal-line-numbers" style="width: 50px; background: #f5f5f5; border-right: 1px solid #ddd; padding: 10px 5px; text-align: right; color: #666; overflow-y: auto; overflow-x: hidden; line-height: 20px;">
                             <div>1</div>
                         </div>
-                        <!-- Code display overlay for syntax highlighting -->
-                        <div id="senegal-code-display" style="position: absolute; left: 50px; right: 0; top: 0; bottom: 0; padding: 10px; pointer-events: none; overflow: hidden; line-height: 20px; font-family: 'Courier New', monospace; font-size: 14px; white-space: pre; word-wrap: normal; letter-spacing: 0; word-spacing: 0;"></div>
-                        <!-- Code textarea -->
-                        <textarea id="senegal-code-box" style="flex: 1; padding: 10px; border: none; background: transparent; color: transparent; caret-color: #f0f0f0; resize: none; outline: none; line-height: 20px; font-family: 'Courier New', monospace; font-size: 14px; position: relative; z-index: 1; white-space: pre; word-wrap: normal; letter-spacing: 0; word-spacing: 0;" placeholder="Enter HTML code here..." spellcheck="false"></textarea>
+                        <!-- Simple textarea -->
+                        <textarea id="senegal-code-box" style="flex: 1; padding: 10px; border: none; background: #ffffff; color: #333; resize: none; outline: none; line-height: 20px; font-family: 'Courier New', monospace; font-size: 14px;" placeholder="Enter HTML code here..." spellcheck="false"></textarea>
                     </div>
                 </div>
                 
-                <style>
-                /* Dark mode syntax highlighting for Senegal */
-                #senegal-code-display .tag { color: #569cd6; }
-                #senegal-code-display .tag-name { color: #4ec9b0; }
-                #senegal-code-display .attribute { color: #9cdcfe; }
-                #senegal-code-display .attribute-value { color: #ce9178; }
-                #senegal-code-display .comment { color: #6a9955; font-style: italic; }
-                #senegal-code-display .text { color: #ffffff; }
-                #senegal-code-display .doctype { color: #c586c0; }
-                #senegal-code-display .cdata { color: #e06c75; }
-                #senegal-code-box::placeholder { color: #9cdcfe; }
-                </style>
-                
                 <script>
-                // HTML syntax highlighting function for Senegal (reused from Panama)
-                function highlightHTMLSenegal(code) {
-                    if (!code) return '';
-                    
-                    // Create a safe copy for processing without changing character count
-                    var result = '';
-                    var i = 0;
-                    var len = code.length;
-                    
-                    while (i < len) {
-                        var char = code[i];
-                        
-                        // Check for HTML comments
-                        if (code.substr(i, 4) === '<!--') {
-                            var commentEnd = code.indexOf('-->', i + 4);
-                            if (commentEnd !== -1) {
-                                var comment = code.substring(i, commentEnd + 3);
-                                result += '<span class="comment">' + escapeHtmlSafeSenegal(comment) + '</span>';
-                                i = commentEnd + 3;
-                                continue;
-                            }
-                        }
-                        
-                        // Check for HTML tags
-                        if (char === '<') {
-                            var tagEnd = code.indexOf('>', i);
-                            if (tagEnd !== -1) {
-                                var tag = code.substring(i, tagEnd + 1);
-                                result += highlightTagSenegal(tag);
-                                i = tagEnd + 1;
-                                continue;
-                            }
-                        }
-                        
-                        // Regular character
-                        result += escapeHtmlSafeSenegal(char);
-                        i++;
-                    }
-                    
-                    // Wrap ALL content in white text to prevent gray default
-                    return '<span style="color: #ffffff;">' + result + '</span>';
-                }
-                
-                // Helper function to escape HTML while preserving character positions (Senegal)
-                function escapeHtmlSafeSenegal(str) {
-                    var div = document.createElement('div');
-                    div.textContent = str;
-                    return div.innerHTML;
-                }
-                
-                // Helper function to highlight HTML tags (Senegal)
-                function highlightTagSenegal(tag) {
-                    var escaped = escapeHtmlSafeSenegal(tag);
-                    
-                    // Simple tag highlighting - maintain exact character positions
-                    if (tag.match(/^<\/?\w+.*>$/)) {
-                        return '<span class="tag">' + escaped + '</span>';
-                    }
-                    
-                    return escaped;
-                }
-                
-                // Sync scroll between textarea, display overlay, and line numbers
+                // Sync scroll between textarea and line numbers
                 document.getElementById('senegal-code-box').addEventListener('scroll', function() {
                     document.getElementById('senegal-line-numbers').scrollTop = this.scrollTop;
-                    document.getElementById('senegal-code-display').scrollTop = this.scrollTop;
                 });
                 
                 // Function to calculate actual visual line numbers for Senegal
@@ -10457,13 +10296,8 @@ class Grove_Admin {
                     }
                 }
                 
-                // Update syntax highlighting and line numbers on input
+                // Update line numbers on input
                 document.getElementById('senegal-code-box').addEventListener('input', function() {
-                    // Update syntax highlighting
-                    var highlighted = highlightHTMLSenegal(this.value);
-                    document.getElementById('senegal-code-display').innerHTML = highlighted || '<span style="color: #9cdcfe;">Enter HTML code here...</span>';
-                    
-                    // Update line numbers to match actual content
                     updateSenegalLineNumbers();
                 });
                 
@@ -10479,10 +10313,9 @@ class Grove_Admin {
                         success: function(response) {
                             if (response.success && response.data) {
                                 document.getElementById('senegal-code-box').value = response.data;
-                                document.getElementById('senegal-code-box').dispatchEvent(new Event('input'));
+                                updateSenegalLineNumbers();
                             } else {
                                 // Initialize with empty state
-                                document.getElementById('senegal-code-display').innerHTML = '<span style="color: #9cdcfe;">Enter HTML code here...</span>';
                                 updateSenegalLineNumbers(); // Initialize line numbers
                             }
                         }
