@@ -5233,6 +5233,12 @@ class Grove_Admin {
                     }
                 });
             }
+            
+            // Select All checkbox functionality
+            $('#select-all').on('change', function() {
+                let isChecked = $(this).is(':checked');
+                $('.row-select').prop('checked', isChecked);
+            });
         });
         </script>
         <style>
