@@ -1448,7 +1448,7 @@ class Grove_Zen_Shortcodes {
         
         $output = '<div class="grove-sitemap">';
         
-        // Section 1: Main Pages
+        // Section 1: Main Pages (always has at least home page)
         $output .= '<div class="sitemap-section">';
         $output .= '<h3>Main Pages:</h3>';
         $output .= '<ul>';
@@ -1469,11 +1469,7 @@ class Grove_Zen_Shortcodes {
         $output .= '</ul>';
         $output .= '</div>';
         
-        // Section 2: Service Pages
-        $output .= '<div class="sitemap-section">';
-        $output .= '<h3>Service Pages:</h3>';
-        $output .= '<ul>';
-        
+        // Section 2: Service Pages (only show if there are service pages)
         // Get service pages from _zen_services table
         $services_table = $wpdb->prefix . 'zen_services';
         $service_pages = $wpdb->get_results("
@@ -1484,28 +1480,28 @@ class Grove_Zen_Shortcodes {
         ");
         
         $service_page_ids = array();
+        $service_pages_html = '';
         foreach ($service_pages as $service) {
             $page_id = $service->asn_service_page_id;
             if ($page_id && get_post_status($page_id) === 'publish') {
                 $service_page_ids[] = $page_id;
                 $page_url = get_permalink($page_id);
                 $page_title = get_the_title($page_id);
-                $output .= '<li><a href="' . esc_url($page_url) . '">' . esc_html($page_title) . '</a></li>';
+                $service_pages_html .= '<li><a href="' . esc_url($page_url) . '">' . esc_html($page_title) . '</a></li>';
             }
         }
         
-        if (empty($service_page_ids)) {
-            $output .= '<li>No service pages found</li>';
+        // Only show Service Pages section if there are service pages
+        if (!empty($service_page_ids)) {
+            $output .= '<div class="sitemap-section">';
+            $output .= '<h3>Service Pages:</h3>';
+            $output .= '<ul>';
+            $output .= $service_pages_html;
+            $output .= '</ul>';
+            $output .= '</div>';
         }
         
-        $output .= '</ul>';
-        $output .= '</div>';
-        
-        // Section 3: Other Pages
-        $output .= '<div class="sitemap-section">';
-        $output .= '<h3>Other Pages:</h3>';
-        $output .= '<ul>';
-        
+        // Section 3: Other Pages (only show if there are other pages)
         // Get all published pages except service pages and posts page
         $exclude_ids = array_merge($service_page_ids, array($posts_page_id));
         
@@ -1520,24 +1516,21 @@ class Grove_Zen_Shortcodes {
         
         $pages = get_posts($args);
         
+        // Only show Other Pages section if there are other pages
         if ($pages) {
+            $output .= '<div class="sitemap-section">';
+            $output .= '<h3>Other Pages:</h3>';
+            $output .= '<ul>';
             foreach ($pages as $page) {
                 $page_url = get_permalink($page->ID);
                 $page_title = $page->post_title;
                 $output .= '<li><a href="' . esc_url($page_url) . '">' . esc_html($page_title) . '</a></li>';
             }
-        } else {
-            $output .= '<li>No other pages found</li>';
+            $output .= '</ul>';
+            $output .= '</div>';
         }
         
-        $output .= '</ul>';
-        $output .= '</div>';
-        
-        // Section 4: Blog Posts
-        $output .= '<div class="sitemap-section">';
-        $output .= '<h3>Blog Posts:</h3>';
-        $output .= '<ul>';
-        
+        // Section 4: Blog Posts (only show if there are blog posts)
         // Get all published blog posts
         $args = array(
             'post_type' => 'post',
@@ -1549,18 +1542,19 @@ class Grove_Zen_Shortcodes {
         
         $posts = get_posts($args);
         
+        // Only show Blog Posts section if there are blog posts
         if ($posts) {
+            $output .= '<div class="sitemap-section">';
+            $output .= '<h3>Blog Posts:</h3>';
+            $output .= '<ul>';
             foreach ($posts as $post) {
                 $post_url = get_permalink($post->ID);
                 $post_title = $post->post_title;
                 $output .= '<li><a href="' . esc_url($post_url) . '">' . esc_html($post_title) . '</a></li>';
             }
-        } else {
-            $output .= '<li>No blog posts found</li>';
+            $output .= '</ul>';
+            $output .= '</div>';
         }
-        
-        $output .= '</ul>';
-        $output .= '</div>';
         
         $output .= '</div>'; // Close grove-sitemap
         
@@ -1586,7 +1580,9 @@ class Grove_Zen_Shortcodes {
                 margin-bottom: 8px;
             }
             .grove-sitemap a {
+                color: #009bff;
                 text-decoration: none;
+                font-weight: normal;
             }
             .grove-sitemap a:hover {
                 text-decoration: underline;
