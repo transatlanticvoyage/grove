@@ -240,6 +240,15 @@ class Grove_Admin {
         
         add_submenu_page(
             'grovehub',
+            'Grove Sitemap Manager',
+            'grove_sitemap_mar',
+            'manage_options',
+            'grove_sitemap_mar',
+            array($this, 'grove_sitemap_mar_page')
+        );
+        
+        add_submenu_page(
+            'grovehub',
             'Dark Mode Test',
             'darkmodetest',
             'manage_options',
@@ -10263,6 +10272,74 @@ class Grove_Admin {
                 </script>
             </div>
         </div>
+        <?php
+    }
+    
+    public function grove_sitemap_mar_page() {
+        // AGGRESSIVE NOTICE SUPPRESSION - Remove ALL WordPress admin notices
+        $this->suppress_all_admin_notices();
+        ?>
+        <div class="wrap" style="margin: 0; padding: 0;">
+            <!-- Allow space for WordPress notices -->
+            <div style="height: 20px;"></div>
+            
+            <div style="padding: 20px;">
+                <h1 style="margin-bottom: 20px;">Grove Sitemap System</h1>
+                
+                <!-- Shortcode Input Section -->
+                <div style="background: #f9f9f9; border: 1px solid #ddd; padding: 20px; margin-bottom: 20px; border-radius: 5px;">
+                    <div style="display: flex; align-items: center; gap: 10px;">
+                        <input 
+                            id="grove-sitemap-shortcode" 
+                            type="text" 
+                            value="[sitemap_method_1]" 
+                            readonly 
+                            style="flex: 1; padding: 10px; font-family: monospace; font-size: 14px; background: white; border: 1px solid #ccc; border-radius: 3px;"
+                        />
+                        <button 
+                            type="button" 
+                            onclick="copyGroveSitemapShortcode()" 
+                            style="padding: 10px 20px; background: #2271b1; color: white; border: none; border-radius: 3px; cursor: pointer; font-size: 14px;"
+                        >
+                            Copy Shortcode
+                        </button>
+                    </div>
+                    <div id="grove-sitemap-copy-message" style="margin-top: 10px; color: green; display: none;">
+                        Shortcode copied to clipboard!
+                    </div>
+                </div>
+                
+                <!-- Information Section -->
+                <div style="background: #fff; border: 1px solid #ddd; padding: 20px; border-radius: 5px;">
+                    <h2 style="margin-top: 0;">How to Use</h2>
+                    <p>Copy the shortcode above and paste it into any page or post where you want to display the sitemap.</p>
+                    
+                    <h3>Sitemap Structure:</h3>
+                    <ul style="list-style-type: disc; margin-left: 20px;">
+                        <li><strong>Main Pages:</strong> Home page and blog posts page</li>
+                        <li><strong>Service Pages:</strong> All pages linked to services in the database</li>
+                        <li><strong>Other Pages:</strong> All other published pages</li>
+                        <li><strong>Blog Posts:</strong> All published blog posts</li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+        
+        <script>
+        function copyGroveSitemapShortcode() {
+            var copyText = document.getElementById("grove-sitemap-shortcode");
+            copyText.select();
+            copyText.setSelectionRange(0, 99999);
+            document.execCommand("copy");
+            
+            // Show confirmation message
+            var message = document.getElementById("grove-sitemap-copy-message");
+            message.style.display = "block";
+            setTimeout(function() {
+                message.style.display = "none";
+            }, 2000);
+        }
+        </script>
         <?php
     }
     

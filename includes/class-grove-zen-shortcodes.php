@@ -89,6 +89,9 @@ class Grove_Zen_Shortcodes {
         add_shortcode('panama_fragment_insert', array($this, 'render_panama_fragment'));
         add_shortcode('senegal_fragment_insert', array($this, 'render_senegal_fragment'));
         
+        // Sitemap shortcode
+        add_shortcode('sitemap_method_1', array($this, 'render_sitemap_method_1'));
+        
         // Register dynamic hoof shortcodes
         $this->register_hoof_shortcodes();
     }
@@ -1434,6 +1437,163 @@ class Grove_Zen_Shortcodes {
         $result = $wpdb->get_var("SELECT senegal_fragment_datum FROM $table_name WHERE id = 1");
         
         return $result ? $result : '';
+    }
+    
+    /**
+     * Render sitemap method 1 shortcode
+     * Displays all pages and posts organized by section
+     */
+    public function render_sitemap_method_1($atts) {
+        global $wpdb;
+        
+        $output = '<div class="grove-sitemap">';
+        
+        // Section 1: Main Pages
+        $output .= '<div class="sitemap-section">';
+        $output .= '<h3>Main Pages:</h3>';
+        $output .= '<ul>';
+        
+        // Home page
+        $home_url = home_url('/');
+        $home_title = get_bloginfo('name');
+        $output .= '<li><a href="' . esc_url($home_url) . '">' . esc_html($home_title) . ' (Home)</a></li>';
+        
+        // Blog posts page
+        $posts_page_id = get_option('page_for_posts');
+        if ($posts_page_id) {
+            $posts_page_url = get_permalink($posts_page_id);
+            $posts_page_title = get_the_title($posts_page_id);
+            $output .= '<li><a href="' . esc_url($posts_page_url) . '">' . esc_html($posts_page_title) . '</a></li>';
+        }
+        
+        $output .= '</ul>';
+        $output .= '</div>';
+        
+        // Section 2: Service Pages
+        $output .= '<div class="sitemap-section">';
+        $output .= '<h3>Service Pages:</h3>';
+        $output .= '<ul>';
+        
+        // Get service pages from _zen_services table
+        $services_table = $wpdb->prefix . 'zen_services';
+        $service_pages = $wpdb->get_results("
+            SELECT DISTINCT asn_service_page_id 
+            FROM $services_table 
+            WHERE asn_service_page_id IS NOT NULL 
+            AND asn_service_page_id != 0
+        ");
+        
+        $service_page_ids = array();
+        foreach ($service_pages as $service) {
+            $page_id = $service->asn_service_page_id;
+            if ($page_id && get_post_status($page_id) === 'publish') {
+                $service_page_ids[] = $page_id;
+                $page_url = get_permalink($page_id);
+                $page_title = get_the_title($page_id);
+                $output .= '<li><a href="' . esc_url($page_url) . '">' . esc_html($page_title) . '</a></li>';
+            }
+        }
+        
+        if (empty($service_page_ids)) {
+            $output .= '<li>No service pages found</li>';
+        }
+        
+        $output .= '</ul>';
+        $output .= '</div>';
+        
+        // Section 3: Other Pages
+        $output .= '<div class="sitemap-section">';
+        $output .= '<h3>Other Pages:</h3>';
+        $output .= '<ul>';
+        
+        // Get all published pages except service pages and posts page
+        $exclude_ids = array_merge($service_page_ids, array($posts_page_id));
+        
+        $args = array(
+            'post_type' => 'page',
+            'post_status' => 'publish',
+            'posts_per_page' => -1,
+            'orderby' => 'title',
+            'order' => 'ASC',
+            'post__not_in' => $exclude_ids
+        );
+        
+        $pages = get_posts($args);
+        
+        if ($pages) {
+            foreach ($pages as $page) {
+                $page_url = get_permalink($page->ID);
+                $page_title = $page->post_title;
+                $output .= '<li><a href="' . esc_url($page_url) . '">' . esc_html($page_title) . '</a></li>';
+            }
+        } else {
+            $output .= '<li>No other pages found</li>';
+        }
+        
+        $output .= '</ul>';
+        $output .= '</div>';
+        
+        // Section 4: Blog Posts
+        $output .= '<div class="sitemap-section">';
+        $output .= '<h3>Blog Posts:</h3>';
+        $output .= '<ul>';
+        
+        // Get all published blog posts
+        $args = array(
+            'post_type' => 'post',
+            'post_status' => 'publish',
+            'posts_per_page' => -1,
+            'orderby' => 'date',
+            'order' => 'DESC'
+        );
+        
+        $posts = get_posts($args);
+        
+        if ($posts) {
+            foreach ($posts as $post) {
+                $post_url = get_permalink($post->ID);
+                $post_title = $post->post_title;
+                $output .= '<li><a href="' . esc_url($post_url) . '">' . esc_html($post_title) . '</a></li>';
+            }
+        } else {
+            $output .= '<li>No blog posts found</li>';
+        }
+        
+        $output .= '</ul>';
+        $output .= '</div>';
+        
+        $output .= '</div>'; // Close grove-sitemap
+        
+        // Add some basic CSS
+        $output .= '<style>
+            .grove-sitemap {
+                padding: 20px 0;
+            }
+            .grove-sitemap .sitemap-section {
+                margin-bottom: 30px;
+            }
+            .grove-sitemap h3 {
+                font-size: 1.2em;
+                margin-bottom: 15px;
+                font-weight: bold;
+            }
+            .grove-sitemap ul {
+                list-style-type: none;
+                padding-left: 0;
+                margin: 0;
+            }
+            .grove-sitemap li {
+                margin-bottom: 8px;
+            }
+            .grove-sitemap a {
+                text-decoration: none;
+            }
+            .grove-sitemap a:hover {
+                text-decoration: underline;
+            }
+        </style>';
+        
+        return $output;
     }
     
 }
