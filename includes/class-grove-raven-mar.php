@@ -147,21 +147,18 @@ class Grove_Raven_Mar {
                                 </span>
                             </td>
                             <td style="border: 1px solid #ddd; padding: 8px; font-weight: bold; white-space: nowrap;"><?php echo esc_html($space->space_name); ?></td>
-                            <td style="border: 1px solid #ddd; padding: 8px; white-space: nowrap;">
+                            <td class="for_db_table_zen_raven_page_spaces" style="border: 1px solid #ddd;">
                                 <div class="cell_inner_wrapper_div for_db_table_zen_raven_page_spaces for_db_column_asn_page_id">
                                     <button class="button button-small choose-page-btn" data-space-id="<?php echo esc_attr($space->space_id); ?>" style="margin-right: 8px;">Choose Page</button>
                                     <?php if ($space->asn_page_id): ?>
                                         <button class="button button-small clear-page-btn" data-space-id="<?php echo esc_attr($space->space_id); ?>" style="margin-right: 8px; font-size: 11px; padding: 2px 6px; background: #dc3545; color: white; border-color: #dc3545;">Clear</button>
                                         <span class="page-info" data-page-id="<?php echo esc_attr($space->asn_page_id); ?>">
-                                            (<?php echo esc_html($space->asn_page_id); ?>) | <span class="page-title-text"><?php 
-                                                $page_title = get_the_title($space->asn_page_id);
-                                                echo esc_html($page_title ? $page_title : 'Loading...');
-                                            ?></span>
+                                            (<?php echo esc_html($space->asn_page_id); ?>) | <span class="page-title-text">Loading...</span>
                                         </span>
                                         <div style="margin-top: 8px; display: flex; gap: 4px;">
-                                            <a href="<?php echo admin_url('post.php?post=' . $space->asn_page_id . '&action=edit'); ?>" target="_blank" class="button" style="font-size: 14px; padding: 3px; text-decoration: none;">pendulum</a>
-                                            <a href="<?php echo admin_url('post.php?post=' . $space->asn_page_id . '&action=elementor'); ?>" target="_blank" class="button" style="font-size: 14px; padding: 3px; text-decoration: none;">elementor</a>
-                                            <a href="<?php echo get_permalink($space->asn_page_id); ?>" class="button frontend-link" data-page-id="<?php echo esc_attr($space->asn_page_id); ?>" target="_blank" style="font-size: 14px; padding: 3px; text-decoration: none;">frontend</a>
+                                            <a href="<?php echo site_url(); ?>/wp-admin/post.php?post=<?php echo esc_attr($space->asn_page_id); ?>&action=edit" target="_blank" class="button" style="font-size: 14px; padding: 3px; text-decoration: none;">pendulum</a>
+                                            <a href="<?php echo site_url(); ?>/wp-admin/post.php?post=<?php echo esc_attr($space->asn_page_id); ?>&action=elementor" target="_blank" class="button" style="font-size: 14px; padding: 3px; text-decoration: none;">elementor</a>
+                                            <a href="#" class="button frontend-link" data-page-id="<?php echo esc_attr($space->asn_page_id); ?>" target="_blank" style="font-size: 14px; padding: 3px; text-decoration: none;">frontend</a>
                                         </div>
                                     <?php endif; ?>
                                 </div>
@@ -252,6 +249,68 @@ class Grove_Raven_Mar {
 
         <script>
         jQuery(document).ready(function($) {
+            // Load page titles and frontend links after page loads
+            loadPageTitles();
+            loadFrontendLinks();
+            
+            // Load page titles for existing assignments
+            function loadPageTitles() {
+                $('.page-info').each(function() {
+                    let pageId = $(this).data('page-id');
+                    let titleElement = $(this).find('.page-title-text');
+                    
+                    $.ajax({
+                        url: ajaxurl,
+                        type: 'POST',
+                        data: {
+                            action: 'grove_get_page_title',
+                            nonce: '<?php echo wp_create_nonce('grove_raven_nonce'); ?>',
+                            page_id: pageId
+                        },
+                        success: function(response) {
+                            if (response.success) {
+                                titleElement.text(response.data.title);
+                            } else {
+                                titleElement.text('(Not found)');
+                            }
+                        },
+                        error: function() {
+                            titleElement.text('(Error loading)');
+                        }
+                    });
+                });
+            }
+            
+            // Load frontend links for navigation buttons
+            function loadFrontendLinks() {
+                $('.frontend-link').each(function() {
+                    let link = $(this);
+                    let pageId = link.data('page-id');
+                    
+                    if (pageId) {
+                        $.ajax({
+                            url: ajaxurl,
+                            type: 'POST',
+                            data: {
+                                action: 'grove_get_page_permalink',
+                                nonce: '<?php echo wp_create_nonce('grove_raven_nonce'); ?>',
+                                page_id: pageId
+                            },
+                            success: function(response) {
+                                if (response.success) {
+                                    link.attr('href', response.data.permalink);
+                                } else {
+                                    link.attr('href', '#').text('frontend (error)');
+                                }
+                            },
+                            error: function() {
+                                link.attr('href', '#').text('frontend (error)');
+                            }
+                        });
+                    }
+                });
+            }
+            
             // Open create modal
             $('#create-popup-btn').click(function() {
                 $('#modal-title').text('Create New Page Space');
@@ -421,6 +480,7 @@ class Grove_Raven_Mar {
                         if (response.success) {
                             $('#raven-page-selector-modal').hide();
                             location.reload(); // Reload to show updated data
+                            // After reload, the loadPageTitles() and loadFrontendLinks() will run automatically
                         } else {
                             alert('Error updating page: ' + response.data);
                         }
