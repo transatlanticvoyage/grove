@@ -113,10 +113,10 @@ class Grove_Raven_Mar {
             
             <!-- Main Table -->
             <div style="overflow-x: auto; border: 1px solid #ddd;">
-                <table style="width: 100%; border-collapse: collapse; background: white;">
+                <table style="width: auto; border-collapse: collapse; background: white; table-layout: auto;">
                     <thead>
                         <tr>
-                            <th style="border: 1px solid #ddd; font-weight: bold; text-transform: lowercase; background: #e0e0e0;"><div class="cell_inner_wrapper_div for_db_table_zen_raven_page_spaces">wp_zen_raven_page_spaces</div></th>
+                            <th style="border: 1px solid #ddd; font-weight: bold; text-transform: lowercase; background: #e0e0e0;"><div class="cell_inner_wrapper_div for_db_table_zen_raven_page_spaces">(ch)</div></th>
                             <th style="border: 1px solid #ddd; font-weight: bold; text-transform: lowercase; background: #e0e0e0;"><div class="cell_inner_wrapper_div for_db_table_zen_raven_page_spaces">wp_zen_raven_page_spaces</div></th>
                             <th style="border: 1px solid #ddd; font-weight: bold; text-transform: lowercase; background: #e0e0e0;"><div class="cell_inner_wrapper_div for_db_table_zen_raven_page_spaces">wp_zen_raven_page_spaces</div></th>
                             <th style="border: 1px solid #ddd; font-weight: bold; text-transform: lowercase; background: #e0e0e0;"><div class="cell_inner_wrapper_div for_db_table_zen_raven_page_spaces">wp_zen_raven_page_spaces</div></th>
@@ -124,40 +124,49 @@ class Grove_Raven_Mar {
                             <th style="border: 1px solid #ddd; font-weight: bold; background: #e0e0e0;"><div class="cell_inner_wrapper_div">(filler)</div></th>
                         </tr>
                         <tr>
-                            <th style="border: 1px solid #ddd; font-weight: bold; text-align: left; background: #f0f0f0; width: 50px;">
+                            <th style="border: 1px solid #ddd; font-weight: bold; text-align: left; background: #f0f0f0; width: auto; white-space: nowrap;">
                                 <div class="cell_inner_wrapper_div"><input type="checkbox" id="select-all" style="width: 20px; height: 20px;"></div>
                             </th>
-                            <th class="for_db_table_zen_raven_page_spaces" data-sort="space_id" style="border: 1px solid #ddd; font-weight: bold; text-transform: lowercase; cursor: pointer; background: #f8f9fa;"><div class="cell_inner_wrapper_div for_db_table_zen_raven_page_spaces for_db_column_space_id">space_id</div></th>
-                            <th class="for_db_table_zen_raven_page_spaces" data-sort="is_default_data" style="border: 1px solid #ddd; font-weight: bold; text-transform: lowercase; cursor: pointer; background: #f8f9fa;"><div class="cell_inner_wrapper_div for_db_table_zen_raven_page_spaces for_db_column_is_default_data">is_default_data</div></th>
-                            <th class="for_db_table_zen_raven_page_spaces" data-sort="space_name" style="border: 1px solid #ddd; font-weight: bold; text-transform: lowercase; cursor: pointer; background: #f8f9fa;"><div class="cell_inner_wrapper_div for_db_table_zen_raven_page_spaces for_db_column_space_name">space_name</div></th>
-                            <th class="for_db_table_zen_raven_page_spaces" data-sort="asn_page_id" style="border: 1px solid #ddd; font-weight: bold; text-transform: lowercase; cursor: pointer; background: #f8f9fa;"><div class="cell_inner_wrapper_div for_db_table_zen_raven_page_spaces for_db_column_asn_page_id">asn_page_id</div></th>
-                            <th style="border: 1px solid #ddd; font-weight: bold; background: #f8f9fa;"><div class="cell_inner_wrapper_div">Actions</div></th>
+                            <th class="for_db_table_zen_raven_page_spaces" data-sort="space_id" style="border: 1px solid #ddd; font-weight: bold; text-transform: lowercase; cursor: pointer; background: #f8f9fa; width: auto; white-space: nowrap;"><div class="cell_inner_wrapper_div for_db_table_zen_raven_page_spaces for_db_column_space_id">space_id</div></th>
+                            <th class="for_db_table_zen_raven_page_spaces" data-sort="is_default_data" style="border: 1px solid #ddd; font-weight: bold; text-transform: lowercase; cursor: pointer; background: #f8f9fa; width: auto; white-space: nowrap;"><div class="cell_inner_wrapper_div for_db_table_zen_raven_page_spaces for_db_column_is_default_data">is_default_data</div></th>
+                            <th class="for_db_table_zen_raven_page_spaces" data-sort="space_name" style="border: 1px solid #ddd; font-weight: bold; text-transform: lowercase; cursor: pointer; background: #f8f9fa; width: auto; white-space: nowrap;"><div class="cell_inner_wrapper_div for_db_table_zen_raven_page_spaces for_db_column_space_name">space_name</div></th>
+                            <th class="for_db_table_zen_raven_page_spaces" data-sort="asn_page_id" style="border: 1px solid #ddd; font-weight: bold; text-transform: lowercase; cursor: pointer; background: #f8f9fa; width: auto; white-space: nowrap;"><div class="cell_inner_wrapper_div for_db_table_zen_raven_page_spaces for_db_column_asn_page_id">asn_page_id</div></th>
+                            <th style="border: 1px solid #ddd; font-weight: bold; background: #f8f9fa; width: auto; white-space: nowrap;"><div class="cell_inner_wrapper_div">Actions</div></th>
                         </tr>
                     </thead>
                     <tbody id="table-body">
                         <?php foreach ($raven_spaces as $space): ?>
                         <tr data-id="<?php echo esc_attr($space->space_id); ?>">
-                            <td style="border: 1px solid #ddd; padding: 8px;">
+                            <td style="border: 1px solid #ddd; padding: 8px; white-space: nowrap;">
                                 <input type="checkbox" class="row-checkbox" value="<?php echo esc_attr($space->space_id); ?>" style="width: 18px; height: 18px;">
                             </td>
-                            <td style="border: 1px solid #ddd; padding: 8px;"><?php echo esc_html($space->space_id); ?></td>
-                            <td style="border: 1px solid #ddd; padding: 8px;">
+                            <td style="border: 1px solid #ddd; padding: 8px; white-space: nowrap;"><?php echo esc_html($space->space_id); ?></td>
+                            <td style="border: 1px solid #ddd; padding: 8px; white-space: nowrap;">
                                 <span style="color: <?php echo $space->is_default_data ? '#28a745' : '#dc3545'; ?>;">
                                     <?php echo $space->is_default_data ? 'Yes' : 'No'; ?>
                                 </span>
                             </td>
-                            <td style="border: 1px solid #ddd; padding: 8px; font-weight: bold;"><?php echo esc_html($space->space_name); ?></td>
-                            <td style="border: 1px solid #ddd; padding: 8px;">
-                                <?php 
-                                if ($space->asn_page_id) {
-                                    $page_title = get_the_title($space->asn_page_id);
-                                    echo esc_html($page_title ? $page_title : 'Page #' . $space->asn_page_id);
-                                } else {
-                                    echo '<span style="color: #999; font-style: italic;">Not assigned</span>';
-                                }
-                                ?>
+                            <td style="border: 1px solid #ddd; padding: 8px; font-weight: bold; white-space: nowrap;"><?php echo esc_html($space->space_name); ?></td>
+                            <td style="border: 1px solid #ddd; padding: 8px; white-space: nowrap;">
+                                <div class="cell_inner_wrapper_div for_db_table_zen_raven_page_spaces for_db_column_asn_page_id">
+                                    <button class="button button-small choose-page-btn" data-space-id="<?php echo esc_attr($space->space_id); ?>" style="margin-right: 8px;">Choose Page</button>
+                                    <?php if ($space->asn_page_id): ?>
+                                        <button class="button button-small clear-page-btn" data-space-id="<?php echo esc_attr($space->space_id); ?>" style="margin-right: 8px; font-size: 11px; padding: 2px 6px; background: #dc3545; color: white; border-color: #dc3545;">Clear</button>
+                                        <span class="page-info" data-page-id="<?php echo esc_attr($space->asn_page_id); ?>">
+                                            (<?php echo esc_html($space->asn_page_id); ?>) | <span class="page-title-text"><?php 
+                                                $page_title = get_the_title($space->asn_page_id);
+                                                echo esc_html($page_title ? $page_title : 'Loading...');
+                                            ?></span>
+                                        </span>
+                                        <div style="margin-top: 8px; display: flex; gap: 4px;">
+                                            <a href="<?php echo admin_url('post.php?post=' . $space->asn_page_id . '&action=edit'); ?>" target="_blank" class="button" style="font-size: 14px; padding: 3px; text-decoration: none;">pendulum</a>
+                                            <a href="<?php echo admin_url('post.php?post=' . $space->asn_page_id . '&action=elementor'); ?>" target="_blank" class="button" style="font-size: 14px; padding: 3px; text-decoration: none;">elementor</a>
+                                            <a href="<?php echo get_permalink($space->asn_page_id); ?>" class="button frontend-link" data-page-id="<?php echo esc_attr($space->asn_page_id); ?>" target="_blank" style="font-size: 14px; padding: 3px; text-decoration: none;">frontend</a>
+                                        </div>
+                                    <?php endif; ?>
+                                </div>
                             </td>
-                            <td style="border: 1px solid #ddd; padding: 8px;">
+                            <td style="border: 1px solid #ddd; padding: 8px; white-space: nowrap;">
                                 <button class="button button-small edit-btn" data-id="<?php echo esc_attr($space->space_id); ?>">Edit</button>
                                 <button class="button button-small delete-btn" data-id="<?php echo esc_attr($space->space_id); ?>" style="background: #dc3545; color: white; border-color: #dc3545; margin-left: 5px;">Delete</button>
                             </td>
@@ -201,6 +210,43 @@ class Grove_Raven_Mar {
                         <button type="submit" style="padding: 10px 20px; background: #0073aa; color: white; border: none; border-radius: 4px; cursor: pointer;">Save</button>
                     </div>
                 </form>
+            </div>
+        </div>
+        
+        <!-- Page Selector Modal -->
+        <div id="raven-page-selector-modal" style="display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.5); z-index: 1000;">
+            <div style="position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); background: white; padding: 30px; border-radius: 8px; width: 80%; max-width: 1200px; max-height: 80vh; overflow-y: auto;">
+                <h2 style="margin-top: 0;">Select a Page or Post</h2>
+                
+                <!-- Search Box -->
+                <div style="margin-bottom: 20px;">
+                    <input type="text" id="raven-page-search" placeholder="Search pages and posts..." style="width: 300px; padding: 8px; border: 1px solid #ddd; border-radius: 4px;">
+                    <button id="clear-raven-page-search" class="button button-small" style="margin-left: 10px;">Clear Search</button>
+                </div>
+                
+                <!-- Pages Table -->
+                <div style="border: 1px solid #ddd; border-radius: 5px; overflow: hidden;">
+                    <table id="raven-pages-table" style="width: 100%; border-collapse: collapse;">
+                        <thead style="background: #f8f9fa;">
+                            <tr>
+                                <th style="padding: 10px; border: 1px solid #ddd; text-align: left;">Select</th>
+                                <th style="padding: 10px; border: 1px solid #ddd; text-align: left;">ID</th>
+                                <th style="padding: 10px; border: 1px solid #ddd; text-align: left;">Title</th>
+                                <th style="padding: 10px; border: 1px solid #ddd; text-align: left;">Type</th>
+                                <th style="padding: 10px; border: 1px solid #ddd; text-align: left;">Status</th>
+                                <th style="padding: 10px; border: 1px solid #ddd; text-align: left;">Date</th>
+                            </tr>
+                        </thead>
+                        <tbody id="raven-pages-tbody">
+                            <!-- Pages will be loaded here -->
+                        </tbody>
+                    </table>
+                </div>
+                
+                <div style="margin-top: 20px; text-align: right;">
+                    <button type="button" id="cancel-raven-page-select" class="button button-secondary" style="margin-right: 10px;">Cancel</button>
+                    <button type="button" id="assign-raven-page-select" class="button button-primary">Assign Selected Page</button>
+                </div>
             </div>
         </div>
 
@@ -286,6 +332,125 @@ class Grove_Raven_Mar {
             $('#clear-search').click(function() {
                 $('#search-box').val('');
                 $('#table-body tr').show();
+            });
+            
+            // Page selector functionality
+            let currentSpaceId = null;
+            let allRavenPagesData = [];
+            
+            // Open page selector modal
+            $(document).on('click', '.choose-page-btn', function() {
+                currentSpaceId = $(this).data('space-id');
+                
+                // Load pages via AJAX
+                $.ajax({
+                    url: ajaxurl,
+                    type: 'POST',
+                    data: {
+                        action: 'grove_get_all_pages',
+                        nonce: '<?php echo wp_create_nonce('grove_raven_nonce'); ?>'
+                    },
+                    success: function(response) {
+                        if (response.success) {
+                            allRavenPagesData = response.data;
+                            displayRavenPages(allRavenPagesData);
+                            $('#raven-page-selector-modal').show();
+                        }
+                    }
+                });
+            });
+            
+            // Display pages in modal
+            function displayRavenPages(pages) {
+                let tbody = $('#raven-pages-tbody');
+                tbody.empty();
+                
+                pages.forEach(function(page) {
+                    let row = $('<tr>');
+                    row.append('<td style="padding: 8px; border: 1px solid #ddd;"><input type="radio" name="raven-page-select" value="' + page.ID + '" data-title="' + page.post_title + '"></td>');
+                    row.append('<td style="padding: 8px; border: 1px solid #ddd;">' + page.ID + '</td>');
+                    row.append('<td style="padding: 8px; border: 1px solid #ddd;">' + page.post_title + '</td>');
+                    row.append('<td style="padding: 8px; border: 1px solid #ddd;">' + page.post_type + '</td>');
+                    row.append('<td style="padding: 8px; border: 1px solid #ddd;">' + page.post_status + '</td>');
+                    row.append('<td style="padding: 8px; border: 1px solid #ddd;">' + page.post_date + '</td>');
+                    tbody.append(row);
+                });
+            }
+            
+            // Search pages in modal
+            $('#raven-page-search').on('input', function() {
+                let searchTerm = $(this).val().toLowerCase();
+                let filteredPages = allRavenPagesData.filter(function(page) {
+                    return page.post_title.toLowerCase().includes(searchTerm) ||
+                           page.ID.toString().includes(searchTerm) ||
+                           page.post_type.toLowerCase().includes(searchTerm);
+                });
+                displayRavenPages(filteredPages);
+            });
+            
+            // Clear search in modal
+            $('#clear-raven-page-search').click(function() {
+                $('#raven-page-search').val('');
+                displayRavenPages(allRavenPagesData);
+            });
+            
+            // Cancel page selection
+            $('#cancel-raven-page-select').click(function() {
+                $('#raven-page-selector-modal').hide();
+            });
+            
+            // Assign selected page
+            $('#assign-raven-page-select').click(function() {
+                let selectedPageId = $('input[name="raven-page-select"]:checked').val();
+                
+                if (!selectedPageId) {
+                    alert('Please select a page first.');
+                    return;
+                }
+                
+                $.ajax({
+                    url: ajaxurl,
+                    type: 'POST',
+                    data: {
+                        action: 'grove_update_raven_page',
+                        nonce: '<?php echo wp_create_nonce('grove_raven_nonce'); ?>',
+                        space_id: currentSpaceId,
+                        page_id: selectedPageId
+                    },
+                    success: function(response) {
+                        if (response.success) {
+                            $('#raven-page-selector-modal').hide();
+                            location.reload(); // Reload to show updated data
+                        } else {
+                            alert('Error updating page: ' + response.data);
+                        }
+                    }
+                });
+            });
+            
+            // Clear page assignment
+            $(document).on('click', '.clear-page-btn', function() {
+                let spaceId = $(this).data('space-id');
+                
+                if (confirm('Are you sure you want to clear the page assignment for this space?')) {
+                    $.ajax({
+                        url: ajaxurl,
+                        type: 'POST',
+                        data: {
+                            action: 'grove_update_raven_page',
+                            nonce: '<?php echo wp_create_nonce('grove_raven_nonce'); ?>',
+                            space_id: spaceId,
+                            page_id: ''
+                        },
+                        success: function(response) {
+                            if (response.success) {
+                                location.reload(); // Reload to show updated data
+                            } else {
+                                alert('Error clearing page assignment: ' + response.data);
+                            }
+                        }
+                    });
+                }
             });
         });
         </script>
