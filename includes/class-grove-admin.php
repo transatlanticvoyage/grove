@@ -10721,17 +10721,8 @@ class Grove_Admin {
     }
     
     public function grove_raven_mar_page() {
-        // AGGRESSIVE NOTICE SUPPRESSION - Remove ALL WordPress admin notices
-        $this->suppress_all_admin_notices();
-        ?>
-        <div class="wrap" style="margin: 0; padding: 0;">
-            <!-- Allow space for WordPress notices -->
-            <div style="height: 20px;"></div>
-            
-            <div style="padding: 20px;">
-                <h1>Grove Raven Mar</h1>
-            </div>
-        </div>
-        <?php
+        // Delegate to the dedicated Grove Raven Mar class
+        $grove_raven_mar = new Grove_Raven_Mar();
+        $grove_raven_mar->grove_raven_mar_page();
     }
 }
