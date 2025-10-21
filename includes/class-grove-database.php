@@ -80,6 +80,7 @@ class Grove_Database {
             $this->create_lighthouse_friendly_names_table($charset_collate);
             $this->create_general_shortcodes_table($charset_collate);
             $this->create_fragments_table($charset_collate);
+            $this->create_raven_page_spaces_table($charset_collate);
         }
     }
     
@@ -558,6 +559,30 @@ class Grove_Database {
     }
     
     /**
+     * Create zen_raven_page_spaces table
+     */
+    private function create_raven_page_spaces_table($charset_collate) {
+        global $wpdb;
+        
+        $table_name = $wpdb->prefix . 'zen_raven_page_spaces';
+        
+        $sql = "CREATE TABLE IF NOT EXISTS $table_name (
+            space_id int(11) NOT NULL AUTO_INCREMENT,
+            is_default_data tinyint(1) DEFAULT 1,
+            space_name varchar(255) NOT NULL,
+            asn_page_id bigint(20) DEFAULT NULL,
+            created_at timestamp DEFAULT CURRENT_TIMESTAMP,
+            updated_at timestamp DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+            PRIMARY KEY (space_id),
+            UNIQUE KEY unique_space_name (space_name),
+            INDEX idx_is_default (is_default_data),
+            INDEX idx_asn_page_id (asn_page_id)
+        ) $charset_collate;";
+        
+        dbDelta($sql);
+    }
+    
+    /**
      * Insert default data if tables are empty
      */
     private function maybe_insert_default_data() {
@@ -597,6 +622,9 @@ class Grove_Database {
         
         // Insert default general shortcodes using version-based migration
         $this->migrate_default_general_shortcodes();
+        
+        // Insert default raven page spaces using version-based migration
+        $this->migrate_default_raven_page_spaces();
     }
     
     /**
@@ -1129,6 +1157,83 @@ class Grove_Database {
         
         // Update the installed defaults version
         update_option('grove_general_shortcodes_defaults_version', '1.0.0');
+    }
+    
+    /**
+     * Version-based migration system for default raven page spaces
+     * Tracks which default entries have been installed and adds new ones on updates
+     */
+    private function migrate_default_raven_page_spaces() {
+        global $wpdb;
+        
+        $raven_page_spaces_table = $wpdb->prefix . 'zen_raven_page_spaces';
+        $installed_defaults_version = get_option('grove_raven_page_spaces_defaults_version', '0.0.0');
+        
+        // Define default raven page spaces with their introduction versions
+        $default_page_spaces = array(
+            '1.0.0' => array(
+                array(
+                    'space_id' => 1,
+                    'is_default_data' => 1,
+                    'space_name' => 'privacy_policy',
+                    'asn_page_id' => null
+                ),
+                array(
+                    'space_id' => 2,
+                    'is_default_data' => 1,
+                    'space_name' => 'tos',
+                    'asn_page_id' => null
+                ),
+                array(
+                    'space_id' => 3,
+                    'is_default_data' => 1,
+                    'space_name' => 'disclaimer',
+                    'asn_page_id' => null
+                ),
+                array(
+                    'space_id' => 4,
+                    'is_default_data' => 1,
+                    'space_name' => 'sitemap',
+                    'asn_page_id' => null
+                ),
+                array(
+                    'space_id' => 5,
+                    'is_default_data' => 1,
+                    'space_name' => 'contact',
+                    'asn_page_id' => null
+                ),
+                array(
+                    'space_id' => 6,
+                    'is_default_data' => 1,
+                    'space_name' => 'about',
+                    'asn_page_id' => null
+                )
+            )
+        );
+        
+        // Install missing default page spaces from each version
+        foreach ($default_page_spaces as $version => $page_spaces) {
+            if (version_compare($installed_defaults_version, $version, '<')) {
+                foreach ($page_spaces as $page_space) {
+                    // Check if this specific page space already exists
+                    $exists = $wpdb->get_var($wpdb->prepare(
+                        "SELECT COUNT(*) FROM $raven_page_spaces_table WHERE space_name = %s",
+                        $page_space['space_name']
+                    ));
+                    
+                    if (!$exists) {
+                        $wpdb->insert(
+                            $raven_page_spaces_table,
+                            $page_space,
+                            array('%d', '%d', '%s', '%d')
+                        );
+                    }
+                }
+            }
+        }
+        
+        // Update the installed defaults version
+        update_option('grove_raven_page_spaces_defaults_version', '1.0.0');
     }
     
     /**

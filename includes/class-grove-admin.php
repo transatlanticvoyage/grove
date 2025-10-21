@@ -249,6 +249,15 @@ class Grove_Admin {
         
         add_submenu_page(
             'grovehub',
+            'Grove Raven Mar',
+            'grove_raven_mar',
+            'manage_options',
+            'grove_raven_mar',
+            array($this, 'grove_raven_mar_page')
+        );
+        
+        add_submenu_page(
+            'grovehub',
             'Dark Mode Test',
             'darkmodetest',
             'manage_options',
@@ -10709,5 +10718,20 @@ class Grove_Admin {
         $content = $wpdb->get_var("SELECT senegal_fragment_datum FROM $table_name WHERE id = 1");
         
         wp_send_json_success($content ? $content : '');
+    }
+    
+    public function grove_raven_mar_page() {
+        // AGGRESSIVE NOTICE SUPPRESSION - Remove ALL WordPress admin notices
+        $this->suppress_all_admin_notices();
+        ?>
+        <div class="wrap" style="margin: 0; padding: 0;">
+            <!-- Allow space for WordPress notices -->
+            <div style="height: 20px;"></div>
+            
+            <div style="padding: 20px;">
+                <h1>Grove Raven Mar</h1>
+            </div>
+        </div>
+        <?php
     }
 }
