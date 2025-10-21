@@ -158,8 +158,8 @@ class Grove_Raven_Mar {
                                             (<?php echo esc_html($space->asn_page_id); ?>) | <span class="page-title-text">Loading...</span>
                                         </span>
                                         <div style="margin-top: 8px; display: flex; gap: 4px;">
-                                            <a href="<?php echo site_url(); ?>/wp-admin/post.php?post=<?php echo esc_attr($space->asn_page_id); ?>&action=edit" target="_blank" class="button" style="font-size: 14px; padding: 3px; text-decoration: none;">pendulum</a>
-                                            <a href="<?php echo site_url(); ?>/wp-admin/post.php?post=<?php echo esc_attr($space->asn_page_id); ?>&action=elementor" target="_blank" class="button" style="font-size: 14px; padding: 3px; text-decoration: none;">elementor</a>
+                                            <a href="http://saltwater.local/wp-admin/post.php?post=<?php echo esc_attr($space->asn_page_id); ?>&action=edit" target="_blank" class="button" style="font-size: 14px; padding: 3px; text-decoration: none;">pendulum</a>
+                                            <a href="http://saltwater.local/wp-admin/post.php?post=<?php echo esc_attr($space->asn_page_id); ?>&action=elementor" target="_blank" class="button" style="font-size: 14px; padding: 3px; text-decoration: none;">elementor</a>
                                             <a href="#" class="button frontend-link" data-page-id="<?php echo esc_attr($space->asn_page_id); ?>" target="_blank" style="font-size: 14px; padding: 3px; text-decoration: none;">frontend</a>
                                         </div>
                                     <?php endif; ?>
@@ -219,19 +219,19 @@ class Grove_Raven_Mar {
         </div>
         
         <!-- Page Selector Modal -->
-        <div id="raven-page-selector-modal" style="display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.5); z-index: 1000;">
+        <div id="page-selector-modal" style="display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.5); z-index: 1000;">
             <div style="position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); background: white; padding: 30px; border-radius: 8px; width: 80%; max-width: 1200px; max-height: 80vh; overflow-y: auto;">
                 <h2 style="margin-top: 0;">Select a Page or Post</h2>
                 
                 <!-- Search Box -->
                 <div style="margin-bottom: 20px;">
-                    <input type="text" id="raven-page-search" placeholder="Search pages and posts..." style="width: 300px; padding: 8px; border: 1px solid #ddd; border-radius: 4px;">
-                    <button id="clear-raven-page-search" class="button button-small" style="margin-left: 10px;">Clear Search</button>
+                    <input type="text" id="page-search" placeholder="Search pages and posts..." style="width: 300px; padding: 8px; border: 1px solid #ddd; border-radius: 4px;">
+                    <button id="clear-page-search" class="button button-small" style="margin-left: 10px;">Clear Search</button>
                 </div>
                 
                 <!-- Pages Table -->
                 <div style="border: 1px solid #ddd; border-radius: 5px; overflow: hidden;">
-                    <table id="raven-pages-table" style="width: 100%; border-collapse: collapse;">
+                    <table id="pages-table" style="width: 100%; border-collapse: collapse;">
                         <thead style="background: #f8f9fa;">
                             <tr>
                                 <th style="padding: 10px; border: 1px solid #ddd; text-align: left;">Select</th>
@@ -242,15 +242,16 @@ class Grove_Raven_Mar {
                                 <th style="padding: 10px; border: 1px solid #ddd; text-align: left;">Date</th>
                             </tr>
                         </thead>
-                        <tbody id="raven-pages-tbody">
+                        <tbody id="pages-tbody">
                             <!-- Pages will be loaded here -->
                         </tbody>
                     </table>
                 </div>
                 
                 <div style="margin-top: 20px; text-align: right;">
-                    <button type="button" id="cancel-raven-page-select" class="button button-secondary" style="margin-right: 10px;">Cancel</button>
-                    <button type="button" id="assign-raven-page-select" class="button button-primary">Assign Selected Page</button>
+                    <input type="hidden" id="current-service-id" />
+                    <button type="button" id="cancel-page-select" class="button button-secondary" style="margin-right: 10px;">Cancel</button>
+                    <button type="button" id="assign-page-select" class="button button-primary">Assign Selected Page</button>
                 </div>
             </div>
         </div>
@@ -272,7 +273,7 @@ class Grove_Raven_Mar {
                         type: 'POST',
                         data: {
                             action: 'grove_get_page_title',
-                            nonce: '<?php echo wp_create_nonce('grove_raven_nonce'); ?>',
+                            nonce: '<?php echo wp_create_nonce('grove_services_nonce'); ?>',
                             page_id: pageId
                         },
                         success: function(response) {
@@ -301,7 +302,7 @@ class Grove_Raven_Mar {
                             type: 'POST',
                             data: {
                                 action: 'grove_get_page_permalink',
-                                nonce: '<?php echo wp_create_nonce('grove_raven_nonce'); ?>',
+                                nonce: '<?php echo wp_create_nonce('grove_services_nonce'); ?>',
                                 page_id: pageId
                             },
                             success: function(response) {
@@ -415,26 +416,27 @@ class Grove_Raven_Mar {
                     type: 'POST',
                     data: {
                         action: 'grove_get_all_pages',
-                        nonce: '<?php echo wp_create_nonce('grove_raven_nonce'); ?>'
+                        nonce: '<?php echo wp_create_nonce('grove_services_nonce'); ?>'
                     },
                     success: function(response) {
                         if (response.success) {
                             allRavenPagesData = response.data;
-                            displayRavenPages(allRavenPagesData);
-                            $('#raven-page-selector-modal').show();
+                            displayPages(allRavenPagesData);
+                            $('#current-service-id').val(currentSpaceId);
+                            $('#page-selector-modal').show();
                         }
                     }
                 });
             });
             
             // Display pages in modal
-            function displayRavenPages(pages) {
-                let tbody = $('#raven-pages-tbody');
+            function displayPages(pages) {
+                let tbody = $('#pages-tbody');
                 tbody.empty();
                 
                 pages.forEach(function(page) {
                     let row = $('<tr>');
-                    row.append('<td style="padding: 8px; border: 1px solid #ddd;"><input type="radio" name="raven-page-select" value="' + page.ID + '" data-title="' + page.post_title + '"></td>');
+                    row.append('<td style="padding: 8px; border: 1px solid #ddd;"><input type="radio" name="page-select" value="' + page.ID + '" data-title="' + page.post_title + '"></td>');
                     row.append('<td style="padding: 8px; border: 1px solid #ddd;">' + page.ID + '</td>');
                     row.append('<td style="padding: 8px; border: 1px solid #ddd;">' + page.post_title + '</td>');
                     row.append('<td style="padding: 8px; border: 1px solid #ddd;">' + page.post_type + '</td>');
@@ -445,30 +447,30 @@ class Grove_Raven_Mar {
             }
             
             // Search pages in modal
-            $('#raven-page-search').on('input', function() {
+            $('#page-search').on('input', function() {
                 let searchTerm = $(this).val().toLowerCase();
                 let filteredPages = allRavenPagesData.filter(function(page) {
                     return page.post_title.toLowerCase().includes(searchTerm) ||
                            page.ID.toString().includes(searchTerm) ||
                            page.post_type.toLowerCase().includes(searchTerm);
                 });
-                displayRavenPages(filteredPages);
+                displayPages(filteredPages);
             });
             
             // Clear search in modal
-            $('#clear-raven-page-search').click(function() {
-                $('#raven-page-search').val('');
-                displayRavenPages(allRavenPagesData);
+            $('#clear-page-search').click(function() {
+                $('#page-search').val('');
+                displayPages(allRavenPagesData);
             });
             
             // Cancel page selection
-            $('#cancel-raven-page-select').click(function() {
-                $('#raven-page-selector-modal').hide();
+            $('#cancel-page-select').click(function() {
+                $('#page-selector-modal').hide();
             });
             
             // Assign selected page
-            $('#assign-raven-page-select').click(function() {
-                let selectedPageId = $('input[name="raven-page-select"]:checked').val();
+            $('#assign-page-select').click(function() {
+                let selectedPageId = $('input[name="page-select"]:checked').val();
                 
                 if (!selectedPageId) {
                     alert('Please select a page first.');
@@ -480,13 +482,13 @@ class Grove_Raven_Mar {
                     type: 'POST',
                     data: {
                         action: 'grove_update_raven_page',
-                        nonce: '<?php echo wp_create_nonce('grove_raven_nonce'); ?>',
+                        nonce: '<?php echo wp_create_nonce('grove_services_nonce'); ?>',
                         space_id: currentSpaceId,
                         page_id: selectedPageId
                     },
                     success: function(response) {
                         if (response.success) {
-                            $('#raven-page-selector-modal').hide();
+                            $('#page-selector-modal').hide();
                             location.reload(); // Reload to show updated data
                             // After reload, the loadPageTitles() and loadFrontendLinks() will run automatically
                         } else {
@@ -506,7 +508,7 @@ class Grove_Raven_Mar {
                         type: 'POST',
                         data: {
                             action: 'grove_update_raven_page',
-                            nonce: '<?php echo wp_create_nonce('grove_raven_nonce'); ?>',
+                            nonce: '<?php echo wp_create_nonce('grove_services_nonce'); ?>',
                             space_id: spaceId,
                             page_id: ''
                         },

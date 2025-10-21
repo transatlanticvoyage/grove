@@ -28,6 +28,7 @@ class Grove_Admin {
         add_action('wp_ajax_grove_get_all_pages', array($this, 'grove_get_all_pages'));
         add_action('wp_ajax_grove_get_page_title', array($this, 'grove_get_page_title'));
         add_action('wp_ajax_grove_update_service_page', array($this, 'grove_update_service_page'));
+        add_action('wp_ajax_grove_update_raven_page', array($this, 'grove_update_raven_page'));
         add_action('wp_ajax_grove_update_post_title', array($this, 'grove_update_post_title'));
         add_action('wp_ajax_grove_get_page_name', array($this, 'grove_get_page_name'));
         add_action('wp_ajax_grove_update_post_name', array($this, 'grove_update_post_name'));
@@ -8462,6 +8463,41 @@ class Grove_Admin {
             wp_send_json_success('Service page updated successfully');
         } else {
             wp_send_json_error('Failed to update service page');
+        }
+    }
+    
+    /**
+     * Update raven page space assignment
+     */
+    public function grove_update_raven_page() {
+        global $wpdb;
+        
+        // Check nonce
+        if (!wp_verify_nonce($_POST['nonce'], 'grove_services_nonce')) {
+            wp_send_json_error('Invalid nonce');
+            return;
+        }
+        
+        $space_id = intval($_POST['space_id']);
+        $page_id = intval($_POST['page_id']);
+        
+        // If page_id is 0, set to NULL to clear the assignment
+        $page_id = ($page_id === 0) ? null : $page_id;
+        
+        $table_name = $wpdb->prefix . 'zen_raven_page_spaces';
+        
+        $result = $wpdb->update(
+            $table_name,
+            array('asn_page_id' => $page_id),
+            array('space_id' => $space_id),
+            array('%d'),
+            array('%d')
+        );
+        
+        if ($result !== false) {
+            wp_send_json_success('Raven page space updated successfully');
+        } else {
+            wp_send_json_error('Failed to update raven page space');
         }
     }
     
