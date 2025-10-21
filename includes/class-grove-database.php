@@ -81,6 +81,7 @@ class Grove_Database {
             $this->create_general_shortcodes_table($charset_collate);
             $this->create_fragments_table($charset_collate);
             $this->create_raven_page_spaces_table($charset_collate);
+            $this->create_streamflow_menus_table($charset_collate);
         }
     }
     
@@ -577,6 +578,26 @@ class Grove_Database {
             UNIQUE KEY unique_space_name (space_name),
             INDEX idx_is_default (is_default_data),
             INDEX idx_asn_page_id (asn_page_id)
+        ) $charset_collate;";
+        
+        dbDelta($sql);
+    }
+    
+    /**
+     * Create zen_streamflow_menus table
+     */
+    private function create_streamflow_menus_table($charset_collate) {
+        global $wpdb;
+        
+        $table_name = $wpdb->prefix . 'zen_streamflow_menus';
+        
+        $sql = "CREATE TABLE IF NOT EXISTS $table_name (
+            menu_id int(11) NOT NULL AUTO_INCREMENT,
+            menu_datum text,
+            menu_description text,
+            created_at timestamp DEFAULT CURRENT_TIMESTAMP,
+            updated_at timestamp DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+            PRIMARY KEY (menu_id)
         ) $charset_collate;";
         
         dbDelta($sql);

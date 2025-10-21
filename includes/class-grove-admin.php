@@ -29,6 +29,11 @@ class Grove_Admin {
         add_action('wp_ajax_grove_get_page_title', array($this, 'grove_get_page_title'));
         add_action('wp_ajax_grove_update_service_page', array($this, 'grove_update_service_page'));
         add_action('wp_ajax_grove_update_raven_page', array($this, 'grove_update_raven_page'));
+        add_action('wp_ajax_grove_get_streamflow_menus', array($this, 'grove_get_streamflow_menus'));
+        add_action('wp_ajax_grove_get_streamflow_menu', array($this, 'grove_get_streamflow_menu'));
+        add_action('wp_ajax_grove_create_streamflow_menu', array($this, 'grove_create_streamflow_menu'));
+        add_action('wp_ajax_grove_update_streamflow_menu', array($this, 'grove_update_streamflow_menu'));
+        add_action('wp_ajax_grove_delete_streamflow_menus', array($this, 'grove_delete_streamflow_menus'));
         add_action('wp_ajax_grove_update_post_title', array($this, 'grove_update_post_title'));
         add_action('wp_ajax_grove_get_page_name', array($this, 'grove_get_page_name'));
         add_action('wp_ajax_grove_update_post_name', array($this, 'grove_update_post_name'));
@@ -255,6 +260,15 @@ class Grove_Admin {
             'manage_options',
             'grove_raven_mar',
             array($this, 'grove_raven_mar_page')
+        );
+        
+        add_submenu_page(
+            'grovehub',
+            'Streamflow Mar',
+            'streamflow_mar',
+            'manage_options',
+            'streamflow_mar',
+            array($this, 'streamflow_mar_page')
         );
         
         add_submenu_page(
@@ -10760,5 +10774,156 @@ class Grove_Admin {
         // Delegate to the dedicated Grove Raven Mar class
         $grove_raven_mar = new Grove_Raven_Mar();
         $grove_raven_mar->grove_raven_mar_page();
+    }
+    
+    public function streamflow_mar_page() {
+        // Delegate to the dedicated Grove Streamflow Mar class
+        $grove_streamflow_mar = new Grove_Streamflow_Mar();
+        $grove_streamflow_mar->streamflow_mar_page();
+    }
+    
+    /**
+     * Get all streamflow menus
+     */
+    public function grove_get_streamflow_menus() {
+        global $wpdb;
+        
+        // Check nonce
+        if (!wp_verify_nonce($_POST['nonce'], 'grove_services_nonce')) {
+            wp_send_json_error('Invalid nonce');
+            return;
+        }
+        
+        $table_name = $wpdb->prefix . 'zen_streamflow_menus';
+        $menus = $wpdb->get_results("SELECT menu_id, menu_datum, menu_description FROM $table_name ORDER BY menu_id ASC");
+        
+        wp_send_json_success($menus);
+    }
+    
+    /**
+     * Get single streamflow menu
+     */
+    public function grove_get_streamflow_menu() {
+        global $wpdb;
+        
+        // Check nonce
+        if (!wp_verify_nonce($_POST['nonce'], 'grove_services_nonce')) {
+            wp_send_json_error('Invalid nonce');
+            return;
+        }
+        
+        $menu_id = intval($_POST['menu_id']);
+        $table_name = $wpdb->prefix . 'zen_streamflow_menus';
+        
+        $menu = $wpdb->get_row($wpdb->prepare(
+            "SELECT * FROM $table_name WHERE menu_id = %d",
+            $menu_id
+        ));
+        
+        if ($menu) {
+            wp_send_json_success($menu);
+        } else {
+            wp_send_json_error('Menu not found');
+        }
+    }
+    
+    /**
+     * Create streamflow menu
+     */
+    public function grove_create_streamflow_menu() {
+        global $wpdb;
+        
+        // Check nonce
+        if (!wp_verify_nonce($_POST['nonce'], 'grove_services_nonce')) {
+            wp_send_json_error('Invalid nonce');
+            return;
+        }
+        
+        $menu_datum = sanitize_textarea_field($_POST['menu_datum']);
+        $menu_description = sanitize_textarea_field($_POST['menu_description']);
+        $table_name = $wpdb->prefix . 'zen_streamflow_menus';
+        
+        $result = $wpdb->insert(
+            $table_name,
+            array(
+                'menu_datum' => $menu_datum,
+                'menu_description' => $menu_description
+            ),
+            array('%s', '%s')
+        );
+        
+        if ($result !== false) {
+            wp_send_json_success('Menu created successfully');
+        } else {
+            wp_send_json_error('Failed to create menu');
+        }
+    }
+    
+    /**
+     * Update streamflow menu
+     */
+    public function grove_update_streamflow_menu() {
+        global $wpdb;
+        
+        // Check nonce
+        if (!wp_verify_nonce($_POST['nonce'], 'grove_services_nonce')) {
+            wp_send_json_error('Invalid nonce');
+            return;
+        }
+        
+        $menu_id = intval($_POST['menu_id']);
+        $menu_datum = sanitize_textarea_field($_POST['menu_datum']);
+        $menu_description = sanitize_textarea_field($_POST['menu_description']);
+        $table_name = $wpdb->prefix . 'zen_streamflow_menus';
+        
+        $result = $wpdb->update(
+            $table_name,
+            array(
+                'menu_datum' => $menu_datum,
+                'menu_description' => $menu_description
+            ),
+            array('menu_id' => $menu_id),
+            array('%s', '%s'),
+            array('%d')
+        );
+        
+        if ($result !== false) {
+            wp_send_json_success('Menu updated successfully');
+        } else {
+            wp_send_json_error('Failed to update menu');
+        }
+    }
+    
+    /**
+     * Delete streamflow menus
+     */
+    public function grove_delete_streamflow_menus() {
+        global $wpdb;
+        
+        // Check nonce
+        if (!wp_verify_nonce($_POST['nonce'], 'grove_services_nonce')) {
+            wp_send_json_error('Invalid nonce');
+            return;
+        }
+        
+        $ids = array_map('intval', $_POST['ids']);
+        $table_name = $wpdb->prefix . 'zen_streamflow_menus';
+        
+        if (empty($ids)) {
+            wp_send_json_error('No IDs provided');
+            return;
+        }
+        
+        $placeholders = implode(',', array_fill(0, count($ids), '%d'));
+        $result = $wpdb->query($wpdb->prepare(
+            "DELETE FROM $table_name WHERE menu_id IN ($placeholders)",
+            $ids
+        ));
+        
+        if ($result !== false) {
+            wp_send_json_success('Menus deleted successfully');
+        } else {
+            wp_send_json_error('Failed to delete menus');
+        }
     }
 }

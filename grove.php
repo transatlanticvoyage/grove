@@ -47,6 +47,7 @@ class GrovePlugin {
         require_once GROVE_PLUGIN_PATH . 'includes/class-grove-buffalor.php';
         require_once GROVE_PLUGIN_PATH . 'includes/class-grove-chimp.php';
         require_once GROVE_PLUGIN_PATH . 'includes/class-grove-raven-mar.php';
+        require_once GROVE_PLUGIN_PATH . 'includes/class-grove-streamflow-mar.php';
         require_once GROVE_PLUGIN_PATH . 'includes/class-grove-silk-dynamic-menu.php';
     }
     
