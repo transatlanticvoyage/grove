@@ -99,7 +99,7 @@ class Grove_Raven_Mar {
                                             <div style="font-size: 16px; display: flex; align-items: center; justify-content: center; gap: 8px;">
                                                 <span style="font-weight: bold;">column pagination</span>
                                                 <span style="font-size: 14px; font-weight: normal;">
-                                                    Showing <span style="font-weight: bold;" id="columns-showing">6</span> columns of <span style="font-weight: bold;">6</span> total columns
+                                                    Showing <span style="font-weight: bold;" id="columns-showing">7</span> columns of <span style="font-weight: bold;">7</span> total columns
                                                 </span>
                                             </div>
                                         </td>
@@ -121,6 +121,7 @@ class Grove_Raven_Mar {
                             <th style="border: 1px solid #ddd; font-weight: bold; text-transform: lowercase; background: #e0e0e0;"><div class="cell_inner_wrapper_div for_db_table_zen_raven_page_spaces">wp_zen_raven_page_spaces</div></th>
                             <th style="border: 1px solid #ddd; font-weight: bold; text-transform: lowercase; background: #e0e0e0;"><div class="cell_inner_wrapper_div for_db_table_zen_raven_page_spaces">wp_zen_raven_page_spaces</div></th>
                             <th style="border: 1px solid #ddd; font-weight: bold; text-transform: lowercase; background: #e0e0e0;"><div class="cell_inner_wrapper_div for_db_table_wp_posts_according_to_asn_page_id">wp_posts</div></th>
+                            <th style="border: 1px solid #ddd; font-weight: bold; background: #e0e0e0;"><div class="cell_inner_wrapper_div">(shortcode)</div></th>
                             <th style="border: 1px solid #ddd; font-weight: bold; background: #e0e0e0;"><div class="cell_inner_wrapper_div">(filler)</div></th>
                         </tr>
                         <tr>
@@ -131,6 +132,7 @@ class Grove_Raven_Mar {
                             <th class="for_db_table_zen_raven_page_spaces" data-sort="is_default_data" style="border: 1px solid #ddd; font-weight: bold; text-transform: lowercase; cursor: pointer; background: #f8f9fa; width: auto; white-space: nowrap;"><div class="cell_inner_wrapper_div for_db_table_zen_raven_page_spaces for_db_column_is_default_data">is_default_data</div></th>
                             <th class="for_db_table_zen_raven_page_spaces" data-sort="space_name" style="border: 1px solid #ddd; font-weight: bold; text-transform: lowercase; cursor: pointer; background: #f8f9fa; width: auto; white-space: nowrap;"><div class="cell_inner_wrapper_div for_db_table_zen_raven_page_spaces for_db_column_space_name">space_name</div></th>
                             <th class="for_db_table_zen_raven_page_spaces" data-sort="asn_page_id" style="border: 1px solid #ddd; font-weight: bold; text-transform: lowercase; cursor: pointer; background: #f8f9fa; width: auto; white-space: nowrap;"><div class="cell_inner_wrapper_div for_db_table_zen_raven_page_spaces for_db_column_asn_page_id">asn_page_id</div></th>
+                            <th style="border: 1px solid #ddd; font-weight: bold; background: #f8f9fa; width: auto; white-space: nowrap;"><div class="cell_inner_wrapper_div">(raven_link)</div></th>
                             <th style="border: 1px solid #ddd; font-weight: bold; background: #f8f9fa; width: auto; white-space: nowrap;"><div class="cell_inner_wrapper_div">Actions</div></th>
                         </tr>
                     </thead>
@@ -161,6 +163,12 @@ class Grove_Raven_Mar {
                                             <a href="#" class="button frontend-link" data-page-id="<?php echo esc_attr($space->asn_page_id); ?>" target="_blank" style="font-size: 14px; padding: 3px; text-decoration: none;">frontend</a>
                                         </div>
                                     <?php endif; ?>
+                                </div>
+                            </td>
+                            <td style="border: 1px solid #ddd; padding: 8px; white-space: nowrap;">
+                                <div class="cell_inner_wrapper_div" style="display: flex; align-items: stretch;">
+                                    <input type="text" readonly value='[raven_link page_space_name="<?php echo esc_attr($space->space_name); ?>"]' style="flex: 1; min-width: 250px; padding: 4px; border: 1px solid #ccc; border-right: none; background: #f9f9f9; font-family: 'Courier New', monospace; font-size: 12px;" />
+                                    <button class="copy-btn" data-copy-target="shortcode" data-shortcode='[raven_link page_space_name="<?php echo esc_attr($space->space_name); ?>"]' style="width: 30px; padding: 0; border: 1px solid #999; background: #0073aa; color: white; cursor: pointer; font-size: 16px; line-height: 1;" title="Copy shortcode">📋</button>
                                 </div>
                             </td>
                             <td style="border: 1px solid #ddd; padding: 8px; white-space: nowrap;">
@@ -511,6 +519,43 @@ class Grove_Raven_Mar {
                         }
                     });
                 }
+            });
+            
+            // Copy shortcode functionality
+            $(document).on('click', '.copy-btn[data-copy-target="shortcode"]', function() {
+                let shortcode = $(this).data('shortcode');
+                let button = $(this);
+                
+                // Copy to clipboard
+                navigator.clipboard.writeText(shortcode).then(function() {
+                    // Show success feedback
+                    let originalText = button.text();
+                    let originalColor = button.css('background-color');
+                    
+                    button.text('✓').css('background-color', '#28a745');
+                    
+                    setTimeout(function() {
+                        button.text(originalText).css('background-color', originalColor);
+                    }, 1000);
+                }).catch(function() {
+                    // Fallback for older browsers
+                    let textArea = document.createElement('textarea');
+                    textArea.value = shortcode;
+                    document.body.appendChild(textArea);
+                    textArea.select();
+                    document.execCommand('copy');
+                    document.body.removeChild(textArea);
+                    
+                    // Show success feedback
+                    let originalText = button.text();
+                    let originalColor = button.css('background-color');
+                    
+                    button.text('✓').css('background-color', '#28a745');
+                    
+                    setTimeout(function() {
+                        button.text(originalText).css('background-color', originalColor);
+                    }, 1000);
+                });
             });
         });
         </script>

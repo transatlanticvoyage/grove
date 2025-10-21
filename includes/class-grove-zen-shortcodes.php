@@ -82,6 +82,9 @@ class Grove_Zen_Shortcodes {
         // Raven contact link shortcode for Elementor Dynamic Tags
         add_shortcode('raven_contact_link', array($this, 'render_raven_contact_link'));
         
+        // Raven page link shortcode
+        add_shortcode('raven_link', array($this, 'render_raven_link'));
+        
         // Factory codes shortcodes
         add_shortcode('sitespren_phone_link', array($this, 'render_sitespren_phone_link'));
         
@@ -985,6 +988,55 @@ class Grove_Zen_Shortcodes {
             // Build complete URL: https://example.com/contact-us/
             return trailingslashit(home_url()) . trailingslashit($short_path);
         }
+    }
+    
+    /**
+     * Raven Link Shortcode: [raven_link page_space_name="privacy_policy"]
+     * Outputs a link to the assigned page for the given page space name
+     */
+    public function render_raven_link($atts) {
+        global $wpdb;
+        
+        $atts = shortcode_atts(array(
+            'page_space_name' => ''
+        ), $atts, 'raven_link');
+        
+        // Validate required attribute
+        if (empty($atts['page_space_name'])) {
+            return '';
+        }
+        
+        // Get the raven page space from database
+        $table_name = $wpdb->prefix . 'zen_raven_page_spaces';
+        $space = $wpdb->get_row($wpdb->prepare(
+            "SELECT asn_page_id FROM $table_name WHERE space_name = %s",
+            $atts['page_space_name']
+        ));
+        
+        // Return empty if no space found or no page assigned
+        if (!$space || empty($space->asn_page_id)) {
+            return '';
+        }
+        
+        // Get the page data
+        $page = get_post($space->asn_page_id);
+        
+        // Return empty if page doesn't exist or isn't published
+        if (!$page || $page->post_status !== 'publish') {
+            return '';
+        }
+        
+        // Get the full URL and title
+        $url = get_permalink($page->ID);
+        $title = get_the_title($page->ID);
+        
+        // Return empty if URL or title are empty
+        if (empty($url) || empty($title)) {
+            return '';
+        }
+        
+        // Return the formatted link
+        return '<a href="' . esc_url($url) . '">' . esc_html($title) . '</a>';
     }
     
     /**
