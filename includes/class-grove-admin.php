@@ -2052,6 +2052,34 @@ class Grove_Admin {
     public function papyrus_hub_page() {
         // AGGRESSIVE NOTICE SUPPRESSION - Remove ALL WordPress admin notices
         $this->suppress_all_admin_notices();
+        
+        // Load papyrus content from vaults
+        $papyrus_1_content = '';
+        $papyrus_2_content = '';
+        $papyrus_3_content = '';
+        
+        // Load papyrus 1 from vault
+        if (class_exists('Grove_Vault_Keeper')) {
+            $papyrus_1_content = Grove_Vault_Keeper::retrieve('papyrus/papyrus-1');
+            if ($papyrus_1_content === false) {
+                $papyrus_1_content = '// Papyrus 1 vault not found';
+            }
+            
+            // Check if papyrus 2 and 3 vaults exist
+            if (Grove_Vault_Keeper::vault_exists('papyrus/papyrus-2')) {
+                $papyrus_2_content = Grove_Vault_Keeper::retrieve('papyrus/papyrus-2');
+            } else {
+                $papyrus_2_content = '// Papyrus 2 vault not yet created';
+            }
+            
+            if (Grove_Vault_Keeper::vault_exists('papyrus/papyrus-3')) {
+                $papyrus_3_content = Grove_Vault_Keeper::retrieve('papyrus/papyrus-3');
+            } else {
+                $papyrus_3_content = '// Papyrus 3 vault not yet created';
+            }
+        } else {
+            $papyrus_1_content = '// Grove Vault Keeper not initialized';
+        }
         ?>
         <div class="wrap" style="margin: 0; padding: 0; height: 100vh; display: flex; flex-direction: column;">
             <div style="padding: 20px; padding-bottom: 10px;">
@@ -2087,56 +2115,7 @@ class Grove_Admin {
                         background-color: #f9f9f9;
                         resize: none;
                         box-sizing: border-box;
-                    " readonly>==========================================================
-INTRODUCTION INSTRUCTIONS
-
-
-==========================================================
-SPECIFIC WEBSITE INFO (from "flag 1 - ai" system)
-
-sitespren_base
-driggs_brand_name
-driggs_phone_1
-driggs_city
-driggs_state_code
-driggs_industry
-driggs_site_type_purpose
-driggs_email_1
-
-
-
-==========================================================
-SHORTCODE USAGE
-
-Do not insert any static info
-
-
-==========================================================
-SPECIFIC PAGE INFO
-
-
-
-==========================================================
-NOTES ON THE OUTPUT FORMATTING THAT I WANT (FOR YOU TO CREATE AND GIVE BACK TO ME)
-
-———————————————————————
-• place the output entirely within a codebox (with a 1 click copy button)
-———————————————————————
-• about the "guarded" class:
-
-
-==========================================================
-OTHER RANDOM NOTES (IF ANY)
-
-
-==========================================================
-BEGIN ACTUAL CONTENT BELOW
-==========================================================
-
-
-
-
-</textarea>
+                    " readonly><?php echo esc_textarea($papyrus_1_content); ?></textarea>
                 </div>
                 
                 <!-- Papyrus 2 Tab -->
@@ -2153,7 +2132,7 @@ BEGIN ACTUAL CONTENT BELOW
                         background-color: #f9f9f9;
                         resize: none;
                         box-sizing: border-box;
-                    " placeholder="Papyrus 2 content..."></textarea>
+                    " readonly><?php echo esc_textarea($papyrus_2_content); ?></textarea>
                 </div>
                 
                 <!-- Papyrus 3 Tab -->
@@ -2170,7 +2149,7 @@ BEGIN ACTUAL CONTENT BELOW
                         background-color: #f9f9f9;
                         resize: none;
                         box-sizing: border-box;
-                    " placeholder="Papyrus 3 content..."></textarea>
+                    " readonly><?php echo esc_textarea($papyrus_3_content); ?></textarea>
                 </div>
             </div>
             

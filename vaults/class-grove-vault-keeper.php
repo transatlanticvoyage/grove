@@ -16,6 +16,13 @@ if (!defined('ABSPATH')) {
 class Grove_Vault_Keeper {
     
     /**
+     * Vault Key Constants - Use these to reference vaults
+     */
+    const grove_vault_papyrus_1 = 'papyrus/papyrus-1';
+    const grove_vault_papyrus_2 = 'papyrus/papyrus-2';
+    const grove_vault_papyrus_3 = 'papyrus/papyrus-3';
+    
+    /**
      * Vault directory path
      */
     private static $vault_path;
