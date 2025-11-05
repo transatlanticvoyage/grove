@@ -33,6 +33,11 @@ class Grove_Vault_Keeper {
     private static $vault_cache = array();
     
     /**
+     * Cache timestamps
+     */
+    private static $cache_timestamps = array();
+    
+    /**
      * Instance
      */
     private static $instance = null;
@@ -55,8 +60,8 @@ class Grove_Vault_Keeper {
         
         // Register global function for cross-plugin access
         if (!function_exists('grove_vault')) {
-            function grove_vault($vault_name) {
-                return Grove_Vault_Keeper::retrieve($vault_name);
+            function grove_vault($vault_name, $bypass_cache = false) {
+                return Grove_Vault_Keeper::retrieve($vault_name, $bypass_cache);
             }
         }
     }
@@ -68,16 +73,29 @@ class Grove_Vault_Keeper {
      * @param string $vault_name The name of the vault (e.g., 'papyrus/papyrus-1')
      * @return string|false The vault content or false if not found
      */
-    public static function retrieve($vault_name) {
+    public static function retrieve($vault_name, $bypass_cache = false) {
         $instance = self::get_instance();
-        
-        // Check cache first
-        if (isset(self::$vault_cache[$vault_name])) {
-            return self::$vault_cache[$vault_name];
-        }
         
         // Construct vault file path
         $vault_file = self::$vault_path . $vault_name . '.vault.php';
+        
+        // Check if file exists first
+        if (!file_exists($vault_file)) {
+            error_log('Grove Vault Keeper Error: Vault not found - ' . $vault_name);
+            return false;
+        }
+        
+        // Get current file modification time
+        $current_mtime = filemtime($vault_file);
+        
+        // Check cache (unless bypassing or file has been modified)
+        if (!$bypass_cache && isset(self::$vault_cache[$vault_name])) {
+            // Check if file has been modified since caching
+            if (isset(self::$cache_timestamps[$vault_name]) && 
+                self::$cache_timestamps[$vault_name] == $current_mtime) {
+                return self::$vault_cache[$vault_name];
+            }
+        }
         
         // Security check - ensure we're not accessing files outside the vault
         $real_vault_path = realpath(self::$vault_path);
@@ -88,17 +106,19 @@ class Grove_Vault_Keeper {
             return false;
         }
         
-        // Check if vault file exists
-        if (!file_exists($vault_file)) {
-            error_log('Grove Vault Keeper Error: Vault not found - ' . $vault_name);
-            return false;
+        // Clear PHP's opcache for this file to ensure we get fresh content
+        if (function_exists('opcache_invalidate')) {
+            opcache_invalidate($vault_file, true);
         }
         
         // Load the vault content
         $content = include $vault_file;
         
-        // Cache the content
-        self::$vault_cache[$vault_name] = $content;
+        // Cache the content and timestamp (only if not bypassing cache)
+        if (!$bypass_cache) {
+            self::$vault_cache[$vault_name] = $content;
+            self::$cache_timestamps[$vault_name] = $current_mtime;
+        }
         
         // Allow filtering of vault content
         $content = apply_filters('grove_vault_content', $content, $vault_name);
