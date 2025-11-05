@@ -388,7 +388,7 @@ class Grove_Admin {
                                 <button id="export-csv-btn" class="button button-secondary" style="padding: 5px 12px; font-size: 13px;">csv</button>
                                 <button id="export-sql-btn" class="button button-secondary" style="padding: 5px 12px; font-size: 13px;">sql</button>
                                 <div style="border-left: 1px solid #ccc; height: 25px; margin: 0 10px;"></div>
-                                <div style="position: relative; display: flex; align-items: center; gap: 10px;">
+                                <div style="position: relative; display: flex; align-items: center; gap: 10px; border: 1px solid gray; padding: 8px; border-radius: 4px; background-color: #fafafa;">
                                     <button id="nova-beluga-btn" class="button button-secondary" style="padding: 5px 12px; font-size: 13px;">nova beluga</button>
                                     <label style="font-size: 11px; display: flex; align-items: center; gap: 3px;">
                                         <input type="checkbox" id="omit-no-friendly" checked style="margin: 0;"> 
