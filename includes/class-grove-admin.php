@@ -2050,10 +2050,18 @@ class Grove_Admin {
      * Grove Papyrus Hub Page
      */
     public function papyrus_hub_page() {
+        // AGGRESSIVE NOTICE SUPPRESSION - Remove ALL WordPress admin notices
+        $this->suppress_all_admin_notices();
         ?>
         <div class="wrap" style="margin: 0; padding: 0; height: 100vh; display: flex; flex-direction: column;">
             <div style="padding: 20px; padding-bottom: 10px;">
                 <h1 style="margin: 0 0 20px 0;">🌳 Grove Papyrus Hub</h1>
+                
+                <!-- Copy Button -->
+                <div style="margin-bottom: 10px;">
+                    <button id="copy-active-tab" class="button button-secondary" style="padding: 6px 12px;">Copy Active Tab Content</button>
+                    <span id="copy-feedback" style="margin-left: 10px; color: #4CAF50; display: none;">Copied!</span>
+                </div>
                 
                 <!-- Tab Navigation -->
                 <div class="nav-tab-wrapper" style="border-bottom: 1px solid #ccc;">
@@ -2079,7 +2087,56 @@ class Grove_Admin {
                         background-color: #f9f9f9;
                         resize: none;
                         box-sizing: border-box;
-                    " placeholder="Papyrus 1 content..."></textarea>
+                    " readonly>==========================================================
+INTRODUCTION INSTRUCTIONS
+
+
+==========================================================
+SPECIFIC WEBSITE INFO (from "flag 1 - ai" system)
+
+sitespren_base
+driggs_brand_name
+driggs_phone_1
+driggs_city
+driggs_state_code
+driggs_industry
+driggs_site_type_purpose
+driggs_email_1
+
+
+
+==========================================================
+SHORTCODE USAGE
+
+Do not insert any static info
+
+
+==========================================================
+SPECIFIC PAGE INFO
+
+
+
+==========================================================
+NOTES ON THE OUTPUT FORMATTING THAT I WANT (FOR YOU TO CREATE AND GIVE BACK TO ME)
+
+———————————————————————
+• place the output entirely within a codebox (with a 1 click copy button)
+———————————————————————
+• about the "guarded" class:
+
+
+==========================================================
+OTHER RANDOM NOTES (IF ANY)
+
+
+==========================================================
+BEGIN ACTUAL CONTENT BELOW
+==========================================================
+
+
+
+
+</textarea>
                 </div>
                 
                 <!-- Papyrus 2 Tab -->
@@ -2135,6 +2192,41 @@ class Grove_Admin {
                     // Show the selected tab content
                     const tabId = $(this).data('tab');
                     $('#' + tabId + '-content').css('display', 'flex');
+                });
+                
+                // Copy button functionality
+                $('#copy-active-tab').on('click', function() {
+                    // Find the active tab
+                    const activeTab = $('.nav-tab-active').data('tab');
+                    const activeEditor = $('#' + activeTab + '-editor');
+                    
+                    if (activeEditor.length) {
+                        const content = activeEditor.val();
+                        
+                        // Copy to clipboard
+                        if (navigator.clipboard && navigator.clipboard.writeText) {
+                            navigator.clipboard.writeText(content).then(function() {
+                                // Show feedback
+                                $('#copy-feedback').fadeIn(200);
+                                setTimeout(function() {
+                                    $('#copy-feedback').fadeOut(200);
+                                }, 2000);
+                            }).catch(function(err) {
+                                console.error('Failed to copy:', err);
+                                alert('Failed to copy content');
+                            });
+                        } else {
+                            // Fallback for older browsers
+                            activeEditor.select();
+                            document.execCommand('copy');
+                            
+                            // Show feedback
+                            $('#copy-feedback').fadeIn(200);
+                            setTimeout(function() {
+                                $('#copy-feedback').fadeOut(200);
+                            }, 2000);
+                        }
+                    }
                 });
                 
                 // Adjust height on window resize
