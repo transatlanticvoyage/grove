@@ -2093,7 +2093,7 @@ class Grove_Admin {
                 
                 <!-- Tab Navigation -->
                 <div class="nav-tab-wrapper" style="border-bottom: 1px solid #ccc;">
-                    <a href="#papyrus1" class="nav-tab nav-tab-active" data-tab="papyrus1">papyrus 1</a>
+                    <a href="#papyrus1" class="nav-tab nav-tab-active" data-tab="papyrus1">grove_vault_papyrus_1</a>
                     <a href="#papyrus2" class="nav-tab" data-tab="papyrus2">papyrus 2</a>
                     <a href="#papyrus3" class="nav-tab" data-tab="papyrus3">papyrus 3</a>
                 </div>
