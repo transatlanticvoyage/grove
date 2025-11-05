@@ -445,13 +445,22 @@ class Grove_Admin {
                                     <th style="padding: 12px 8px; border: 1px solid #ddd; font-weight: bold; text-align: left; background: #f0f0f0; width: 50px;">
                                         <input type="checkbox" id="select-all" style="width: 20px; height: 20px;">
                                     </th>
+                                    <th class="dogsdogs" style="padding: 12px 8px; border: 1px solid #ddd; font-weight: bold; text-transform: lowercase; background: #f8f9fa; position: relative;">
+                                        <span style="position: relative; display: inline-flex; align-items: center;">
+                                            <span class="friendly-tooltip-icon" style="cursor: help; margin-right: 5px; display: inline-block; width: 16px; height: 16px; line-height: 16px; text-align: center; background: #666; color: white; border-radius: 50%; font-size: 12px; font-weight: bold;" title="Click to see full path">ⓘ</span>
+                                            friendly_name
+                                        </span>
+                                        <div class="friendly-tooltip" style="display: none; position: absolute; top: 100%; left: 0; margin-top: 5px; padding: 10px; background: #333; color: white; border-radius: 4px; box-shadow: 0 2px 8px rgba(0,0,0,0.2); white-space: nowrap; z-index: 1000; font-weight: normal; font-size: 12px;">
+                                            <div style="margin-bottom: 8px;">_zen_lighthouse_friendly_names.friendly_name_1_datum</div>
+                                            <button class="copy-friendly-path" style="padding: 4px 8px; background: #555; color: white; border: none; border-radius: 3px; cursor: pointer; font-size: 11px;">Copy</button>
+                                        </div>
+                                    </th>
                                     <th style="padding: 12px 8px; border: 1px solid #ddd; font-weight: bold; text-transform: lowercase; background: #f8f9fa;">flag1<br>(ai)</th>
                                     <th style="padding: 12px 8px; border: 1px solid #ddd; font-weight: bold; text-transform: lowercase; background: #f8f9fa;">flag2<br>citat.</th>
                                     <th style="padding: 12px 8px; border: 1px solid #ddd; font-weight: bold; text-transform: lowercase; background: #f8f9fa;">Field Name</th>
                                     <th style="padding: 12px 8px; border: 1px solid #ddd; font-weight: bold; text-transform: lowercase; background: #f8f9fa;">Value</th>
                                     <th style="padding: 12px 8px; border: 1px solid #ddd; font-weight: bold; text-transform: lowercase; background: #f8f9fa;">shortcode 1</th>
                                     <th style="padding: 0; border: 1px solid #ddd; font-weight: bold; text-transform: lowercase; background: #f8f9fa; width: 20px;">stuff3</th>
-                                    <th class="dogsdogs" style="padding: 12px 8px; border: 1px solid #ddd; font-weight: bold; text-transform: lowercase; background: #f8f9fa;">_zen_lighthouse_friendly_names.friendly_name_1_datum</th>
                                 </tr>
                             </thead>
                             <tbody id="table-body">
@@ -598,6 +607,58 @@ class Grove_Admin {
             // Load initial data
             loadDriggsData();
             
+            // Add tooltip handlers
+            $(document).on('click', '.friendly-tooltip-icon', function(e) {
+                e.stopPropagation();
+                let tooltip = $(this).closest('th').find('.friendly-tooltip');
+                $('.friendly-tooltip').not(tooltip).hide(); // Hide other tooltips
+                tooltip.toggle();
+            });
+            
+            // Hide tooltip when clicking outside
+            $(document).on('click', function(e) {
+                if (!$(e.target).closest('.friendly-tooltip-icon, .friendly-tooltip').length) {
+                    $('.friendly-tooltip').hide();
+                }
+            });
+            
+            // Copy button handler
+            $(document).on('click', '.copy-friendly-path', function(e) {
+                e.stopPropagation();
+                let textToCopy = '_zen_lighthouse_friendly_names.friendly_name_1_datum';
+                
+                if (navigator.clipboard && navigator.clipboard.writeText) {
+                    navigator.clipboard.writeText(textToCopy).then(() => {
+                        let btn = $(this);
+                        let originalText = btn.text();
+                        btn.text('Copied!');
+                        btn.css('background', '#4CAF50');
+                        
+                        setTimeout(() => {
+                            btn.text(originalText);
+                            btn.css('background', '#555');
+                        }, 1500);
+                    });
+                } else {
+                    // Fallback for older browsers
+                    let tempInput = $('<input>');
+                    $('body').append(tempInput);
+                    tempInput.val(textToCopy).select();
+                    document.execCommand('copy');
+                    tempInput.remove();
+                    
+                    let btn = $(this);
+                    let originalText = btn.text();
+                    btn.text('Copied!');
+                    btn.css('background', '#4CAF50');
+                    
+                    setTimeout(() => {
+                        btn.text(originalText);
+                        btn.css('background', '#555');
+                    }, 1500);
+                }
+            });
+            
             function loadDriggsData() {
                 $.ajax({
                     url: ajaxurl,
@@ -737,6 +798,10 @@ class Grove_Admin {
                         let separatorCheckboxTd = $('<td style="padding: 8px; border: 1px solid #ddd; text-align: center; background-color: #333;"></td>');
                         separatorTr.append(separatorCheckboxTd);
                         
+                        // Empty friendly_name cell
+                        let separatorFriendlyTd = $('<td style="padding: 8px; border: 1px solid #ddd; text-align: center; background-color: #333;"></td>');
+                        separatorTr.append(separatorFriendlyTd);
+                        
                         // Empty flag1 cell
                         let separatorFlag1Td = $('<td style="padding: 8px; border: 1px solid #ddd; text-align: center; background-color: #333;"></td>');
                         separatorTr.append(separatorFlag1Td);
@@ -746,7 +811,7 @@ class Grove_Admin {
                         separatorTr.append(separatorFlag2Td);
                         
                         // Separator label spanning remaining columns
-                        let separatorLabelTd = $('<td colspan="5" style="padding: 12px 8px; border: 1px solid #ddd; font-weight: bold; text-align: center; background-color: #333; color: white; font-size: 14px;"></td>');
+                        let separatorLabelTd = $('<td colspan="4" style="padding: 12px 8px; border: 1px solid #ddd; font-weight: bold; text-align: center; background-color: #333; color: white; font-size: 14px;"></td>');
                         separatorLabelTd.text(field.label);
                         separatorTr.append(separatorLabelTd);
                         
@@ -782,6 +847,13 @@ class Grove_Admin {
                     checkboxTd.append(checkbox);
                     tr.append(checkboxTd);
                     
+                    // Add new lighthouse friendly name column (moved to 2nd position)
+                    let friendlyNameTd = $('<td style="padding: 8px; border: 1px solid #ddd; text-align: left;"></td>');
+                    if (isSpecialBg) friendlyNameTd.css('background-color', '#d5d5d5');
+                    // Placeholder for friendly name - will be populated later
+                    friendlyNameTd.text('');
+                    tr.append(friendlyNameTd);
+                    
                     // Flag1 column - add red flag icon for specific fields
                     let flagTd = $('<td style="padding: 8px; border: 1px solid #ddd; text-align: center;"></td>');
                     if (isSpecialBg) flagTd.css('background-color', '#d5d5d5');
@@ -798,10 +870,9 @@ class Grove_Admin {
                         'driggs_email_1'
                     ];
                     
-                    // Add red flag icon if field is in the list
+                    // Add dark red circle icon if field is in the list
                     if (flagFields.includes(field.key)) {
-                        flagTd.html('🚩');
-                        flagTd.css('color', 'red');
+                        flagTd.html('<div style="width: 12px; height: 12px; background-color: darkred; border-radius: 50%; display: inline-block;"></div>');
                     }
                     
                     tr.append(flagTd);
@@ -1049,14 +1120,6 @@ class Grove_Admin {
                     stuff3Td.append(roaring_div);
                     tr.append(stuff3Td);
                     
-                    // Add new lighthouse friendly name column
-                    let friendlyNameTd = $('<td style="padding: 8px; border: 1px solid #ddd; text-align: left;"></td>');
-                    if (isSpecialBg) friendlyNameTd.css('background-color', '#d5d5d5');
-                    
-                    // Placeholder for friendly name - will be populated later
-                    friendlyNameTd.text('');
-                    tr.append(friendlyNameTd);
-                    
                     tbody.append(tr);
                 });
                 
@@ -1070,12 +1133,12 @@ class Grove_Admin {
                 $('#table-body tr').each(function() {
                     let row = $(this);
                     if (!row.find('td[colspan]').length) { // Skip separator rows
-                        let fieldNameCell = row.find('td:nth-child(4)'); // Field name is 4th column (after checkbox, flag1, and flag2)
+                        let fieldNameCell = row.find('td:nth-child(5)'); // Field name is 5th column (after checkbox, friendly_name, flag1, and flag2)
                         if (fieldNameCell.length) {
                             let fieldName = fieldNameCell.text().trim();
                             if (fieldName && !fieldName.includes('section')) {
                                 fieldKeys.push({
-                                    element: row.find('td:last-child'), // Last column is friendly name
+                                    element: row.find('td:nth-child(2)'), // Second column is friendly name
                                     fieldName: fieldName
                                 });
                             }
