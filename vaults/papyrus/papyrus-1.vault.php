@@ -15,46 +15,60 @@ if (!defined('ABSPATH')) {
 }
 
 return <<<'PAPYRUS_TEXT'
-papyrus insert flow
+==========================================================
+INTRODUCTION INSTRUCTIONS
 
-overall seo keyword / description 
 
-header 303 -- maybe will be filled from chatgpt
+==========================================================
+SITE-LEVEL INFO (from "flag 1 - ai" system)
 
-hero 4 - a big hero with maybe some reviews and a checklist box .. can also be a calculator, several different flavors available
+sitespren_base
+driggs_brand_name
+driggs_phone_1
+driggs_city
+driggs_state_code
+driggs_industry
+driggs_site_type_purpose
+driggs_email_1
 
-full width bar / breakout bar filled with chatgpt (these can be manually inserted at any point within a silo module that has already been placed on a page, and you can insert any qty of them as desired.)
 
-then the silos (each silo can create infinite modules from the content it sources) -- these can create as many qty of the module template on a page as desired , but the content source for each silo will be the same within each silo folder. e.g. in the "replace" silo 3000, if the silo 3000 has 6 modules that get stamped out, each of the 6 modules will all draw their content from the /replace folder in each website's ftp-uploads. all the while, silo 6000 aka /install will work the same way, but for install
 
-silo 1000 - general
+==========================================================
+SHORTCODE USAGE
 
-silo 2000 - repair
+Do not insert any static info
 
-silo 3000 - replace
 
-silo 4000 - brands
+==========================================================
+PAGE-LEVEL INFO
 
-silo 5000 - cost
+NoteToSelf: need somewhere in the orbitposts db table (in ruplin plugin) to create something for this
 
-silo 6000 - install
+////////////////////////////////////////////
+[INSERT DB COLUMN VALUE FROM orbit_posts]
+////////////////////////////////////////////
 
-silo 7000 - near-me
 
-footer
 
-CRITICAL ELEMENTOR INJECTION REQUIREMENTS:
-1. Each hero/silo insertion must maintain exact Elementor JSON structure
-2. Widget IDs must be unique and follow pattern: hero4_[timestamp]_[index]
-3. Parent-child relationships must be preserved in _elements arrays
-4. Column and section wrappers required for proper rendering
-5. All text content must be properly escaped for JSON
-6. Responsive settings must be copied from source widgets
 
-MANDATORY CHECKS BEFORE INJECTION:
-- Validate JSON structure integrity
-- Ensure unique widget IDs
-- Verify parent container exists
-- Check for ID conflicts
-- Maintain proper nesting depth
+==========================================================
+NOTES ON THE OUTPUT FORMATTING THAT I WANT (FOR YOU TO CREATE AND GIVE BACK TO ME)
+
+———————————————————————
+• place the output entirely within a codebox (with a 1 click copy button)
+———————————————————————
+• about the "guarded" class:
+
+
+==========================================================
+OTHER RANDOM NOTES (IF ANY)
+
+
+==========================================================
+BEGIN ACTUAL CONTENT BELOW
+==========================================================
+
+
+
+
 PAPYRUS_TEXT;
