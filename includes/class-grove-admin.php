@@ -129,6 +129,15 @@ class Grove_Admin {
         
         add_submenu_page(
             'grovehub',
+            'Grove Papyrus Hub',
+            'grove_papyrus_hub',
+            'manage_options',
+            'grove_papyrus_hub',
+            array($this, 'papyrus_hub_page')
+        );
+        
+        add_submenu_page(
+            'grovehub',
             'Grove Locations Manager', 
             'grove_locations_mar',
             'manage_options',
@@ -2035,6 +2044,118 @@ class Grove_Admin {
         } catch (Exception $e) {
             wp_send_json_error('Error updating field: ' . $e->getMessage());
         }
+    }
+    
+    /**
+     * Grove Papyrus Hub Page
+     */
+    public function papyrus_hub_page() {
+        ?>
+        <div class="wrap" style="margin: 0; padding: 0; height: 100vh; display: flex; flex-direction: column;">
+            <div style="padding: 20px; padding-bottom: 10px;">
+                <h1 style="margin: 0 0 20px 0;">🌳 Grove Papyrus Hub</h1>
+                
+                <!-- Tab Navigation -->
+                <div class="nav-tab-wrapper" style="border-bottom: 1px solid #ccc;">
+                    <a href="#papyrus1" class="nav-tab nav-tab-active" data-tab="papyrus1">papyrus 1</a>
+                    <a href="#papyrus2" class="nav-tab" data-tab="papyrus2">papyrus 2</a>
+                    <a href="#papyrus3" class="nav-tab" data-tab="papyrus3">papyrus 3</a>
+                </div>
+            </div>
+            
+            <!-- Tab Content Areas -->
+            <div style="flex: 1; display: flex; flex-direction: column; padding: 0 20px 20px 20px; min-height: 0;">
+                <!-- Papyrus 1 Tab -->
+                <div id="papyrus1-content" class="tab-content" style="display: flex; flex-direction: column; height: 100%;">
+                    <textarea id="papyrus1-editor" style="
+                        width: 100%;
+                        height: 100%;
+                        font-family: 'Courier New', Courier, monospace;
+                        font-size: 14px;
+                        line-height: 1.5;
+                        padding: 15px;
+                        border: 1px solid #ddd;
+                        border-radius: 4px;
+                        background-color: #f9f9f9;
+                        resize: none;
+                        box-sizing: border-box;
+                    " placeholder="Papyrus 1 content..."></textarea>
+                </div>
+                
+                <!-- Papyrus 2 Tab -->
+                <div id="papyrus2-content" class="tab-content" style="display: none; flex-direction: column; height: 100%;">
+                    <textarea id="papyrus2-editor" style="
+                        width: 100%;
+                        height: 100%;
+                        font-family: 'Courier New', Courier, monospace;
+                        font-size: 14px;
+                        line-height: 1.5;
+                        padding: 15px;
+                        border: 1px solid #ddd;
+                        border-radius: 4px;
+                        background-color: #f9f9f9;
+                        resize: none;
+                        box-sizing: border-box;
+                    " placeholder="Papyrus 2 content..."></textarea>
+                </div>
+                
+                <!-- Papyrus 3 Tab -->
+                <div id="papyrus3-content" class="tab-content" style="display: none; flex-direction: column; height: 100%;">
+                    <textarea id="papyrus3-editor" style="
+                        width: 100%;
+                        height: 100%;
+                        font-family: 'Courier New', Courier, monospace;
+                        font-size: 14px;
+                        line-height: 1.5;
+                        padding: 15px;
+                        border: 1px solid #ddd;
+                        border-radius: 4px;
+                        background-color: #f9f9f9;
+                        resize: none;
+                        box-sizing: border-box;
+                    " placeholder="Papyrus 3 content..."></textarea>
+                </div>
+            </div>
+            
+            <script type="text/javascript">
+            jQuery(document).ready(function($) {
+                // Tab switching functionality
+                $('.nav-tab').on('click', function(e) {
+                    e.preventDefault();
+                    
+                    // Remove active class from all tabs
+                    $('.nav-tab').removeClass('nav-tab-active');
+                    
+                    // Add active class to clicked tab
+                    $(this).addClass('nav-tab-active');
+                    
+                    // Hide all tab contents
+                    $('.tab-content').hide();
+                    
+                    // Show the selected tab content
+                    const tabId = $(this).data('tab');
+                    $('#' + tabId + '-content').css('display', 'flex');
+                });
+                
+                // Adjust height on window resize
+                function adjustEditorHeight() {
+                    const windowHeight = $(window).height();
+                    const headerHeight = $('.wrap > div:first-child').outerHeight();
+                    const adminBarHeight = $('#wpadminbar').length ? $('#wpadminbar').outerHeight() : 0;
+                    const footerMargin = 40; // Some padding at the bottom
+                    
+                    const availableHeight = windowHeight - headerHeight - adminBarHeight - footerMargin;
+                    
+                    $('.tab-content').css('height', availableHeight + 'px');
+                }
+                
+                // Call on load and resize
+                adjustEditorHeight();
+                $(window).on('resize', adjustEditorHeight);
+            });
+            </script>
+        </div>
+        <?php
     }
     
     /**
