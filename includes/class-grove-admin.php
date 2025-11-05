@@ -818,8 +818,7 @@ class Grove_Admin {
                     
                     // Add dark green flag icon if field is in the list
                     if (flag2Fields.includes(field.key)) {
-                        flag2Td.html('🚩');
-                        flag2Td.css('color', 'darkgreen');
+                        flag2Td.html('<span style="color: darkgreen;">🚩</span>');
                     }
                     
                     tr.append(flag2Td);
