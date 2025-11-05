@@ -2094,8 +2094,9 @@ class Grove_Admin {
                 <!-- Tab Navigation -->
                 <div class="nav-tab-wrapper" style="border-bottom: 1px solid #ccc;">
                     <a href="#papyrus1" class="nav-tab nav-tab-active" data-tab="papyrus1">grove_vault_papyrus_1</a>
-                    <a href="#papyrus2" class="nav-tab" data-tab="papyrus2">papyrus 2</a>
-                    <a href="#papyrus3" class="nav-tab" data-tab="papyrus3">papyrus 3</a>
+                    <a href="#papyrus2" class="nav-tab" data-tab="papyrus2">grove_vault_papyrus_2</a>
+                    <a href="#papyrus3" class="nav-tab" data-tab="papyrus3">grove_vault_papyrus_3</a>
+                    <a href="#flag1db" class="nav-tab" data-tab="flag1db">dynamically rendered "flag1" db columns</a>
                 </div>
             </div>
             
@@ -2150,6 +2151,51 @@ class Grove_Admin {
                         resize: none;
                         box-sizing: border-box;
                     " readonly><?php echo esc_textarea($papyrus_3_content); ?></textarea>
+                </div>
+                
+                <!-- Flag1 DB Columns Tab -->
+                <div id="flag1db-content" class="tab-content" style="display: none; flex-direction: column; height: 100%;">
+                    <textarea id="flag1db-editor" style="
+                        width: 100%;
+                        height: 100%;
+                        font-family: 'Courier New', Courier, monospace;
+                        font-size: 14px;
+                        line-height: 1.5;
+                        padding: 15px;
+                        border: 1px solid #ddd;
+                        border-radius: 4px;
+                        background-color: #f9f9f9;
+                        resize: none;
+                        box-sizing: border-box;
+                    " readonly><?php 
+                        // Query zen_sitespren table for driggs values
+                        global $wpdb;
+                        $table_name = $wpdb->prefix . 'zen_sitespren';
+                        
+                        // Define the columns we want to display
+                        $columns = array(
+                            'sitespren_base',
+                            'driggs_brand_name',
+                            'driggs_phone_1',
+                            'driggs_city',
+                            'driggs_state_code',
+                            'driggs_industry',
+                            'driggs_site_type_purpose',
+                            'driggs_email_1'
+                        );
+                        
+                        // Get the first row from zen_sitespren
+                        $sitespren_data = $wpdb->get_row("SELECT * FROM $table_name LIMIT 1", ARRAY_A);
+                        
+                        // Build the output with tabs
+                        $output = '';
+                        foreach ($columns as $column) {
+                            $value = isset($sitespren_data[$column]) ? $sitespren_data[$column] : '';
+                            $output .= $column . "\t" . $value . "\n";
+                        }
+                        
+                        echo esc_textarea(trim($output));
+                    ?></textarea>
                 </div>
             </div>
             

@@ -22,14 +22,7 @@ INTRODUCTION INSTRUCTIONS
 ==========================================================
 SITE-LEVEL INFO (from "flag 1 - ai" system)
 
-sitespren_base
-driggs_brand_name
-driggs_phone_1
-driggs_city
-driggs_state_code
-driggs_industry
-driggs_site_type_purpose
-driggs_email_1
+(INSERT HERE - MAIN SITE LEVEL DRIGGS DATA - flag1 ai chat for content generation)
 
 
 
