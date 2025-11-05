@@ -816,9 +816,9 @@ class Grove_Admin {
                         'driggs_brand_name'
                     ];
                     
-                    // Add dark green flag icon if field is in the list
+                    // Add dark green circle icon if field is in the list
                     if (flag2Fields.includes(field.key)) {
-                        flag2Td.html('<span style="color: darkgreen;">🚩</span>');
+                        flag2Td.html('<div style="width: 12px; height: 12px; background-color: darkgreen; border-radius: 50%; display: inline-block;"></div>');
                     }
                     
                     tr.append(flag2Td);
