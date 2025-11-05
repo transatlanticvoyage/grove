@@ -445,6 +445,7 @@ class Grove_Admin {
                                     <th style="padding: 12px 8px; border: 1px solid #ddd; font-weight: bold; text-align: left; background: #f0f0f0; width: 50px;">
                                         <input type="checkbox" id="select-all" style="width: 20px; height: 20px;">
                                     </th>
+                                    <th style="padding: 12px 8px; border: 1px solid #ddd; font-weight: bold; text-transform: lowercase; background: #f8f9fa;">flag1</th>
                                     <th style="padding: 12px 8px; border: 1px solid #ddd; font-weight: bold; text-transform: lowercase; background: #f8f9fa;">Field Name</th>
                                     <th style="padding: 12px 8px; border: 1px solid #ddd; font-weight: bold; text-transform: lowercase; background: #f8f9fa;">Value</th>
                                     <th style="padding: 12px 8px; border: 1px solid #ddd; font-weight: bold; text-transform: lowercase; background: #f8f9fa;">shortcode 1</th>
@@ -735,7 +736,11 @@ class Grove_Admin {
                         let separatorCheckboxTd = $('<td style="padding: 8px; border: 1px solid #ddd; text-align: center; background-color: #333;"></td>');
                         separatorTr.append(separatorCheckboxTd);
                         
-                        // Separator label spanning remaining columns
+                        // Empty flag1 cell
+                        let separatorFlagTd = $('<td style="padding: 8px; border: 1px solid #ddd; text-align: center; background-color: #333;"></td>');
+                        separatorTr.append(separatorFlagTd);
+                        
+                        // Separator label spanning remaining columns (now 5 instead of 4)
                         let separatorLabelTd = $('<td colspan="5" style="padding: 12px 8px; border: 1px solid #ddd; font-weight: bold; text-align: center; background-color: #333; color: white; font-size: 14px;"></td>');
                         separatorLabelTd.text(field.label);
                         separatorTr.append(separatorLabelTd);
@@ -771,6 +776,30 @@ class Grove_Admin {
                     let checkbox = $('<input type="checkbox" style="width: 20px; height: 20px;" data-field="' + field.key + '">');
                     checkboxTd.append(checkbox);
                     tr.append(checkboxTd);
+                    
+                    // Flag1 column - add red flag icon for specific fields
+                    let flagTd = $('<td style="padding: 8px; border: 1px solid #ddd; text-align: center;"></td>');
+                    if (isSpecialBg) flagTd.css('background-color', '#d5d5d5');
+                    
+                    // List of fields that should show a red flag
+                    const flagFields = [
+                        'sitespren_base',
+                        'driggs_brand_name',
+                        'driggs_phone_1',
+                        'driggs_city',
+                        'driggs_state_code',
+                        'driggs_industry',
+                        'driggs_site_type_purpose',
+                        'driggs_email_1'
+                    ];
+                    
+                    // Add red flag icon if field is in the list
+                    if (flagFields.includes(field.key)) {
+                        flagTd.html('🚩');
+                        flagTd.css('color', 'red');
+                    }
+                    
+                    tr.append(flagTd);
                     
                     // Field name column - bold DB field names
                     let fieldNameTd = $('<td style="padding: 8px; border: 1px solid #ddd; font-weight: bold; color: #23282d; font-family: monospace;"></td>');
@@ -1019,7 +1048,7 @@ class Grove_Admin {
                 $('#table-body tr').each(function() {
                     let row = $(this);
                     if (!row.find('td[colspan]').length) { // Skip separator rows
-                        let fieldNameCell = row.find('td:nth-child(2)'); // Field name is 2nd column
+                        let fieldNameCell = row.find('td:nth-child(3)'); // Field name is 3rd column (after checkbox and flag1)
                         if (fieldNameCell.length) {
                             let fieldName = fieldNameCell.text().trim();
                             if (fieldName && !fieldName.includes('section')) {
