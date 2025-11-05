@@ -305,9 +305,9 @@ class Grove_Admin {
         <div class="wrap grove-content" style="margin: 0; padding: 0;">
             <div style="padding: 20px; padding-top: 0;">
                 <!-- Grove Title -->
-                <div style="margin-bottom: 15px; display: flex; justify-content: space-between; align-items: center;">
+                <div style="margin-bottom: 15px; display: flex; align-items: center; gap: 15px;">
                     <h1 style="margin: 0;">🌳 Grove Hub - Driggs Site Manager</h1>
-                    <button id="nuve-pilot-btn" class="button button-primary" style="padding: 8px 16px; font-size: 14px;">nuve pilot</button>
+                    <button id="nuve-pilot-btn" class="button button-primary" style="padding: 6px; font-size: 14px;">nuve pilot</button>
                 </div>
                 
                 <!-- WordPress Native Settings - Horizontal Bar -->
