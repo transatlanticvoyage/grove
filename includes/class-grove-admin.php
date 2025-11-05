@@ -2093,10 +2093,17 @@ class Grove_Admin {
                 
                 <!-- Tab Navigation -->
                 <div class="nav-tab-wrapper" style="border-bottom: 1px solid #ccc;">
-                    <a href="#papyrus1" class="nav-tab nav-tab-active" data-tab="papyrus1">grove_vault_papyrus_1</a>
+                    <a href="#papyrus1" class="nav-tab nav-tab-active" data-tab="papyrus1">grove_vault_papyrus_1 (raw)</a>
+                    <a href="#papyrus1rendered" class="nav-tab" data-tab="papyrus1rendered">grove_vault_papyrus_1 (rendered)</a>
                     <a href="#papyrus2" class="nav-tab" data-tab="papyrus2">grove_vault_papyrus_2</a>
                     <a href="#papyrus3" class="nav-tab" data-tab="papyrus3">grove_vault_papyrus_3</a>
-                    <a href="#flag1db" class="nav-tab" data-tab="flag1db">dynamically rendered "flag1" db columns</a>
+                    <a href="#flag1db" class="nav-tab" data-tab="flag1db">
+                        <span style="color: red; cursor: help; margin-right: 5px;" 
+                              title="flag1 db columns / ui rows are not centrally defined anywhere - currently they are using static duplicated coding here on the grove_papyrus_hub page and also on the driggs_mar page"
+                              onclick="event.stopPropagation(); alert('flag1 db columns / ui rows are not centrally defined anywhere - currently they are using static duplicated coding here on the grove_papyrus_hub page and also on the driggs_mar page'); return false;">
+                            ⚠️
+                        </span>dynamically rendered "flag1" db columns
+                    </a>
                 </div>
             </div>
             
@@ -2117,6 +2124,58 @@ class Grove_Admin {
                         resize: none;
                         box-sizing: border-box;
                     " readonly><?php echo esc_textarea($papyrus_1_content); ?></textarea>
+                </div>
+                
+                <!-- Papyrus 1 Rendered Tab -->
+                <div id="papyrus1rendered-content" class="tab-content" style="display: none; flex-direction: column; height: 100%;">
+                    <textarea id="papyrus1rendered-editor" style="
+                        width: 100%;
+                        height: 100%;
+                        font-family: 'Courier New', Courier, monospace;
+                        font-size: 14px;
+                        line-height: 1.5;
+                        padding: 15px;
+                        border: 1px solid #ddd;
+                        border-radius: 4px;
+                        background-color: #f9f9f9;
+                        resize: none;
+                        box-sizing: border-box;
+                    " readonly><?php 
+                        // Get the raw papyrus content
+                        $rendered_content = $papyrus_1_content;
+                        
+                        // Query zen_sitespren table for driggs values
+                        global $wpdb;
+                        $table_name = $wpdb->prefix . 'zen_sitespren';
+                        
+                        // Get the first row from zen_sitespren
+                        $sitespren_data = $wpdb->get_row("SELECT * FROM $table_name LIMIT 1", ARRAY_A);
+                        
+                        // Build the replacement text with actual DB values
+                        $flag1_columns = array(
+                            'sitespren_base',
+                            'driggs_brand_name',
+                            'driggs_phone_1',
+                            'driggs_city',
+                            'driggs_state_code',
+                            'driggs_industry',
+                            'driggs_site_type_purpose',
+                            'driggs_email_1'
+                        );
+                        
+                        $replacement_text = '';
+                        foreach ($flag1_columns as $column) {
+                            $value = isset($sitespren_data[$column]) ? $sitespren_data[$column] : '';
+                            $replacement_text .= $column . "\t" . $value . "\n";
+                        }
+                        $replacement_text = trim($replacement_text);
+                        
+                        // Replace the INSERT HERE text with actual values
+                        $search = '(INSERT HERE - MAIN SITE LEVEL DRIGGS DATA - flag1 ai chat for content generation)';
+                        $rendered_content = str_replace($search, $replacement_text, $rendered_content);
+                        
+                        echo esc_textarea($rendered_content); 
+                    ?></textarea>
                 </div>
                 
                 <!-- Papyrus 2 Tab -->
