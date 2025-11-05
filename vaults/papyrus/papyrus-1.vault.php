@@ -40,7 +40,7 @@ PAGE-LEVEL INFO
 NoteToSelf: need somewhere in the orbitposts db table (in ruplin plugin) to create something for this
 
 ////////////////////////////////////////////
-[INSERT DB COLUMN VALUE FROM orbit_posts]
+[INSERT DB COLUMN VALUE FROM orbitposts.papyrus_page_level_insert]
 ////////////////////////////////////////////
 
 
