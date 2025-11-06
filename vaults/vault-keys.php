@@ -14,9 +14,9 @@ if (!defined('ABSPATH')) {
 }
 
 // Papyrus Vault Keys - Elementor injection templates
-$grove_vault_papyrus_1 = 'papyrus/papyrus-1';
-$grove_vault_papyrus_2 = 'papyrus/papyrus-2';
-$grove_vault_papyrus_3 = 'papyrus/papyrus-3';
+$grove_vault_papyrus_1 = 'papyrus/papyrus_1';
+$grove_vault_papyrus_2 = 'papyrus/papyrus_2';
+$grove_vault_papyrus_3 = 'papyrus/papyrus_3';
 
 // Future Vault Keys (examples)
 $grove_vault_scrolls_config = 'scrolls/config';

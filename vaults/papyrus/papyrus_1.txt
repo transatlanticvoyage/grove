@@ -1,20 +1,3 @@
-<?php
-/**
- * PAPYRUS VAULT 1
- * Sacred Text Repository - Grove Plugin Custodian
- * 
- * This vault contains the canonical papyrus-1 text.
- * Last Modified: <?php echo date('Y-m-d H:i:s'); ?>
- * Custodian: Grove Plugin Vault System
- * Classification: Static Sacred Text
- * Access: Cross-Plugin Available
- */
-
-if (!defined('ABSPATH')) {
-    exit; // Silence is golden
-}
-
-return <<<'PAPYRUS_TEXT'
 ==========================================================
 BEGIN PAPYRUS
 ==========================================================
@@ -125,6 +108,3 @@ BEGIN REMC CONTENT BELOW (REFERENCE EXAMPLE MODEL CONTENT)
 
 
 
-
-
-PAPYRUS_TEXT;

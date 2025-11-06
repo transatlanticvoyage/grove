@@ -18,9 +18,9 @@ class Grove_Vault_Keeper {
     /**
      * Vault Key Constants - Use these to reference vaults
      */
-    const grove_vault_papyrus_1 = 'papyrus/papyrus-1';
-    const grove_vault_papyrus_2 = 'papyrus/papyrus-2';
-    const grove_vault_papyrus_3 = 'papyrus/papyrus-3';
+    const grove_vault_papyrus_1 = 'papyrus/papyrus_1';
+    const grove_vault_papyrus_2 = 'papyrus/papyrus_2';
+    const grove_vault_papyrus_3 = 'papyrus/papyrus_3';
     
     /**
      * Vault directory path
@@ -70,14 +70,19 @@ class Grove_Vault_Keeper {
      * Retrieve content from a specific vault
      * This is the main method that other plugins will call
      * 
-     * @param string $vault_name The name of the vault (e.g., 'papyrus/papyrus-1')
+     * @param string $vault_name The name of the vault (e.g., 'papyrus/papyrus_1')
      * @return string|false The vault content or false if not found
      */
     public static function retrieve($vault_name, $bypass_cache = false) {
         $instance = self::get_instance();
         
-        // Construct vault file path
-        $vault_file = self::$vault_path . $vault_name . '.vault.php';
+        // Check if this is a papyrus vault request and use .txt extension
+        if (strpos($vault_name, 'papyrus/') === 0) {
+            $vault_file = self::$vault_path . $vault_name . '.txt';
+        } else {
+            // For backward compatibility with other vault types
+            $vault_file = self::$vault_path . $vault_name . '.vault.php';
+        }
         
         // Check if file exists first
         if (!file_exists($vault_file)) {
@@ -112,7 +117,17 @@ class Grove_Vault_Keeper {
         }
         
         // Load the vault content
-        $content = include $vault_file;
+        if (strpos($vault_name, 'papyrus/') === 0) {
+            // For papyrus .txt files, read as plain text
+            $content = file_get_contents($vault_file);
+            if ($content === false) {
+                error_log('Grove Vault Keeper Error: Could not read vault file - ' . $vault_name);
+                return false;
+            }
+        } else {
+            // For other vault types, use include
+            $content = include $vault_file;
+        }
         
         // Cache the content and timestamp (only if not bypassing cache)
         if (!$bypass_cache) {
@@ -134,11 +149,20 @@ class Grove_Vault_Keeper {
      */
     public static function list_vaults() {
         $vaults = array();
-        $vault_pattern = self::$vault_path . '*/*.vault.php';
         
+        // Get .vault.php files
+        $vault_pattern = self::$vault_path . '*/*.vault.php';
         foreach (glob($vault_pattern) as $vault_file) {
             $relative_path = str_replace(self::$vault_path, '', $vault_file);
             $vault_name = str_replace('.vault.php', '', $relative_path);
+            $vaults[] = $vault_name;
+        }
+        
+        // Get papyrus .txt files
+        $papyrus_pattern = self::$vault_path . 'papyrus/*.txt';
+        foreach (glob($papyrus_pattern) as $vault_file) {
+            $relative_path = str_replace(self::$vault_path, '', $vault_file);
+            $vault_name = str_replace('.txt', '', $relative_path);
             $vaults[] = $vault_name;
         }
         
@@ -152,7 +176,11 @@ class Grove_Vault_Keeper {
      * @return bool
      */
     public static function vault_exists($vault_name) {
-        $vault_file = self::$vault_path . $vault_name . '.vault.php';
+        if (strpos($vault_name, 'papyrus/') === 0) {
+            $vault_file = self::$vault_path . $vault_name . '.txt';
+        } else {
+            $vault_file = self::$vault_path . $vault_name . '.vault.php';
+        }
         return file_exists($vault_file);
     }
     
@@ -164,7 +192,11 @@ class Grove_Vault_Keeper {
      */
     public static function get_metadata($vault_name) {
         $instance = self::get_instance();
-        $vault_file = self::$vault_path . $vault_name . '.vault.php';
+        if (strpos($vault_name, 'papyrus/') === 0) {
+            $vault_file = self::$vault_path . $vault_name . '.txt';
+        } else {
+            $vault_file = self::$vault_path . $vault_name . '.vault.php';
+        }
         
         if (!file_exists($vault_file)) {
             return false;

@@ -15,7 +15,7 @@ if (class_exists('Grove_Vault_Keeper')) {
 // ============================================
 // OPTION 2: Using a local variable
 // ============================================
-$grove_vault_papyrus_1 = 'papyrus/papyrus-1';
+$grove_vault_papyrus_1 = 'papyrus/papyrus_1';
 $content = grove_vault($grove_vault_papyrus_1);
 
 // ============================================
@@ -23,7 +23,7 @@ $content = grove_vault($grove_vault_papyrus_1);
 // ============================================
 // In your plugin's main file:
 if (!defined('grove_vault_papyrus_1')) {
-    define('grove_vault_papyrus_1', 'papyrus/papyrus-1');
+    define('grove_vault_papyrus_1', 'papyrus/papyrus_1');
 }
 
 // Then anywhere in your code:

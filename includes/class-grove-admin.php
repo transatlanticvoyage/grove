@@ -2060,20 +2060,20 @@ class Grove_Admin {
         
         // Load papyrus 1 from vault
         if (class_exists('Grove_Vault_Keeper')) {
-            $papyrus_1_content = Grove_Vault_Keeper::retrieve('papyrus/papyrus-1');
+            $papyrus_1_content = Grove_Vault_Keeper::retrieve('papyrus/papyrus_1');
             if ($papyrus_1_content === false) {
                 $papyrus_1_content = '// Papyrus 1 vault not found';
             }
             
             // Check if papyrus 2 and 3 vaults exist
-            if (Grove_Vault_Keeper::vault_exists('papyrus/papyrus-2')) {
-                $papyrus_2_content = Grove_Vault_Keeper::retrieve('papyrus/papyrus-2');
+            if (Grove_Vault_Keeper::vault_exists('papyrus/papyrus_2')) {
+                $papyrus_2_content = Grove_Vault_Keeper::retrieve('papyrus/papyrus_2');
             } else {
                 $papyrus_2_content = '// Papyrus 2 vault not yet created';
             }
             
-            if (Grove_Vault_Keeper::vault_exists('papyrus/papyrus-3')) {
-                $papyrus_3_content = Grove_Vault_Keeper::retrieve('papyrus/papyrus-3');
+            if (Grove_Vault_Keeper::vault_exists('papyrus/papyrus_3')) {
+                $papyrus_3_content = Grove_Vault_Keeper::retrieve('papyrus/papyrus_3');
             } else {
                 $papyrus_3_content = '// Papyrus 3 vault not yet created';
             }
