@@ -2170,9 +2170,37 @@ class Grove_Admin {
                         }
                         $replacement_text = trim($replacement_text);
                         
-                        // Replace the INSERT HERE text with actual values
-                        $search = '(INSERT HERE - MAIN SITE LEVEL DRIGGS DATA - flag1 ai chat for content generation)';
-                        $rendered_content = str_replace($search, $replacement_text, $rendered_content);
+                        // Process pappycode shortcodes
+                        $lines = explode("\n", $rendered_content);
+                        $result_lines = array();
+                        $next_line_replacement = null;
+                        
+                        foreach ($lines as $line) {
+                            // Check if this line contains a pappycode
+                            if (preg_match('/\[pappycode(\d+)[^\]]*\]/', $line, $matches)) {
+                                $pappycode_num = $matches[1];
+                                
+                                // Determine what content to insert based on pappycode number
+                                if ($pappycode_num == '13') {
+                                    $next_line_replacement = $replacement_text;
+                                } else if ($pappycode_num == '14') {
+                                    $next_line_replacement = '// Page-level data not available in Grove admin';
+                                }
+                            }
+                            
+                            // Add the current line
+                            $result_lines[] = $line;
+                            
+                            // If this line is [actual insert here] and we have a replacement ready
+                            if (trim($line) === '[actual insert here]' && $next_line_replacement !== null) {
+                                // Replace this line with the actual content
+                                array_pop($result_lines); // Remove the [actual insert here] line
+                                $result_lines[] = $next_line_replacement;
+                                $next_line_replacement = null;
+                            }
+                        }
+                        
+                        $rendered_content = implode("\n", $result_lines);
                         
                         echo esc_textarea($rendered_content); 
                     ?></textarea>
