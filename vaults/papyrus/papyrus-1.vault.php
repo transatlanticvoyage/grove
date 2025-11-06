@@ -31,13 +31,20 @@ SITE-LEVEL INFO (from "flag 1 - ai" system)
 ==========================================================
 SHORTCODE USAGE
 
-Do not insert any static info
+Do not insert any statically-written content on the page when you would be writing the same DB values from these DB columns:
+
+driggs_brand_name
+driggs_phone_1
+driggs_email_1
+
+Instead, please use the following shortcodes:
+[phone_local]
+[sitespren dbcol="driggs_phone_1"]
+[sitespren dbcol="driggs_email_1"]
 
 
 ==========================================================
-PAGE-LEVEL INFO
-
-NoteToSelf: need somewhere in the orbitposts db table (in ruplin plugin) to create something for this
+PAGE-LEVEL PAGE-SPECIFIC INSTRUCTIONS
 
 ////////////////////////////////////////////
 [INSERT DB COLUMN VALUE FROM orbitposts.papyrus_page_level_insert]
