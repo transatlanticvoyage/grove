@@ -4146,8 +4146,8 @@ class Grove_Admin {
                         
                         // Add navigation buttons row
                         pageCell += '<div style="margin-top: 8px; display: flex; gap: 4px;">';
-                        pageCell += '<a href="http://saltwater.local/wp-admin/post.php?post=' + service.asn_service_page_id + '&action=edit" target="_blank" class="button" style="font-size: 14px; padding: 3px; text-decoration: none;">pendulum</a>';
-                        pageCell += '<a href="http://saltwater.local/wp-admin/post.php?post=' + service.asn_service_page_id + '&action=elementor" target="_blank" class="button" style="font-size: 14px; padding: 3px; text-decoration: none;">elementor</a>';
+                        pageCell += '<a href="<?php echo admin_url('post.php'); ?>?post=' + service.asn_service_page_id + '&action=edit" target="_blank" class="button" style="font-size: 14px; padding: 3px; text-decoration: none;">pendulum</a>';
+                        pageCell += '<a href="<?php echo admin_url('post.php'); ?>?post=' + service.asn_service_page_id + '&action=elementor" target="_blank" class="button" style="font-size: 14px; padding: 3px; text-decoration: none;">elementor</a>';
                         pageCell += '<a href="#" class="button frontend-link" data-page-id="' + service.asn_service_page_id + '" target="_blank" style="font-size: 14px; padding: 3px; text-decoration: none;">frontend</a>';
                         pageCell += '</div>';
                     }

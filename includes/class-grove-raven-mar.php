@@ -158,8 +158,8 @@ class Grove_Raven_Mar {
                                             (<?php echo esc_html($space->asn_page_id); ?>) | <span class="page-title-text">Loading...</span>
                                         </span>
                                         <div style="margin-top: 8px; display: flex; gap: 4px;">
-                                            <a href="http://saltwater.local/wp-admin/post.php?post=<?php echo esc_attr($space->asn_page_id); ?>&action=edit" target="_blank" class="button" style="font-size: 14px; padding: 3px; text-decoration: none;">pendulum</a>
-                                            <a href="http://saltwater.local/wp-admin/post.php?post=<?php echo esc_attr($space->asn_page_id); ?>&action=elementor" target="_blank" class="button" style="font-size: 14px; padding: 3px; text-decoration: none;">elementor</a>
+                                            <a href="<?php echo admin_url('post.php?post=' . esc_attr($space->asn_page_id) . '&action=edit'); ?>" target="_blank" class="button" style="font-size: 14px; padding: 3px; text-decoration: none;">pendulum</a>
+                                            <a href="<?php echo admin_url('post.php?post=' . esc_attr($space->asn_page_id) . '&action=elementor'); ?>" target="_blank" class="button" style="font-size: 14px; padding: 3px; text-decoration: none;">elementor</a>
                                             <a href="#" class="button frontend-link" data-page-id="<?php echo esc_attr($space->asn_page_id); ?>" target="_blank" style="font-size: 14px; padding: 3px; text-decoration: none;">frontend</a>
                                         </div>
                                     <?php endif; ?>
