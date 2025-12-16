@@ -1,9 +1,9 @@
 <?php
 /**
- * Plugin Name: Grove
+ * Plugin Name: Grove (Elementor-Safe v1.2)
  * Plugin URI: https://github.com/transatlanticvoyage/grove
- * Description: Grove - WordPress plugin for zen data fallback and shortcode management
- * Version: 1.1.0
+ * Description: Grove - WordPress plugin for zen data fallback and shortcode management - Works with or without Elementor
+ * Version: 1.2.0
  * Author: Grove Team
  * License: GPL v2 or later
  * Text Domain: grove
@@ -18,12 +18,14 @@ if (!defined('ABSPATH')) {
 }
 
 // Define plugin constants
-define('GROVE_PLUGIN_VERSION', '1.1.0');
+define('GROVE_PLUGIN_VERSION', '1.2.0');
 define('GROVE_PLUGIN_PATH', plugin_dir_path(__FILE__));
 define('GROVE_PLUGIN_URL', plugin_dir_url(__FILE__));
 
 // Main plugin class
 class GrovePlugin {
+    
+    private $elementor_available = false;
     
     public function __construct() {
         add_action('init', array($this, 'init'));
@@ -31,7 +33,22 @@ class GrovePlugin {
         register_deactivation_hook(__FILE__, array($this, 'deactivate'));
     }
     
+    /**
+     * Check if Elementor is available and active
+     */
+    public function is_elementor_available() {
+        return class_exists('Elementor\\Plugin') && is_plugin_active('elementor/elementor.php');
+    }
+    
     public function init() {
+        // Check Elementor availability
+        $this->elementor_available = $this->is_elementor_available();
+        
+        // Define constant for global access
+        if (!defined('GROVE_ELEMENTOR_AVAILABLE')) {
+            define('GROVE_ELEMENTOR_AVAILABLE', $this->elementor_available);
+        }
+        
         $this->load_dependencies();
         $this->init_hooks();
     }

@@ -202,11 +202,33 @@ class Grove_Panzer {
      * @param int $target_id Target post ID
      */
     private function handle_panzer_elementor_processing($source_id, $target_id) {
-        // Check if Elementor is active (same check as the working plugin)
-        if (is_plugin_active('elementor/elementor.php')) {
-            // Use the exact same method as the working plugin
-            $css = \Elementor\Core\Files\CSS\Post::create($target_id);
-            $css->update();
+        // Check if Elementor is active and available
+        if (defined('GROVE_ELEMENTOR_AVAILABLE') && GROVE_ELEMENTOR_AVAILABLE) {
+            if (class_exists('\\Elementor\\Core\\Files\\CSS\\Post')) {
+                // Use the exact same method as the working plugin
+                $css = \Elementor\Core\Files\CSS\Post::create($target_id);
+                $css->update();
+            }
+        } else {
+            // In non-Elementor mode, ensure content is properly formatted
+            $this->handle_panzer_fallback_processing($source_id, $target_id);
+        }
+    }
+    
+    /**
+     * Handle fallback processing for non-Elementor pages
+     * 
+     * @param int $source_id Source post ID
+     * @param int $target_id Target post ID
+     */
+    private function handle_panzer_fallback_processing($source_id, $target_id) {
+        // Ensure any shortcodes in the content are preserved
+        $content = get_post_field('post_content', $target_id);
+        if ($content) {
+            // Process any Grove-specific shortcodes
+            $content = do_shortcode($content);
+            // Store processed version for reference
+            update_post_meta($target_id, '_grove_processed_content', $content);
         }
     }
     

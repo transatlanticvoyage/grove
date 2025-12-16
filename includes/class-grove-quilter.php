@@ -152,7 +152,9 @@ class Grove_Quilter {
      */
     private function handle_elementor_post_duplication($target_id) {
         // Check if Elementor is active
-        if (!class_exists('\Elementor\Plugin')) {
+        if (!defined('GROVE_ELEMENTOR_AVAILABLE') || !GROVE_ELEMENTOR_AVAILABLE) {
+            // Handle fallback for non-Elementor mode
+            $this->handle_fallback_post_duplication($target_id);
             return;
         }
         
@@ -167,7 +169,9 @@ class Grove_Quilter {
         
         // Ensure Elementor version meta is set
         if (!get_post_meta($target_id, '_elementor_version', true)) {
-            update_post_meta($target_id, '_elementor_version', ELEMENTOR_VERSION);
+            if (defined('ELEMENTOR_VERSION')) {
+                update_post_meta($target_id, '_elementor_version', ELEMENTOR_VERSION);
+            }
         }
         
         // Clear and regenerate Elementor CSS files for this post
@@ -188,6 +192,10 @@ class Grove_Quilter {
      * @param int $post_id Post ID
      */
     private function regenerate_elementor_css($post_id) {
+        if (!defined('GROVE_ELEMENTOR_AVAILABLE') || !GROVE_ELEMENTOR_AVAILABLE) {
+            return;
+        }
+        
         if (!class_exists('\Elementor\Core\Files\CSS\Post')) {
             return;
         }
@@ -209,6 +217,10 @@ class Grove_Quilter {
      * Clear global Elementor cache
      */
     private function clear_elementor_global_cache() {
+        if (!defined('GROVE_ELEMENTOR_AVAILABLE') || !GROVE_ELEMENTOR_AVAILABLE) {
+            return;
+        }
+        
         try {
             if (method_exists('\Elementor\Plugin', 'instance')) {
                 $elementor = \Elementor\Plugin::instance();
@@ -241,6 +253,10 @@ class Grove_Quilter {
      * @param int $post_id Post ID
      */
     private function delayed_elementor_css_regeneration($post_id) {
+        if (!defined('GROVE_ELEMENTOR_AVAILABLE') || !GROVE_ELEMENTOR_AVAILABLE) {
+            return;
+        }
+        
         if (!class_exists('\Elementor\Plugin')) {
             return;
         }
@@ -259,6 +275,28 @@ class Grove_Quilter {
             
         } catch (Exception $e) {
             error_log('Grove Quilter: Delayed Elementor CSS regeneration failed for post ' . $post_id . ': ' . $e->getMessage());
+        }
+    }
+    
+    /**
+     * Handle fallback processing for duplicated posts in non-Elementor mode
+     * 
+     * @param int $target_id Target post ID
+     */
+    private function handle_fallback_post_duplication($target_id) {
+        // Ensure any shortcodes and content are properly formatted
+        $content = get_post_field('post_content', $target_id);
+        if ($content) {
+            // Mark as non-Elementor page
+            update_post_meta($target_id, '_grove_page_mode', 'classic');
+            
+            // Store original content for reference
+            update_post_meta($target_id, '_grove_original_content', $content);
+            
+            // Process any Grove shortcodes
+            if (has_shortcode($content, 'grove') || has_shortcode($content, 'zen')) {
+                update_post_meta($target_id, '_grove_has_shortcodes', 'yes');
+            }
         }
     }
     
