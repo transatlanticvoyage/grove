@@ -282,6 +282,15 @@ class Grove_Admin {
         
         add_submenu_page(
             'grovehub',
+            'Plasma Import Mar',
+            'plasma_import_mar',
+            'manage_options',
+            'plasma_import_mar',
+            array($this, 'plasma_import_mar_page')
+        );
+        
+        add_submenu_page(
+            'grovehub',
             'Dark Mode Test',
             'darkmodetest',
             'manage_options',
@@ -11217,6 +11226,12 @@ class Grove_Admin {
         // Delegate to the dedicated Grove Streamflow Mar class
         $grove_streamflow_mar = new Grove_Streamflow_Mar();
         $grove_streamflow_mar->streamflow_mar_page();
+    }
+    
+    public function plasma_import_mar_page() {
+        // Delegate to the dedicated Grove Plasma Import Mar class
+        $grove_plasma_import_mar = new Grove_Plasma_Import_Mar();
+        $grove_plasma_import_mar->plasma_import_mar_page();
     }
     
     /**

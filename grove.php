@@ -65,6 +65,7 @@ class GrovePlugin {
         require_once GROVE_PLUGIN_PATH . 'includes/class-grove-chimp.php';
         require_once GROVE_PLUGIN_PATH . 'includes/class-grove-raven-mar.php';
         require_once GROVE_PLUGIN_PATH . 'includes/class-grove-streamflow-mar.php';
+        require_once GROVE_PLUGIN_PATH . 'includes/class-grove-plasma-import-mar.php';
         
         // Load the Vault Keeper for cross-plugin sacred text access
         require_once GROVE_PLUGIN_PATH . 'vaults/class-grove-vault-keeper.php';
