@@ -66,6 +66,7 @@ class GrovePlugin {
         require_once GROVE_PLUGIN_PATH . 'includes/class-grove-raven-mar.php';
         require_once GROVE_PLUGIN_PATH . 'includes/class-grove-streamflow-mar.php';
         require_once GROVE_PLUGIN_PATH . 'includes/class-grove-plasma-import-mar.php';
+        require_once GROVE_PLUGIN_PATH . 'includes/class-grove-plasma-import-processor.php';
         
         // Load the Vault Keeper for cross-plugin sacred text access
         require_once GROVE_PLUGIN_PATH . 'vaults/class-grove-vault-keeper.php';
@@ -79,6 +80,20 @@ class GrovePlugin {
         new Grove_Quilter();
         new Grove_Panzer();
         new Grove_Chimp();
+        
+        // Initialize plasma import processor and AJAX handlers
+        $this->init_plasma_import();
+    }
+    
+    /**
+     * Initialize plasma import functionality
+     */
+    private function init_plasma_import() {
+        $processor = new Grove_Plasma_Import_Processor();
+        
+        // Register AJAX handlers
+        add_action('wp_ajax_grove_plasma_import', array($processor, 'handle_ajax_import'));
+        add_action('wp_ajax_nopriv_grove_plasma_import', array($processor, 'handle_ajax_import'));
     }
     
     public function activate() {

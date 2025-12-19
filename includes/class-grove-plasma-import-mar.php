@@ -61,6 +61,17 @@ class Grove_Plasma_Import_Mar {
                 <div id="driggs-preview-section" style="background: white; border: 1px solid #ddd; padding: 20px; border-radius: 5px; margin-top: 20px; display: none;">
                     <h3 style="margin: 0 0 15px 0;">Preview Imported Data - driggs data</h3>
                     
+                    <div style="margin-bottom: 15px; padding: 10px; background-color: #f8f9fa; border-left: 4px solid #007cba; border-radius: 3px;">
+                        <label style="font-weight: 500; display: flex; align-items: center; cursor: pointer;">
+                            <input type="checkbox" id="update-empty-fields" checked style="margin-right: 8px;">
+                            Update all selected items to empty (if empty)
+                        </label>
+                        <div style="font-size: 12px; color: #666; margin-top: 5px; margin-left: 20px;">
+                            When checked: Empty values from import will set database columns to empty<br>
+                            When unchecked: Empty values from import will be ignored (existing data preserved)
+                        </div>
+                    </div>
+                    
                     <div id="driggs-table-container">
                         <!-- Driggs data table will be populated via JavaScript -->
                     </div>
@@ -278,8 +289,69 @@ class Grove_Plasma_Import_Mar {
                     return;
                 }
 
-                // TODO: Implement AJAX call to create WordPress pages
-                alert('Page creation functionality will be implemented next. Selected: ' + selectedIndexes.length + ' pages.');
+                // Prepare the data for import
+                const selectedPages = [];
+                selectedIndexes.forEach(function(index) {
+                    if (importedData.pages[index]) {
+                        selectedPages.push(importedData.pages[index]);
+                    }
+                });
+
+                // Disable button during processing
+                const $btn = $('#create-pages-btn');
+                const originalText = $btn.text();
+                $btn.prop('disabled', true).text('Creating pages...');
+
+                // Get the empty fields update setting
+                const updateEmptyFields = $('#update-empty-fields').is(':checked');
+
+                // Make AJAX call to import pages
+                $.ajax({
+                    url: ajaxurl,
+                    type: 'POST',
+                    data: {
+                        action: 'grove_plasma_import',
+                        pages: selectedPages,
+                        update_empty_fields: updateEmptyFields ? 'true' : 'false',
+                        nonce: '<?php echo wp_create_nonce("grove_plasma_import"); ?>'
+                    },
+                    success: function(response) {
+                        if (response.success) {
+                            alert('✅ Success: ' + response.data.message);
+                            
+                            // Show detailed results if available
+                            if (response.data.details) {
+                                const details = response.data.details;
+                                let detailMsg = '';
+                                if (details.success && details.success.length > 0) {
+                                    detailMsg += 'Successfully created:\n';
+                                    details.success.forEach(function(item) {
+                                        detailMsg += '- ' + item.title + ' (Post ID: ' + item.post_id + ')\n';
+                                    });
+                                }
+                                if (details.errors && details.errors.length > 0) {
+                                    detailMsg += '\nErrors:\n';
+                                    details.errors.forEach(function(item) {
+                                        detailMsg += '- ' + (item.title || 'Unknown') + ': ' + item.message + '\n';
+                                    });
+                                }
+                                if (detailMsg) {
+                                    console.log('Import Details:', detailMsg);
+                                }
+                            }
+                        } else {
+                            alert('❌ Error: ' + (response.data ? response.data.message : 'Unknown error occurred'));
+                        }
+                    },
+                    error: function(xhr, status, error) {
+                        alert('❌ AJAX Error: ' + error);
+                        console.error('AJAX Error:', xhr, status, error);
+                    },
+                    complete: function() {
+                        // Re-enable button
+                        $btn.prop('disabled', false).text(originalText);
+                    }
+                });
             });
 
             // Utility function to escape HTML
