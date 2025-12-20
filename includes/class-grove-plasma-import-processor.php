@@ -134,8 +134,8 @@ class Grove_Plasma_Import_Processor {
         }
         
         // Set defaults if not provided
-        if (!isset($post_data['post_status'])) {
-            $post_data['post_status'] = 'draft';
+        if (!isset($post_data['post_status']) || empty($post_data['post_status'])) {
+            $post_data['post_status'] = 'publish';
         }
         
         if (!isset($post_data['post_type'])) {

@@ -32,6 +32,35 @@ class Grove_Plasma_Import_Mar {
                     </h1>
                 </div>
                 
+                <!-- Error Reporting Section (initially hidden) -->
+                <div id="error-reporting-container" style="margin-bottom: 20px; display: none;">
+                    <div style="background: #fff2cd; border: 1px solid #f1c40f; padding: 15px; border-radius: 5px; border-left: 4px solid #f39c12;">
+                        <h4 style="margin: 0 0 10px 0; color: #d68910;">Import Error Details</h4>
+                        <textarea id="error-details-text" readonly style="width: 100%; height: 200px; font-family: monospace; font-size: 12px; background: #fefefe; border: 1px solid #ddd; padding: 10px; resize: vertical;" placeholder="Error details will appear here..."></textarea>
+                        <p style="margin: 10px 0 0 0; font-size: 11px; color: #666;">
+                            You can copy this error information to share with support or for debugging.
+                        </p>
+                    </div>
+                </div>
+                
+                <!-- Tab Navigation -->
+                <div style="border-bottom: 1px solid #ddd; margin-bottom: 20px;">
+                    <div style="display: flex; gap: 0;">
+                        <button id="tab-main" class="plasma-tab active" style="padding: 12px 20px; background: #fff; border: 1px solid #ddd; border-bottom: none; border-top-left-radius: 5px; border-top-right-radius: 5px; cursor: pointer; font-weight: 500; color: #0073aa;">
+                            Main Tab 1
+                        </button>
+                        <button id="tab-error" class="plasma-tab" style="padding: 12px 20px; background: #f1f1f1; border: 1px solid #ddd; border-bottom: none; border-top-left-radius: 5px; border-top-right-radius: 5px; cursor: pointer; font-weight: 500; color: #333; margin-left: -1px;">
+                            Error Reporting
+                        </button>
+                    </div>
+                </div>
+                
+                <!-- Tab Content Container -->
+                <div id="tab-content">
+                    
+                    <!-- Main Tab Content -->
+                    <div id="main-tab-content" class="tab-content active">
+                
                 <!-- JSON Upload Section -->
                 <div style="background: white; border: 1px solid #ddd; padding: 20px; border-radius: 5px; margin-bottom: 20px;">
                     <h3 style="margin-top: 0;">Import JSON File</h3>
@@ -75,7 +104,29 @@ class Grove_Plasma_Import_Mar {
                     <div id="driggs-table-container">
                         <!-- Driggs data table will be populated via JavaScript -->
                     </div>
-                </div>
+                    </div>
+                    
+                    <!-- Error Reporting Tab Content -->
+                    <div id="error-tab-content" class="tab-content" style="display: none;">
+                        <div style="background: white; border: 1px solid #ddd; padding: 20px; border-radius: 5px;">
+                            <h3 style="margin-top: 0;">Detailed Error Information</h3>
+                            <div style="margin-bottom: 15px;">
+                                <p>This tab shows detailed error information from import attempts. Error details will automatically appear here when imports fail.</p>
+                            </div>
+                            
+                            <div id="error-log-container">
+                                <textarea id="error-log-display" readonly style="width: 100%; height: 400px; font-family: 'Courier New', monospace; font-size: 12px; background: #f8f9fa; border: 1px solid #dee2e6; padding: 15px; resize: vertical; line-height: 1.4;" placeholder="No errors recorded yet. Import errors will appear here with full details including:&#10;- Error messages&#10;- Stack traces&#10;- Request data&#10;- Server responses&#10;- Timestamps"></textarea>
+                            </div>
+                            
+                            <div style="margin-top: 15px; display: flex; gap: 10px;">
+                                <button id="clear-error-log" class="button" style="background: #dc3545; color: white; border: none; padding: 8px 16px; border-radius: 3px;">Clear Error Log</button>
+                                <button id="copy-error-log" class="button" style="background: #6c757d; color: white; border: none; padding: 8px 16px; border-radius: 3px;">Copy to Clipboard</button>
+                                <span id="copy-feedback" style="color: #28a745; font-size: 12px; display: none; align-self: center;">Copied to clipboard!</span>
+                            </div>
+                        </div>
+                    </div>
+                    
+                </div> <!-- End tab-content -->
                 
             </div>
         </div>
@@ -83,6 +134,96 @@ class Grove_Plasma_Import_Mar {
         <script>
         jQuery(document).ready(function($) {
             let importedData = null;
+            let errorLog = [];
+            
+            // Tab switching functionality
+            $('.plasma-tab').click(function() {
+                const tabId = $(this).attr('id');
+                
+                // Remove active class from all tabs and content
+                $('.plasma-tab').removeClass('active').css({
+                    'background': '#f1f1f1',
+                    'color': '#333'
+                });
+                $('.tab-content').removeClass('active').hide();
+                
+                // Add active class to clicked tab
+                $(this).addClass('active').css({
+                    'background': '#fff',
+                    'color': '#0073aa'
+                });
+                
+                // Show corresponding content
+                if (tabId === 'tab-main') {
+                    $('#main-tab-content').addClass('active').show();
+                } else if (tabId === 'tab-error') {
+                    $('#error-tab-content').addClass('active').show();
+                }
+            });
+            
+            // Error reporting functions
+            function addErrorToLog(error) {
+                const timestamp = new Date().toISOString();
+                const errorEntry = {
+                    timestamp: timestamp,
+                    error: error,
+                    userAgent: navigator.userAgent,
+                    url: window.location.href
+                };
+                
+                errorLog.push(errorEntry);
+                updateErrorDisplay();
+                
+                // Also show the compact error at top
+                showCompactError(error);
+            }
+            
+            function updateErrorDisplay() {
+                let logText = '';
+                errorLog.forEach((entry, index) => {
+                    logText += `=== ERROR ${index + 1} [${entry.timestamp}] ===\n`;
+                    logText += `URL: ${entry.url}\n`;
+                    logText += `User Agent: ${entry.userAgent}\n`;
+                    logText += `\nERROR DETAILS:\n`;
+                    if (typeof entry.error === 'object') {
+                        logText += JSON.stringify(entry.error, null, 2);
+                    } else {
+                        logText += entry.error;
+                    }
+                    logText += '\n\n' + '='.repeat(80) + '\n\n';
+                });
+                
+                $('#error-log-display').val(logText);
+            }
+            
+            function showCompactError(error) {
+                let errorText = '';
+                if (typeof error === 'object') {
+                    errorText = JSON.stringify(error, null, 2);
+                } else {
+                    errorText = error;
+                }
+                
+                $('#error-details-text').val(errorText);
+                $('#error-reporting-container').show();
+            }
+            
+            // Clear error log
+            $('#clear-error-log').click(function() {
+                if (confirm('Are you sure you want to clear the error log?')) {
+                    errorLog = [];
+                    updateErrorDisplay();
+                    $('#error-reporting-container').hide();
+                }
+            });
+            
+            // Copy error log to clipboard
+            $('#copy-error-log').click(function() {
+                const logText = $('#error-log-display').val();
+                navigator.clipboard.writeText(logText).then(function() {
+                    $('#copy-feedback').show().delay(2000).fadeOut();
+                });
+            });
 
             // Handle file import
             $('#import-json-btn').click(function() {
@@ -334,17 +475,55 @@ class Grove_Plasma_Import_Mar {
                                     details.errors.forEach(function(item) {
                                         detailMsg += '- ' + (item.title || 'Unknown') + ': ' + item.message + '\n';
                                     });
+                                    
+                                    // If there were errors, log them for detailed analysis
+                                    addErrorToLog({
+                                        type: 'Import Partial Success with Errors',
+                                        message: response.data.message,
+                                        details: details,
+                                        requestData: {
+                                            pages: selectedPages,
+                                            update_empty_fields: updateEmptyFields
+                                        }
+                                    });
                                 }
                                 if (detailMsg) {
                                     console.log('Import Details:', detailMsg);
                                 }
                             }
                         } else {
-                            alert('❌ Error: ' + (response.data ? response.data.message : 'Unknown error occurred'));
+                            // Import failed - log detailed error
+                            const errorData = {
+                                type: 'Import Failed',
+                                message: response.data ? response.data.message : 'Unknown error occurred',
+                                fullResponse: response,
+                                requestData: {
+                                    pages: selectedPages,
+                                    update_empty_fields: updateEmptyFields
+                                }
+                            };
+                            
+                            addErrorToLog(errorData);
+                            alert('❌ Error: ' + errorData.message + '\n\nDetailed error information has been logged. Check the Error Reporting tab for full details.');
                         }
                     },
                     error: function(xhr, status, error) {
-                        alert('❌ AJAX Error: ' + error);
+                        // AJAX request failed - log comprehensive error
+                        const errorData = {
+                            type: 'AJAX Request Failed',
+                            status: status,
+                            error: error,
+                            statusCode: xhr.status,
+                            statusText: xhr.statusText,
+                            responseText: xhr.responseText,
+                            requestData: {
+                                pages: selectedPages,
+                                update_empty_fields: updateEmptyFields
+                            }
+                        };
+                        
+                        addErrorToLog(errorData);
+                        alert('❌ AJAX Error: ' + error + '\n\nFull error details have been logged. Check the Error Reporting tab for complete information.');
                         console.error('AJAX Error:', xhr, status, error);
                     },
                     complete: function() {
@@ -375,6 +554,33 @@ class Grove_Plasma_Import_Mar {
         }
         .widefat tr:hover {
             background: #f0f8ff;
+        }
+        
+        /* Tab styling */
+        .plasma-tab {
+            transition: all 0.2s ease;
+        }
+        .plasma-tab:hover {
+            background: #e9ecef !important;
+            color: #0073aa !important;
+        }
+        .plasma-tab.active:hover {
+            background: #fff !important;
+        }
+        
+        /* Tab content animation */
+        .tab-content {
+            animation: fadeIn 0.2s ease-in-out;
+        }
+        
+        @keyframes fadeIn {
+            from { opacity: 0; }
+            to { opacity: 1; }
+        }
+        
+        /* Error reporting styles */
+        #error-details-text, #error-log-display {
+            font-family: 'Courier New', Consolas, 'Monaco', monospace !important;
         }
         </style>
         <?php
