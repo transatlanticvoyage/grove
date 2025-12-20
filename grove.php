@@ -94,6 +94,8 @@ class GrovePlugin {
         // Register AJAX handlers
         add_action('wp_ajax_grove_plasma_import', array($processor, 'handle_ajax_import'));
         add_action('wp_ajax_nopriv_grove_plasma_import', array($processor, 'handle_ajax_import'));
+        add_action('wp_ajax_grove_driggs_data_import', array($processor, 'handle_ajax_driggs_import'));
+        add_action('wp_ajax_nopriv_grove_driggs_data_import', array($processor, 'handle_ajax_driggs_import'));
     }
     
     public function activate() {

@@ -138,8 +138,15 @@ class Grove_Plasma_Import_Processor {
             $post_data['post_status'] = 'publish';
         }
         
-        if (!isset($post_data['post_type'])) {
+        if (!isset($post_data['post_type']) || empty($post_data['post_type'])) {
+            // Default to 'page', but check for special conditions
             $post_data['post_type'] = 'page';
+            
+            // If page_type is blank/null and page_archetype has value of "blogpost", create as post
+            if ((!isset($page_data['page_type']) || empty($page_data['page_type'])) && 
+                (isset($page_data['page_archetype']) && $page_data['page_archetype'] === 'blogpost')) {
+                $post_data['post_type'] = 'post';
+            }
         }
         
         if (!isset($post_data['post_title'])) {
@@ -302,5 +309,136 @@ class Grove_Plasma_Import_Processor {
         // and normalizes the template name to match available templates
         
         // No action needed here - template assignment happens at render time
+    }
+    
+    /**
+     * AJAX handler for driggs data import request
+     */
+    public function handle_ajax_driggs_import() {
+        // Verify nonce
+        if (!isset($_POST['nonce']) || !wp_verify_nonce($_POST['nonce'], 'grove_driggs_import')) {
+            wp_die('Security check failed');
+        }
+        
+        // Check user permissions
+        if (!current_user_can('edit_posts')) {
+            wp_send_json_error(['message' => 'Insufficient permissions']);
+            return;
+        }
+        
+        // Get the driggs data from POST
+        $driggs_data = isset($_POST['driggs_data']) ? $_POST['driggs_data'] : [];
+        
+        if (empty($driggs_data)) {
+            wp_send_json_error(['message' => 'No driggs data provided']);
+            return;
+        }
+        
+        // Process the driggs data import
+        $results = $this->import_driggs_data($driggs_data);
+        
+        // Return results
+        if ($results['success']) {
+            wp_send_json_success([
+                'message' => sprintf('Successfully imported %d driggs data fields to wp_zen_sitespren', count($driggs_data)),
+                'details' => $results
+            ]);
+        } else {
+            wp_send_json_error([
+                'message' => 'Driggs data import failed: ' . $results['error'],
+                'details' => $results
+            ]);
+        }
+    }
+    
+    /**
+     * Import driggs data into wp_zen_sitespren table
+     * 
+     * @param array $driggs_data Array of driggs field => value pairs
+     * @return array Results with success/error information
+     */
+    private function import_driggs_data($driggs_data) {
+        global $wpdb;
+        
+        $sitespren_table = $wpdb->prefix . 'zen_sitespren';
+        
+        try {
+            // Check if the sitespren record exists (assuming we work with ID 1)
+            $existing_record = $wpdb->get_row($wpdb->prepare(
+                "SELECT * FROM $sitespren_table WHERE wppma_id = %d",
+                1
+            ));
+            
+            if ($existing_record) {
+                // Update existing record
+                $update_data = [];
+                foreach ($driggs_data as $field => $value) {
+                    // Sanitize the field name to prevent SQL injection
+                    if (preg_match('/^[a-zA-Z0-9_]+$/', $field)) {
+                        $update_data[$field] = $value;
+                    }
+                }
+                
+                if (!empty($update_data)) {
+                    $result = $wpdb->update(
+                        $sitespren_table,
+                        $update_data,
+                        ['wppma_id' => 1],
+                        null,
+                        ['%d']
+                    );
+                    
+                    if ($result === false) {
+                        return [
+                            'success' => false,
+                            'error' => 'Database update failed: ' . $wpdb->last_error
+                        ];
+                    }
+                    
+                    return [
+                        'success' => true,
+                        'updated_fields' => array_keys($update_data),
+                        'record_id' => 1
+                    ];
+                } else {
+                    return [
+                        'success' => false,
+                        'error' => 'No valid fields to update'
+                    ];
+                }
+            } else {
+                // Create new record with driggs data
+                $insert_data = ['wppma_id' => 1];
+                foreach ($driggs_data as $field => $value) {
+                    // Sanitize the field name to prevent SQL injection
+                    if (preg_match('/^[a-zA-Z0-9_]+$/', $field)) {
+                        $insert_data[$field] = $value;
+                    }
+                }
+                
+                $result = $wpdb->insert(
+                    $sitespren_table,
+                    $insert_data
+                );
+                
+                if ($result === false) {
+                    return [
+                        'success' => false,
+                        'error' => 'Database insert failed: ' . $wpdb->last_error
+                    ];
+                }
+                
+                return [
+                    'success' => true,
+                    'inserted_fields' => array_keys($insert_data),
+                    'record_id' => $wpdb->insert_id
+                ];
+            }
+        } catch (Exception $e) {
+            return [
+                'success' => false,
+                'error' => 'Exception occurred: ' . $e->getMessage()
+            ];
+        }
     }
 }

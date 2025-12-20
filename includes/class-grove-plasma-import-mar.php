@@ -90,6 +90,14 @@ class Grove_Plasma_Import_Mar {
                 <div id="driggs-preview-section" style="background: white; border: 1px solid #ddd; padding: 20px; border-radius: 5px; margin-top: 20px; display: none;">
                     <h3 style="margin: 0 0 15px 0;">Preview Imported Data - driggs data</h3>
                     
+                    <!-- Driggs Data Import Button -->
+                    <div style="margin-bottom: 15px;">
+                        <button id="import-driggs-data" type="button" class="button button-primary" style="background: #d54e21; border-color: #d54e21; padding: 8px 16px; font-size: 14px; font-weight: 500;">
+                            f51 - import driggs data
+                        </button>
+                        <div id="driggs-import-status" style="margin-top: 8px; font-size: 13px;"></div>
+                    </div>
+                    
                     <div style="margin-bottom: 15px; padding: 10px; background-color: #f8f9fa; border-left: 4px solid #007cba; border-radius: 3px;">
                         <label style="font-weight: 500; display: flex; align-items: center; cursor: pointer;">
                             <input type="checkbox" id="update-empty-fields" checked style="margin-right: 8px;">
@@ -282,7 +290,29 @@ class Grove_Plasma_Import_Mar {
                     Object.keys(page).forEach(key => allColumns.add(key));
                 });
                 
-                const columns = Array.from(allColumns);
+                // Create ordered columns array with specific order: page_type, moniker, page_archetype, page_status, page_title, staircase_page_template_desired, others
+                const allColumnsArray = Array.from(allColumns);
+                const columns = [];
+                const priorityColumns = ['page_type', 'moniker', 'page_archetype', 'page_status', 'page_title', 'staircase_page_template_desired'];
+                
+                // Add priority columns in order if they exist
+                priorityColumns.forEach(col => {
+                    if (allColumnsArray.includes(col)) {
+                        columns.push(col);
+                    }
+                });
+                
+                // Add staircase_page_template_desired even if it doesn't exist in data (new column)
+                if (!allColumnsArray.includes('staircase_page_template_desired') && !columns.includes('staircase_page_template_desired')) {
+                    columns.push('staircase_page_template_desired');
+                }
+                
+                // Then add all other columns (excluding priority columns since they're already added)
+                allColumnsArray.forEach(col => {
+                    if (!priorityColumns.includes(col)) {
+                        columns.push(col);
+                    }
+                });
 
                 // Build table
                 let tableHTML = '<table class="widefat striped" style="margin-top: 15px;">';
@@ -303,26 +333,81 @@ class Grove_Plasma_Import_Mar {
                     columns.forEach(col => {
                         let value = page[col] || '';
                         
-                        // Truncate long content
-                        if (typeof value === 'string' && value.length > 20) {
-                            value = value.substring(0, 20) + '...';
-                        } else if (typeof value === 'object') {
-                            value = JSON.stringify(value).substring(0, 20) + '...';
+                        if (['page_type', 'moniker', 'page_archetype', 'page_status', 'page_title', 'staircase_page_template_desired'].includes(col)) {
+                            // Make these columns editable with input fields
+                            let maxWidth = '150px';
+                            if (col === 'moniker') {
+                                maxWidth = '180px';
+                            } else if (col === 'page_archetype') {
+                                maxWidth = '140px';
+                            } else if (col === 'page_status') {
+                                maxWidth = '120px';
+                            } else if (col === 'page_title') {
+                                maxWidth = '200px';
+                            } else if (col === 'staircase_page_template_desired') {
+                                maxWidth = '160px';
+                            }
+                            
+                            tableHTML += '<td style="padding: 4px; max-width: ' + maxWidth + ';" class="editable-cell" data-column="' + col + '" data-row-index="' + index + '">';
+                            tableHTML += '<input type="text" class="editable-input ' + col + '-input" value="' + escapeHtml(String(value)) + '" ';
+                            tableHTML += 'style="width: 100%; padding: 4px; border: 1px solid #ddd; border-radius: 3px; font-size: 12px;" ';
+                            tableHTML += 'data-original-value="' + escapeHtml(String(value)) + '" data-column="' + col + '" />';
+                            tableHTML += '</td>';
+                        } else {
+                            // Regular non-editable cells
+                            // Truncate long content for display
+                            let displayValue = value;
+                            if (typeof value === 'string' && value.length > 20) {
+                                displayValue = value.substring(0, 20) + '...';
+                            } else if (typeof value === 'object') {
+                                displayValue = JSON.stringify(value).substring(0, 20) + '...';
+                            }
+                            
+                            tableHTML += '<td style="padding: 8px; max-width: 200px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;" title="' + escapeHtml(page[col] || '') + '">';
+                            tableHTML += escapeHtml(String(displayValue));
+                            tableHTML += '</td>';
                         }
-                        
-                        tableHTML += '<td style="padding: 8px; max-width: 200px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;" title="' + escapeHtml(page[col] || '') + '">';
-                        tableHTML += escapeHtml(String(value));
-                        tableHTML += '</td>';
                     });
                     tableHTML += '</tr>';
                 });
                 tableHTML += '</tbody></table>';
 
                 $('#data-table-container').html(tableHTML);
+                
+                // Initialize staircase_page_template_desired field in data if it doesn't exist
+                if (importedData && importedData.pages) {
+                    importedData.pages.forEach(page => {
+                        if (!page.hasOwnProperty('staircase_page_template_desired')) {
+                            page.staircase_page_template_desired = '';
+                        }
+                    });
+                }
 
                 // Handle select all checkbox
                 $('#select-all-pages').change(function() {
                     $('.page-checkbox').prop('checked', this.checked);
+                });
+                
+                // Handle editable input changes to update data for all editable columns
+                $('.editable-input').on('change input', function() {
+                    const rowIndex = $(this).closest('.editable-cell').data('row-index');
+                    const columnName = $(this).data('column');
+                    const newValue = $(this).val();
+                    
+                    // Update the importedData with new value
+                    if (importedData && importedData.pages && importedData.pages[rowIndex]) {
+                        importedData.pages[rowIndex][columnName] = newValue;
+                    }
+                    
+                    // Visual feedback for changed values
+                    const originalValue = $(this).data('original-value');
+                    if (newValue !== originalValue) {
+                        $(this).css('background-color', '#fff3cd'); // Light yellow background for changed values
+                        $(this).css('border-color', '#ffeaa7');
+                    } else {
+                        $(this).css('background-color', '');
+                        $(this).css('border-color', '#ddd');
+                    }
                 });
             }
 
@@ -524,6 +609,69 @@ class Grove_Plasma_Import_Mar {
                         
                         addErrorToLog(errorData);
                         alert('❌ AJAX Error: ' + error + '\n\nFull error details have been logged. Check the Error Reporting tab for complete information.');
+                        console.error('AJAX Error:', xhr, status, error);
+                    },
+                    complete: function() {
+                        // Re-enable button
+                        $btn.prop('disabled', false).text(originalText);
+                    }
+                });
+            });
+
+            // Handle driggs data import button
+            $('#import-driggs-data').click(function() {
+                if (!importedData || !importedData.driggs_data) {
+                    alert('No driggs data found. Please import a JSON file with driggs_data first.');
+                    return;
+                }
+
+                const selectedFields = [];
+                $('.driggs-checkbox:checked').each(function() {
+                    selectedFields.push($(this).data('field'));
+                });
+
+                if (selectedFields.length === 0) {
+                    alert('Please select at least one driggs data field to import.');
+                    return;
+                }
+
+                if (!confirm('Import ' + selectedFields.length + ' driggs data fields to wp_zen_sitespren table?')) {
+                    return;
+                }
+
+                // Prepare driggs data for import
+                const driggsDataForImport = {};
+                selectedFields.forEach(function(field) {
+                    driggsDataForImport[field] = importedData.driggs_data[field];
+                });
+
+                // Disable button during processing
+                const $btn = $('#import-driggs-data');
+                const originalText = $btn.text();
+                $btn.prop('disabled', true).text('Importing driggs data...');
+                
+                // Clear status
+                $('#driggs-import-status').html('');
+
+                // Make AJAX call to import driggs data
+                $.ajax({
+                    url: ajaxurl,
+                    type: 'POST',
+                    data: {
+                        action: 'grove_driggs_data_import',
+                        driggs_data: driggsDataForImport,
+                        nonce: '<?php echo wp_create_nonce("grove_driggs_import"); ?>'
+                    },
+                    success: function(response) {
+                        if (response.success) {
+                            $('#driggs-import-status').html('<span style="color: #46b450;">✅ ' + response.data.message + '</span>');
+                        } else {
+                            const errorMsg = response.data ? response.data.message : 'Unknown error occurred';
+                            $('#driggs-import-status').html('<span style="color: #dc3232;">❌ Error: ' + errorMsg + '</span>');
+                        }
+                    },
+                    error: function(xhr, status, error) {
+                        $('#driggs-import-status').html('<span style="color: #dc3232;">❌ AJAX Error: ' + error + '</span>');
                         console.error('AJAX Error:', xhr, status, error);
                     },
                     complete: function() {
