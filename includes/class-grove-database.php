@@ -12,7 +12,7 @@ if (file_exists(dirname(dirname(dirname(__FILE__))) . '/shenzi-shared-db-schema/
  */
 class Grove_Database {
     
-    const ZEN_DB_VERSION = '2.4';
+    const ZEN_DB_VERSION = '2.5';
     
     public function __construct() {
         // Check and create tables on initialization
@@ -134,6 +134,7 @@ class Grove_Database {
             driggs_owner_name varchar(255) DEFAULT NULL,
             driggs_short_descr text DEFAULT NULL,
             driggs_long_descr text DEFAULT NULL,
+            driggs_footer_blurb text DEFAULT NULL,
             driggs_year_opened int(11) DEFAULT NULL,
             driggs_employees_qty int(11) DEFAULT NULL,
             driggs_keywords text DEFAULT NULL,
@@ -229,6 +230,7 @@ class Grove_Database {
             driggs_owner_name varchar(255) DEFAULT NULL,
             driggs_short_descr text DEFAULT NULL,
             driggs_long_descr text DEFAULT NULL,
+            driggs_footer_blurb text DEFAULT NULL,
             driggs_year_opened int(11) DEFAULT NULL,
             driggs_employees_qty int(11) DEFAULT NULL,
             driggs_keywords text DEFAULT NULL,
@@ -286,6 +288,7 @@ class Grove_Database {
             driggs_owner_name varchar(255) DEFAULT NULL,
             driggs_short_descr text DEFAULT NULL,
             driggs_long_descr text DEFAULT NULL,
+            driggs_footer_blurb text DEFAULT NULL,
             driggs_year_opened int(11) DEFAULT NULL,
             driggs_employees_qty int(11) DEFAULT NULL,
             rel_industry_id int(11) DEFAULT NULL,
@@ -1004,15 +1007,21 @@ class Grove_Database {
                 ),
                 array(
                     'db_table_name' => 'sitespren',
+                    'db_column_name' => 'driggs_footer_blurb',
+                    'friendly_name_1_datum' => 'Footer Blurb',
+                    'friendly_name_1_custom_position_a' => 12
+                ),
+                array(
+                    'db_table_name' => 'sitespren',
                     'db_column_name' => 'driggs_hours',
                     'friendly_name_1_datum' => 'Operating Hours',
-                    'friendly_name_1_custom_position_a' => 12
+                    'friendly_name_1_custom_position_a' => 13
                 ),
                 array(
                     'db_table_name' => 'sitespren',
                     'db_column_name' => 'driggs_keywords',
                     'friendly_name_1_datum' => 'Keywords',
-                    'friendly_name_1_custom_position_a' => 13
+                    'friendly_name_1_custom_position_a' => 14
                 ),
                 array(
                     'db_table_name' => 'sitespren',

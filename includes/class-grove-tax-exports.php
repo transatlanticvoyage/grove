@@ -263,6 +263,7 @@ class Grove_Tax_Exports {
             'driggs_site_type_purpose',
             'driggs_short_descr',
             'driggs_long_descr',
+            'driggs_footer_blurb',
             
             // Contact Section
             'contact_section',

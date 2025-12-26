@@ -752,6 +752,7 @@ class Grove_Admin {
                     {key: 'driggs_owner_name', label: 'driggs_owner_name', type: 'text'},
                     {key: 'driggs_short_descr', label: 'driggs_short_descr', type: 'textarea'},
                     {key: 'driggs_long_descr', label: 'driggs_long_descr', type: 'textarea'},
+                    {key: 'driggs_footer_blurb', label: 'driggs_footer_blurb', type: 'textarea'},
                     {key: 'driggs_year_opened', label: 'driggs_year_opened', type: 'number'},
                     {key: 'driggs_employees_qty', label: 'driggs_employees_qty', type: 'number'},
                     {key: 'driggs_payment_methods', label: 'driggs_payment_methods', type: 'textarea'},
@@ -1965,7 +1966,7 @@ class Grove_Admin {
             
             // Business details (some may need DB columns added)
             'driggs_hours', 'driggs_owner_name', 'driggs_short_descr', 'driggs_long_descr', 
-            'driggs_year_opened', 'driggs_employees_qty', 'driggs_keywords', 'driggs_category',
+            'driggs_footer_blurb', 'driggs_year_opened', 'driggs_employees_qty', 'driggs_keywords', 'driggs_category',
             'driggs_payment_methods', 'driggs_social_media_links',
             
             // Project management
@@ -7349,6 +7350,7 @@ class Grove_Admin {
             array('key' => 'driggs_owner_name', 'label' => 'driggs_owner_name', 'type' => 'text'),
             array('key' => 'driggs_short_descr', 'label' => 'driggs_short_descr', 'type' => 'textarea'),
             array('key' => 'driggs_long_descr', 'label' => 'driggs_long_descr', 'type' => 'textarea'),
+            array('key' => 'driggs_footer_blurb', 'label' => 'driggs_footer_blurb', 'type' => 'textarea'),
             array('key' => 'driggs_year_opened', 'label' => 'driggs_year_opened', 'type' => 'number'),
             array('key' => 'driggs_employees_qty', 'label' => 'driggs_employees_qty', 'type' => 'number'),
             array('key' => 'driggs_keywords', 'label' => 'driggs_keywords', 'type' => 'textarea'),

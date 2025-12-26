@@ -449,6 +449,7 @@ class Grove_Plasma_Import_Mar {
                     'driggs_owner_name',
                     'driggs_short_descr',
                     'driggs_long_descr',
+                    'driggs_footer_blurb',
                     'driggs_year_opened',
                     'driggs_employees_qty',
                     'driggs_payment_methods',
