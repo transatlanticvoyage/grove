@@ -69,14 +69,36 @@ class Grove_Plasma_Import_Mar {
                         <div style="display: flex; align-items: center; gap: 15px; margin-bottom: 15px;">
                             <input type="file" id="plasma-json-file" name="plasma_json_file" accept=".json" style="padding: 8px; border: 1px solid #ccc; border-radius: 4px;">
                             <button type="button" id="import-json-btn" class="button button-primary">Import JSON File</button>
+                            <button type="button" id="import-all-btn" class="button button-primary" style="background: #28a745; border-color: #28a745;" disabled>
+                                run f47 and f51 both - import plasma_pages plus driggs data
+                            </button>
                         </div>
                     </form>
                     <div id="upload-status" style="margin-top: 10px;"></div>
+                    <div id="consolidated-import-status" style="margin-top: 10px; display: none;">
+                        <div style="padding: 10px; background: #f0f8ff; border-left: 4px solid #0073aa; border-radius: 3px;">
+                            <strong>Consolidated Import Progress:</strong>
+                            <div id="import-progress-details" style="margin-top: 8px; font-size: 13px;"></div>
+                        </div>
+                    </div>
                 </div>
 
                 <!-- Data Preview Section (Hidden initially) -->
                 <div id="data-preview-section" style="background: white; border: 1px solid #ddd; padding: 20px; border-radius: 5px; display: none;">
-                    <h3 style="margin: 0 0 15px 0;">Preview Imported Data</h3>
+                    <h3 style="margin: 0 0 15px 0;">Preview Imported Data - plasma_pages data</h3>
+                    
+                    <!-- Homepage Assignment Option -->
+                    <div style="margin-bottom: 15px; padding: 10px; background-color: #f0f8ff; border-left: 4px solid #0073aa; border-radius: 3px;">
+                        <label style="font-weight: 500; display: flex; align-items: center; cursor: pointer;">
+                            <input type="checkbox" id="set-homepage-option" checked style="margin-right: 8px;">
+                            Set the page with "page_archetype" of "homepage" as the assigned front page in WordPress native settings
+                        </label>
+                        <div style="font-size: 12px; color: #666; margin-top: 5px; margin-left: 20px;">
+                            When checked: The page with page_archetype="homepage" will be set as the WordPress front page<br>
+                            Note: Import will fail if multiple pages have page_archetype="homepage"
+                        </div>
+                    </div>
+                    
                     <div style="margin-bottom: 15px;">
                         <button id="create-pages-btn" class="button button-primary">f47 - Create Selected Pages/Posts in WP</button>
                     </div>
@@ -268,10 +290,14 @@ class Grove_Plasma_Import_Mar {
                         
                         $('#upload-status').html('<span style="color: green;">✓ JSON file imported successfully! ' + jsonData.pages.length + ' pages found.</span>');
                         $('#data-preview-section').show();
+                        
+                        // Enable the consolidated import button after successful file load
+                        $('#import-all-btn').prop('disabled', false);
 
                     } catch (error) {
                         alert('Error parsing JSON file: ' + error.message);
                         $('#upload-status').html('<span style="color: red;">✗ Error parsing JSON file.</span>');
+                        $('#import-all-btn').prop('disabled', true);
                     }
                 };
                 reader.readAsText(file);
@@ -512,10 +538,6 @@ class Grove_Plasma_Import_Mar {
                     return;
                 }
 
-                if (!confirm('Create ' + selectedIndexes.length + ' pages/posts in WordPress?')) {
-                    return;
-                }
-
                 // Prepare the data for import
                 const selectedPages = [];
                 selectedIndexes.forEach(function(index) {
@@ -523,6 +545,25 @@ class Grove_Plasma_Import_Mar {
                         selectedPages.push(importedData.pages[index]);
                     }
                 });
+
+                // Check homepage assignment option
+                const setHomepageOption = $('#set-homepage-option').is(':checked');
+                
+                if (setHomepageOption) {
+                    // Count pages with page_archetype = "homepage" among selected pages
+                    const homepagePages = selectedPages.filter(function(page) {
+                        return page.page_archetype === 'homepage';
+                    });
+                    
+                    if (homepagePages.length > 1) {
+                        alert('Error: Multiple pages have page_archetype set to "homepage". Please ensure only one page is marked as homepage, or uncheck the "Set as front page" option.');
+                        return;
+                    }
+                }
+
+                if (!confirm('Create ' + selectedIndexes.length + ' pages/posts in WordPress?')) {
+                    return;
+                }
 
                 // Disable button during processing
                 const $btn = $('#create-pages-btn');
@@ -540,6 +581,7 @@ class Grove_Plasma_Import_Mar {
                         action: 'grove_plasma_import',
                         pages: selectedPages,
                         update_empty_fields: updateEmptyFields ? 'true' : 'false',
+                        set_homepage_option: setHomepageOption ? 'true' : 'false',
                         nonce: '<?php echo wp_create_nonce("grove_plasma_import"); ?>'
                     },
                     success: function(response) {
@@ -678,6 +720,156 @@ class Grove_Plasma_Import_Mar {
                     complete: function() {
                         // Re-enable button
                         $btn.prop('disabled', false).text(originalText);
+                    }
+                });
+            });
+
+            // Handle consolidated import button (f47 + f51)
+            $('#import-all-btn').click(function() {
+                if (!importedData || !importedData.pages) {
+                    alert('Please import a JSON file first.');
+                    return;
+                }
+                
+                // Check if we have pages to import
+                if (importedData.pages.length === 0) {
+                    alert('No pages found in the imported data.');
+                    return;
+                }
+                
+                // Auto-select all pages
+                $('.page-checkbox').prop('checked', true);
+                
+                // Get all selected pages (which is all of them now)
+                const selectedPages = importedData.pages;
+                
+                // Check homepage assignment option
+                const setHomepageOption = $('#set-homepage-option').is(':checked');
+                
+                if (setHomepageOption) {
+                    // Count pages with page_archetype = "homepage"
+                    const homepagePages = selectedPages.filter(function(page) {
+                        return page.page_archetype === 'homepage';
+                    });
+                    
+                    if (homepagePages.length > 1) {
+                        alert('Error: Multiple pages have page_archetype set to "homepage". Please ensure only one page is marked as homepage, or uncheck the "Set as front page" option.');
+                        return;
+                    }
+                }
+                
+                // Prepare driggs data if it exists
+                let driggsDataForImport = null;
+                if (importedData.driggs_data && Object.keys(importedData.driggs_data).length > 0) {
+                    // Auto-select all driggs fields
+                    $('.driggs-checkbox').prop('checked', true);
+                    driggsDataForImport = importedData.driggs_data;
+                }
+                
+                const totalOperations = driggsDataForImport ? 2 : 1;
+                const confirmMessage = driggsDataForImport 
+                    ? `This will import ${selectedPages.length} pages/posts AND all driggs data fields. Continue?`
+                    : `This will import ${selectedPages.length} pages/posts. Continue?`;
+                
+                if (!confirm(confirmMessage)) {
+                    return;
+                }
+                
+                // Show progress container
+                $('#consolidated-import-status').show();
+                $('#import-progress-details').html('Starting consolidated import...');
+                
+                // Disable button during processing
+                const $btn = $('#import-all-btn');
+                const originalText = $btn.text();
+                $btn.prop('disabled', true).text('Importing...');
+                
+                // Track results
+                let pagesImported = false;
+                let driggsImported = false;
+                let completedOperations = 0;
+                
+                // Function to check if all operations are complete
+                function checkAllComplete() {
+                    completedOperations++;
+                    if (completedOperations === totalOperations) {
+                        $btn.prop('disabled', false).text(originalText);
+                        
+                        let finalStatus = '';
+                        if (pagesImported && driggsImported) {
+                            finalStatus = '✅ Successfully imported pages/posts and driggs data!';
+                        } else if (pagesImported && !driggsDataForImport) {
+                            finalStatus = '✅ Successfully imported pages/posts!';
+                        } else if (pagesImported && !driggsImported) {
+                            finalStatus = '⚠️ Pages imported successfully, but driggs data import failed.';
+                        } else {
+                            finalStatus = '❌ Import failed. Check error details above.';
+                        }
+                        
+                        $('#import-progress-details').append('<br><br><strong>' + finalStatus + '</strong>');
+                    }
+                }
+                
+                // Get settings
+                const updateEmptyFields = $('#update-empty-fields').is(':checked');
+                
+                // Step 1: Import Pages
+                $('#import-progress-details').html('Step 1: Importing pages/posts...');
+                
+                $.ajax({
+                    url: ajaxurl,
+                    type: 'POST',
+                    data: {
+                        action: 'grove_plasma_import',
+                        pages: selectedPages,
+                        update_empty_fields: updateEmptyFields ? 'true' : 'false',
+                        set_homepage_option: setHomepageOption ? 'true' : 'false',
+                        nonce: '<?php echo wp_create_nonce("grove_plasma_import"); ?>'
+                    },
+                    success: function(response) {
+                        if (response.success) {
+                            pagesImported = true;
+                            $('#import-progress-details').append('<br>✅ Pages: ' + response.data.message);
+                            
+                            // If we have driggs data, import it next
+                            if (driggsDataForImport) {
+                                $('#import-progress-details').append('<br><br>Step 2: Importing driggs data...');
+                                
+                                $.ajax({
+                                    url: ajaxurl,
+                                    type: 'POST',
+                                    data: {
+                                        action: 'grove_driggs_data_import',
+                                        driggs_data: driggsDataForImport,
+                                        nonce: '<?php echo wp_create_nonce("grove_driggs_import"); ?>'
+                                    },
+                                    success: function(driggsResponse) {
+                                        if (driggsResponse.success) {
+                                            driggsImported = true;
+                                            $('#import-progress-details').append('<br>✅ Driggs: ' + driggsResponse.data.message);
+                                        } else {
+                                            const errorMsg = driggsResponse.data ? driggsResponse.data.message : 'Unknown error';
+                                            $('#import-progress-details').append('<br>❌ Driggs: ' + errorMsg);
+                                        }
+                                        checkAllComplete();
+                                    },
+                                    error: function(xhr, status, error) {
+                                        $('#import-progress-details').append('<br>❌ Driggs AJAX Error: ' + error);
+                                        checkAllComplete();
+                                    }
+                                });
+                            } else {
+                                checkAllComplete();
+                            }
+                        } else {
+                            const errorMsg = response.data ? response.data.message : 'Unknown error';
+                            $('#import-progress-details').append('<br>❌ Pages: ' + errorMsg);
+                            checkAllComplete();
+                        }
+                    },
+                    error: function(xhr, status, error) {
+                        $('#import-progress-details').append('<br>❌ Pages AJAX Error: ' + error);
+                        checkAllComplete();
                     }
                 });
             });

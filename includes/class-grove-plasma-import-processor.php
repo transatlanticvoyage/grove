@@ -65,8 +65,13 @@ class Grove_Plasma_Import_Processor {
         $results = [
             'success' => [],
             'errors' => [],
-            'total' => count($pages_data)
+            'total' => count($pages_data),
+            'homepage_id' => null
         ];
+        
+        // Check if we should set homepage
+        $should_set_homepage = isset($_POST['set_homepage_option']) && $_POST['set_homepage_option'] === 'true';
+        $homepage_post_id = null;
         
         foreach ($pages_data as $index => $page) {
             try {
@@ -84,6 +89,12 @@ class Grove_Plasma_Import_Processor {
                             'title' => $page['page_title'] ?? 'Untitled',
                             'page_id' => $page['page_id'] ?? null
                         ];
+                        
+                        // Check if this is the homepage
+                        if ($should_set_homepage && isset($page['page_archetype']) && $page['page_archetype'] === 'homepage') {
+                            $homepage_post_id = $post_id;
+                            $results['homepage_id'] = $post_id;
+                        }
                         
                         // TODO: Future - assign page template based on staircase_page_template_desired
                         // $this->assign_page_template($post_id, $page);
@@ -111,6 +122,14 @@ class Grove_Plasma_Import_Processor {
                     'title' => $page['page_title'] ?? 'Untitled'
                 ];
             }
+        }
+        
+        // Set the homepage if we found one
+        if ($should_set_homepage && $homepage_post_id) {
+            update_option('show_on_front', 'page');
+            update_option('page_on_front', $homepage_post_id);
+            $results['homepage_set'] = true;
+            $results['homepage_message'] = 'Homepage successfully set to page ID: ' . $homepage_post_id;
         }
         
         return $results;
@@ -273,16 +292,24 @@ class Grove_Plasma_Import_Processor {
         
         // Return results
         if (count($results['errors']) === 0) {
+            $message = sprintf('Successfully imported %d pages', count($results['success']));
+            if (isset($results['homepage_set']) && $results['homepage_set']) {
+                $message .= '. ' . $results['homepage_message'];
+            }
             wp_send_json_success([
-                'message' => sprintf('Successfully imported %d pages', count($results['success'])),
+                'message' => $message,
                 'details' => $results
             ]);
         } else if (count($results['success']) > 0) {
+            $message = sprintf('Imported %d of %d pages with some errors', 
+                count($results['success']), 
+                $results['total']
+            );
+            if (isset($results['homepage_set']) && $results['homepage_set']) {
+                $message .= '. ' . $results['homepage_message'];
+            }
             wp_send_json_success([
-                'message' => sprintf('Imported %d of %d pages with some errors', 
-                    count($results['success']), 
-                    $results['total']
-                ),
+                'message' => $message,
                 'details' => $results
             ]);
         } else {
