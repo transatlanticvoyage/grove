@@ -1500,28 +1500,7 @@ class Grove_Zen_Shortcodes {
         
         $output = '<div class="grove-sitemap">';
         
-        // Section 1: Main Pages (always has at least home page)
-        $output .= '<div class="sitemap-section">';
-        $output .= '<h3>Main Pages:</h3>';
-        $output .= '<ul>';
-        
-        // Home page
-        $home_url = home_url('/');
-        $home_title = get_bloginfo('name');
-        $output .= '<li><a href="' . esc_url($home_url) . '">' . esc_html($home_title) . ' (Home)</a></li>';
-        
-        // Blog posts page
-        $posts_page_id = get_option('page_for_posts');
-        if ($posts_page_id) {
-            $posts_page_url = get_permalink($posts_page_id);
-            $posts_page_title = get_the_title($posts_page_id);
-            $output .= '<li><a href="' . esc_url($posts_page_url) . '">' . esc_html($posts_page_title) . '</a></li>';
-        }
-        
-        $output .= '</ul>';
-        $output .= '</div>';
-        
-        // Section 2: Service Pages (only show if there are service pages)
+        // Section 1: Service Pages (only show if there are service pages)
         // Get service pages from _zen_services table
         $services_table = $wpdb->prefix . 'zen_services';
         $service_pages = $wpdb->get_results("
@@ -1553,7 +1532,7 @@ class Grove_Zen_Shortcodes {
             $output .= '</div>';
         }
         
-        // Section 3: Other Pages (only show if there are other pages)
+        // Section 2: Pages (only show if there are other pages)
         // Get all published pages except service pages and posts page
         $exclude_ids = array_merge($service_page_ids, array($posts_page_id));
         
@@ -1568,11 +1547,32 @@ class Grove_Zen_Shortcodes {
         
         $pages = get_posts($args);
         
-        // Only show Other Pages section if there are other pages
+        // Only show Pages section if there are other pages
         if ($pages) {
             $output .= '<div class="sitemap-section">';
-            $output .= '<h3>Other Pages:</h3>';
+            $output .= '<h3>Pages:</h3>';
             $output .= '<ul>';
+            
+            // Check for front page and add it first if it exists in the list
+            $front_page_id = get_option('page_on_front');
+            $front_page_added = false;
+            
+            if ($front_page_id && get_post_status($front_page_id) === 'publish') {
+                // Check if front page is in our pages list
+                foreach ($pages as $key => $page) {
+                    if ($page->ID == $front_page_id) {
+                        $page_url = get_permalink($page->ID);
+                        $page_title = $page->post_title;
+                        $output .= '<li><a href="' . esc_url($page_url) . '">' . esc_html($page_title) . '</a></li>';
+                        $front_page_added = true;
+                        // Remove from array so it's not added again
+                        unset($pages[$key]);
+                        break;
+                    }
+                }
+            }
+            
+            // Add remaining pages
             foreach ($pages as $page) {
                 $page_url = get_permalink($page->ID);
                 $page_title = $page->post_title;
@@ -1582,7 +1582,7 @@ class Grove_Zen_Shortcodes {
             $output .= '</div>';
         }
         
-        // Section 4: Blog Posts (only show if there are blog posts)
+        // Section 3: Blog Posts (only show if there are blog posts)
         // Get all published blog posts
         $args = array(
             'post_type' => 'post',
@@ -1594,11 +1594,20 @@ class Grove_Zen_Shortcodes {
         
         $posts = get_posts($args);
         
-        // Only show Blog Posts section if there are blog posts
+        // Only show Blog section if there are blog posts
         if ($posts) {
             $output .= '<div class="sitemap-section">';
-            $output .= '<h3>Blog Posts:</h3>';
+            $output .= '<h3>Blog:</h3>';
             $output .= '<ul>';
+            
+            // Add blog posts page link first (if set)
+            $posts_page_id = get_option('page_for_posts');
+            if ($posts_page_id) {
+                $posts_page_url = get_permalink($posts_page_id);
+                $posts_page_title = get_the_title($posts_page_id);
+                $output .= '<li><a href="' . esc_url($posts_page_url) . '">' . esc_html($posts_page_title) . '</a></li>';
+            }
+            
             foreach ($posts as $post) {
                 $post_url = get_permalink($post->ID);
                 $post_title = $post->post_title;
