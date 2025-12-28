@@ -99,6 +99,17 @@ class Grove_Plasma_Import_Mar {
                         </div>
                     </div>
                     
+                    <!-- F582 Date Processing Option -->
+                    <div style="margin-bottom: 15px; padding: 10px; background-color: #fff8e1; border-left: 4px solid #ff9800; border-radius: 3px;">
+                        <label style="font-weight: 500; display: flex; align-items: center; cursor: pointer;">
+                            <input type="checkbox" id="run-f582-option" checked style="margin-right: 8px;">
+                            Run "run f582 - set blog post dates" on all items with "page_type" of "post"
+                        </label>
+                        <div style="font-size: 12px; color: #666; margin-top: 5px; margin-left: 20px;">
+                            This will automatically find 8 blog posts and back date them, and then future date the rest, using a random interval (down to day, hour, minute, second) of between 4 and 11 days
+                        </div>
+                    </div>
+                    
                     <div style="margin-bottom: 15px;">
                         <button id="create-pages-btn" class="button button-primary">f47 - Create Selected Pages/Posts in WP</button>
                     </div>
@@ -572,6 +583,9 @@ class Grove_Plasma_Import_Mar {
 
                 // Get the empty fields update setting
                 const updateEmptyFields = $('#update-empty-fields').is(':checked');
+                
+                // Get the F582 date processing setting
+                const runF582Option = $('#run-f582-option').is(':checked');
 
                 // Make AJAX call to import pages
                 $.ajax({
@@ -582,6 +596,7 @@ class Grove_Plasma_Import_Mar {
                         pages: selectedPages,
                         update_empty_fields: updateEmptyFields ? 'true' : 'false',
                         set_homepage_option: setHomepageOption ? 'true' : 'false',
+                        run_f582_option: runF582Option ? 'true' : 'false',
                         nonce: '<?php echo wp_create_nonce("grove_plasma_import"); ?>'
                     },
                     success: function(response) {
@@ -812,6 +827,7 @@ class Grove_Plasma_Import_Mar {
                 
                 // Get settings
                 const updateEmptyFields = $('#update-empty-fields').is(':checked');
+                const runF582Option = $('#run-f582-option').is(':checked');
                 
                 // Step 1: Import Pages
                 $('#import-progress-details').html('Step 1: Importing pages/posts...');
@@ -824,6 +840,7 @@ class Grove_Plasma_Import_Mar {
                         pages: selectedPages,
                         update_empty_fields: updateEmptyFields ? 'true' : 'false',
                         set_homepage_option: setHomepageOption ? 'true' : 'false',
+                        run_f582_option: runF582Option ? 'true' : 'false',
                         nonce: '<?php echo wp_create_nonce("grove_plasma_import"); ?>'
                     },
                     success: function(response) {

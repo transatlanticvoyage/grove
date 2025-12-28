@@ -290,11 +290,27 @@ class Grove_Plasma_Import_Processor {
         // Process the import
         $results = $this->import_pages($pages_data);
         
+        // Check if F582 date processing is requested
+        $run_f582_option = isset($_POST['run_f582_option']) && $_POST['run_f582_option'] === 'true';
+        
+        if ($run_f582_option && count($results['success']) > 0) {
+            // Run F582 date processing on posts that were imported
+            $f582_result = $this->run_f582_date_processing($results);
+            if ($f582_result['success']) {
+                $results['f582_message'] = $f582_result['message'];
+            } else {
+                $results['f582_error'] = $f582_result['message'];
+            }
+        }
+        
         // Return results
         if (count($results['errors']) === 0) {
             $message = sprintf('Successfully imported %d pages', count($results['success']));
             if (isset($results['homepage_set']) && $results['homepage_set']) {
                 $message .= '. ' . $results['homepage_message'];
+            }
+            if (isset($results['f582_message'])) {
+                $message .= '. ' . $results['f582_message'];
             }
             wp_send_json_success([
                 'message' => $message,
@@ -307,6 +323,9 @@ class Grove_Plasma_Import_Processor {
             );
             if (isset($results['homepage_set']) && $results['homepage_set']) {
                 $message .= '. ' . $results['homepage_message'];
+            }
+            if (isset($results['f582_message'])) {
+                $message .= '. ' . $results['f582_message'];
             }
             wp_send_json_success([
                 'message' => $message,
@@ -465,6 +484,136 @@ class Grove_Plasma_Import_Processor {
             return [
                 'success' => false,
                 'error' => 'Exception occurred: ' . $e->getMessage()
+            ];
+        }
+    }
+    
+    /**
+     * Run F582 date processing on imported posts
+     * This is a centralized version that can be called from different import functions
+     */
+    private function run_f582_date_processing($import_results) {
+        try {
+            // Get only the posts (page_type = 'post') from the successfully imported items
+            $post_ids = [];
+            foreach ($import_results['success'] as $item) {
+                if (isset($item['page_type']) && $item['page_type'] === 'post' && isset($item['post_id'])) {
+                    $post_ids[] = $item['post_id'];
+                }
+            }
+            
+            if (empty($post_ids)) {
+                return [
+                    'success' => true,
+                    'message' => 'No blog posts found for F582 processing'
+                ];
+            }
+            
+            global $wpdb;
+            
+            // F582 settings - using the same defaults as the Date Worshipper
+            $backdate_count = min(8, count($post_ids)); // Default to 8 or total posts if less
+            $future_count = count($post_ids) - $backdate_count;
+            $interval_from = 4; // Default interval from 4 days
+            $interval_to = 11;  // Default interval to 11 days
+            
+            // Shuffle the post IDs for random distribution
+            shuffle($post_ids);
+            
+            // Split posts into backdate and future groups
+            $backdate_posts = array_slice($post_ids, 0, $backdate_count);
+            $future_posts = array_slice($post_ids, $backdate_count, $future_count);
+            
+            $current_time = current_time('timestamp');
+            $updated_count = 0;
+            
+            // Process backdate posts (going backward in time)
+            $backdate_time = $current_time;
+            foreach ($backdate_posts as $post_id) {
+                // Generate random interval in seconds
+                $min_seconds = $interval_from * 24 * 60 * 60;
+                $max_seconds = $interval_to * 24 * 60 * 60;
+                $random_seconds = rand($min_seconds, $max_seconds);
+                
+                // Add random hours, minutes, seconds for more natural distribution
+                $random_seconds += rand(0, 24 * 60 * 60);
+                
+                // Go back in time
+                $backdate_time -= $random_seconds;
+                
+                $new_date = date('Y-m-d H:i:s', $backdate_time);
+                
+                // Update post date
+                $result = $wpdb->update(
+                    $wpdb->posts,
+                    array(
+                        'post_date' => $new_date,
+                        'post_date_gmt' => get_gmt_from_date($new_date),
+                        'post_status' => 'publish',
+                        'post_modified' => current_time('mysql'),
+                        'post_modified_gmt' => current_time('mysql', 1)
+                    ),
+                    array('ID' => $post_id),
+                    array('%s', '%s', '%s', '%s', '%s'),
+                    array('%d')
+                );
+                
+                if ($result !== false) {
+                    $updated_count++;
+                    clean_post_cache($post_id);
+                }
+            }
+            
+            // Process future posts (going forward in time)
+            $future_time = $current_time;
+            foreach ($future_posts as $post_id) {
+                // Generate random interval in seconds
+                $min_seconds = $interval_from * 24 * 60 * 60;
+                $max_seconds = $interval_to * 24 * 60 * 60;
+                $random_seconds = rand($min_seconds, $max_seconds);
+                
+                // Add random hours, minutes, seconds
+                $random_seconds += rand(0, 24 * 60 * 60);
+                
+                // Go forward in time
+                $future_time += $random_seconds;
+                
+                $new_date = date('Y-m-d H:i:s', $future_time);
+                
+                // Update post date and set as scheduled
+                $result = $wpdb->update(
+                    $wpdb->posts,
+                    array(
+                        'post_date' => $new_date,
+                        'post_date_gmt' => get_gmt_from_date($new_date),
+                        'post_status' => 'future',
+                        'post_modified' => current_time('mysql'),
+                        'post_modified_gmt' => current_time('mysql', 1)
+                    ),
+                    array('ID' => $post_id),
+                    array('%s', '%s', '%s', '%s', '%s'),
+                    array('%d')
+                );
+                
+                if ($result !== false) {
+                    $updated_count++;
+                    clean_post_cache($post_id);
+                    
+                    // Schedule the post to be published
+                    wp_schedule_single_event($future_time, 'publish_future_post', array($post_id));
+                }
+            }
+            
+            return [
+                'success' => true,
+                'message' => sprintf('F582 processed %d posts (%d backdated, %d scheduled)', 
+                    $updated_count, count($backdate_posts), count($future_posts))
+            ];
+            
+        } catch (Exception $e) {
+            return [
+                'success' => false,
+                'message' => 'F582 processing failed: ' . $e->getMessage()
             ];
         }
     }
