@@ -96,6 +96,12 @@ class GrovePlugin {
         add_action('wp_ajax_nopriv_grove_plasma_import', array($processor, 'handle_ajax_import'));
         add_action('wp_ajax_grove_driggs_data_import', array($processor, 'handle_ajax_driggs_import'));
         add_action('wp_ajax_nopriv_grove_driggs_data_import', array($processor, 'handle_ajax_driggs_import'));
+        
+        // File-based import handlers (new)
+        add_action('wp_ajax_grove_upload_json_file', array($processor, 'handle_file_upload'));
+        add_action('wp_ajax_nopriv_grove_upload_json_file', array($processor, 'handle_file_upload'));
+        add_action('wp_ajax_grove_process_file_batch', array($processor, 'handle_file_batch_import'));
+        add_action('wp_ajax_nopriv_grove_process_file_batch', array($processor, 'handle_file_batch_import'));
     }
     
     public function activate() {

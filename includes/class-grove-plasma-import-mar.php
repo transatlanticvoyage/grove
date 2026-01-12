@@ -64,6 +64,22 @@ class Grove_Plasma_Import_Mar {
                 <!-- JSON Upload Section -->
                 <div style="background: white; border: 1px solid #ddd; padding: 20px; border-radius: 5px; margin-bottom: 20px;">
                     <h3 style="margin-top: 0;">Import JSON File</h3>
+                    
+                    <!-- Import Method Selection -->
+                    <div style="margin-bottom: 20px; padding: 15px; background: #f8f9fa; border-left: 4px solid #007cba; border-radius: 3px;">
+                        <h4 style="margin: 0 0 10px 0;">Import Method Selection</h4>
+                        <label style="display: flex; align-items: center; margin-bottom: 8px; cursor: pointer;">
+                            <input type="radio" name="import_method" value="direct" id="import-method-direct" checked style="margin-right: 8px;">
+                            <strong>Direct Import (Default)</strong> - Load JSON in browser memory, send via AJAX
+                            <span style="color: #666; font-size: 12px; margin-left: 10px;">(Works for most files, may fail on large datasets due to PHP limits)</span>
+                        </label>
+                        <label style="display: flex; align-items: center; cursor: pointer;">
+                            <input type="radio" name="import_method" value="file_based" id="import-method-file" style="margin-right: 8px;">
+                            <strong>File-Based Import (Large Files)</strong> - Upload file to server, process in batches
+                            <span style="color: #666; font-size: 12px; margin-left: 10px;">(Recommended for files >500KB or >50 pages, bypasses PHP limits)</span>
+                        </label>
+                    </div>
+                    
                     <form id="plasma-upload-form" method="post" enctype="multipart/form-data" style="margin-bottom: 15px;">
                         <?php wp_nonce_field('plasma_import_nonce', 'plasma_import_nonce'); ?>
                         <div style="display: flex; align-items: center; gap: 15px; margin-bottom: 15px;">
@@ -111,7 +127,32 @@ class Grove_Plasma_Import_Mar {
                     </div>
                     
                     <div style="margin-bottom: 15px;">
-                        <button id="create-pages-btn" class="button button-primary">f47 - Create Selected Pages/Posts in WP</button>
+                        <div style="display: flex; align-items: center; gap: 10px; flex-wrap: wrap;">
+                            <button id="create-pages-btn" class="button button-primary">f47 - Create Selected Pages/Posts in WP</button>
+                            
+                            <!-- Range Selection Buttons -->
+                            <div style="display: flex; align-items: center; gap: 5px; margin-left: 20px; flex-wrap: wrap;">
+                                <span style="font-weight: 500; color: #666; font-size: 12px; margin-right: 5px;">Quick Select (20s):</span>
+                                <button type="button" class="button button-secondary range-select-btn" data-start="1" data-end="20" style="font-size: 11px; padding: 3px 8px;">1-20</button>
+                                <button type="button" class="button button-secondary range-select-btn" data-start="21" data-end="40" style="font-size: 11px; padding: 3px 8px;">21-40</button>
+                                <button type="button" class="button button-secondary range-select-btn" data-start="41" data-end="60" style="font-size: 11px; padding: 3px 8px;">41-60</button>
+                                <button type="button" class="button button-secondary range-select-btn" data-start="61" data-end="80" style="font-size: 11px; padding: 3px 8px;">61-80</button>
+                                <button type="button" class="button" id="clear-all-btn" style="font-size: 11px; padding: 3px 8px; color: #d63384;">Clear All</button>
+                            </div>
+                            
+                            <!-- Range Selection Buttons - Increments of 10 -->
+                            <div style="display: flex; align-items: center; gap: 5px; margin-left: 20px; margin-top: 5px; flex-wrap: wrap;">
+                                <span style="font-weight: 500; color: #666; font-size: 12px; margin-right: 5px;">Quick Select (10s):</span>
+                                <button type="button" class="button button-secondary range-select-btn-10" data-start="1" data-end="10" style="font-size: 11px; padding: 3px 8px;">1-10</button>
+                                <button type="button" class="button button-secondary range-select-btn-10" data-start="11" data-end="20" style="font-size: 11px; padding: 3px 8px;">11-20</button>
+                                <button type="button" class="button button-secondary range-select-btn-10" data-start="21" data-end="30" style="font-size: 11px; padding: 3px 8px;">21-30</button>
+                                <button type="button" class="button button-secondary range-select-btn-10" data-start="31" data-end="40" style="font-size: 11px; padding: 3px 8px;">31-40</button>
+                                <button type="button" class="button button-secondary range-select-btn-10" data-start="41" data-end="50" style="font-size: 11px; padding: 3px 8px;">41-50</button>
+                                <button type="button" class="button button-secondary range-select-btn-10" data-start="51" data-end="60" style="font-size: 11px; padding: 3px 8px;">51-60</button>
+                                <button type="button" class="button button-secondary range-select-btn-10" data-start="61" data-end="70" style="font-size: 11px; padding: 3px 8px;">61-70</button>
+                                <button type="button" class="button button-secondary range-select-btn-10" data-start="71" data-end="80" style="font-size: 11px; padding: 3px 8px;">71-80</button>
+                            </div>
+                        </div>
                     </div>
                     
                     <div id="data-table-container">
@@ -125,9 +166,27 @@ class Grove_Plasma_Import_Mar {
                     
                     <!-- Driggs Data Import Button -->
                     <div style="margin-bottom: 15px;">
-                        <button id="import-driggs-data" type="button" class="button button-primary" style="background: #d54e21; border-color: #d54e21; padding: 8px 16px; font-size: 14px; font-weight: 500;">
-                            f51 - import driggs data
-                        </button>
+                        <div style="display: flex; align-items: center; gap: 15px; flex-wrap: wrap;">
+                            <button id="import-driggs-data" type="button" class="button button-primary" style="background: #d54e21; border-color: #d54e21; padding: 8px 16px; font-size: 14px; font-weight: 500;">
+                                f51 - import driggs data
+                            </button>
+                            
+                            <!-- Auto Import Option -->
+                            <div style="display: flex; align-items: center; gap: 10px; padding: 8px 12px; background: #e8f5e8; border: 1px solid #4caf50; border-radius: 4px;">
+                                <label style="display: flex; align-items: center; cursor: pointer; margin: 0; font-size: 13px; font-weight: 500;">
+                                    <input type="radio" name="driggs_import_mode" value="auto" id="driggs-import-auto" checked style="margin-right: 6px;">
+                                    Use all db columns in import file for driggs import
+                                </label>
+                            </div>
+                            
+                            <!-- Manual Selection Option -->
+                            <div style="display: flex; align-items: center; gap: 10px; padding: 8px 12px; background: #fff8e1; border: 1px solid #ff9800; border-radius: 4px;">
+                                <label style="display: flex; align-items: center; cursor: pointer; margin: 0; font-size: 13px; font-weight: 500;">
+                                    <input type="radio" name="driggs_import_mode" value="manual" id="driggs-import-manual" style="margin-right: 6px;">
+                                    Use only selected fields from table below
+                                </label>
+                            </div>
+                        </div>
                         <div id="driggs-import-status" style="margin-top: 8px; font-size: 13px;"></div>
                     </div>
                     
@@ -280,6 +339,18 @@ class Grove_Plasma_Import_Mar {
                     return;
                 }
 
+                // Check selected import method
+                const importMethod = $('input[name="import_method"]:checked').val();
+                
+                if (importMethod === 'file_based') {
+                    handleFileBasedImport(file);
+                } else {
+                    handleDirectImport(file);
+                }
+            });
+            
+            // Direct import method (existing)
+            function handleDirectImport(file) {
                 const reader = new FileReader();
                 reader.onload = function(e) {
                     try {
@@ -299,7 +370,7 @@ class Grove_Plasma_Import_Mar {
                             $('#driggs-preview-section').show();
                         }
                         
-                        $('#upload-status').html('<span style="color: green;">✓ JSON file imported successfully! ' + jsonData.pages.length + ' pages found.</span>');
+                        $('#upload-status').html('<span style="color: green;">✓ JSON file loaded successfully! ' + jsonData.pages.length + ' pages found. (Direct method)</span>');
                         $('#data-preview-section').show();
                         
                         // Enable the consolidated import button after successful file load
@@ -312,7 +383,141 @@ class Grove_Plasma_Import_Mar {
                     }
                 };
                 reader.readAsText(file);
-            });
+            }
+            
+            // File-based import method (new)
+            function handleFileBasedImport(file) {
+                $('#upload-status').html('<span style="color: blue;">📤 Uploading file to server for processing...</span>');
+                
+                const formData = new FormData();
+                formData.append('action', 'grove_upload_json_file');
+                formData.append('json_file', file);
+                formData.append('nonce', '<?php echo wp_create_nonce("grove_file_upload"); ?>');
+                
+                $.ajax({
+                    url: ajaxurl,
+                    type: 'POST',
+                    data: formData,
+                    processData: false,
+                    contentType: false,
+                    success: function(response) {
+                        if (response.success) {
+                            // File uploaded successfully, parse the data for preview
+                            importedData = response.data.json_data;
+                            importedData.file_id = response.data.file_id; // Store file ID for batch processing
+                            
+                            displayDataTable(importedData.pages);
+                            
+                            // Handle driggs data if present
+                            if (importedData.driggs_data) {
+                                displayDriggsDataTable(importedData.driggs_data);
+                                $('#driggs-preview-section').show();
+                            }
+                            
+                            $('#upload-status').html('<span style="color: green;">✓ File uploaded successfully! ' + importedData.pages.length + ' pages found. (File-based method - will process in batches)</span>');
+                            $('#data-preview-section').show();
+                            $('#import-all-btn').prop('disabled', false);
+                        } else {
+                            alert('Upload failed: ' + response.data);
+                            $('#upload-status').html('<span style="color: red;">✗ File upload failed.</span>');
+                        }
+                    },
+                    error: function(xhr, status, error) {
+                        alert('Upload error: ' + error);
+                        $('#upload-status').html('<span style="color: red;">✗ Upload error occurred.</span>');
+                    }
+                });
+            }
+
+            // Update range selection buttons based on page count
+            function updateRangeSelectionButtons(totalPages) {
+                const rangeContainer = $('.range-select-btn').parent();
+                if (rangeContainer.length === 0) return; // Exit if container not found
+                
+                // Clear existing range buttons
+                $('.range-select-btn').remove();
+                
+                // Generate new range buttons based on total pages
+                let rangeButtonsHTML = '';
+                const rangeSize = 20;
+                
+                for (let start = 1; start <= totalPages; start += rangeSize) {
+                    const end = Math.min(start + rangeSize - 1, totalPages);
+                    rangeButtonsHTML += `<button type="button" class="button button-secondary range-select-btn" data-start="${start}" data-end="${end}" style="font-size: 11px; padding: 3px 8px;">${start}-${end}</button>`;
+                }
+                
+                // Insert the new buttons before the "Clear All" button
+                $('#clear-all-btn').before(rangeButtonsHTML);
+                
+                // Re-attach event handlers for new buttons
+                $('.range-select-btn').click(handleRangeButtonClick);
+                
+                // Also generate and handle 10-increment buttons
+                updateRange10Buttons(totalPages);
+            }
+            
+            // Update 10-increment range selection buttons
+            function updateRange10Buttons(totalPages) {
+                // Find the 10s container by looking for the span that says "Quick Select (10s):"
+                const container10 = $('span:contains("Quick Select (10s):")').parent();
+                
+                if (container10.length > 0) {
+                    // Clear existing 10-increment buttons in this container
+                    container10.find('.range-select-btn-10').remove();
+                    
+                    // Generate new 10-increment range buttons
+                    let range10ButtonsHTML = '';
+                    const range10Size = 10;
+                    
+                    for (let start = 1; start <= Math.min(totalPages, 80); start += range10Size) {
+                        const end = Math.min(start + range10Size - 1, totalPages, 80);
+                        range10ButtonsHTML += `<button type="button" class="button button-secondary range-select-btn-10" data-start="${start}" data-end="${end}" style="font-size: 11px; padding: 3px 8px;">${start}-${end}</button>`;
+                    }
+                    
+                    // Append the new buttons to the container
+                    container10.append(range10ButtonsHTML);
+                    
+                    // Attach event handlers for 10-increment buttons
+                    $('.range-select-btn-10').click(handleRangeButtonClick);
+                    
+                    console.log(`Generated ${Math.ceil(Math.min(totalPages, 80) / 10)} dynamic 10-increment buttons for ${totalPages} total pages`);
+                } else {
+                    console.log('Could not find 10s container - buttons may not be generated');
+                }
+            }
+            
+            // Unified range button click handler
+            function handleRangeButtonClick() {
+                const startRange = parseInt($(this).data('start'));
+                const endRange = parseInt($(this).data('end'));
+                
+                // First uncheck all
+                $('.page-checkbox').prop('checked', false);
+                $('#select-all-pages').prop('checked', false);
+                
+                // Then check the range (convert from 1-based to 0-based indexing)
+                $('.page-checkbox').each(function(index) {
+                    const pageNumber = index + 1; // Convert to 1-based
+                    if (pageNumber >= startRange && pageNumber <= endRange) {
+                        $(this).prop('checked', true);
+                    }
+                });
+                
+                // Provide visual feedback
+                const selectedCount = $('.page-checkbox:checked').length;
+                $(this).css('background-color', '#0073aa');
+                $(this).css('color', '#fff');
+                
+                // Reset other range buttons (both types)
+                $('.range-select-btn, .range-select-btn-10').not(this).css('background-color', '').css('color', '');
+                
+                // Show temporary feedback
+                const originalText = $(this).text();
+                $(this).text(`✓ ${selectedCount}`);
+                setTimeout(() => {
+                    $(this).text(originalText);
+                }, 1500);
+            }
 
             // Display data in table
             function displayDataTable(pages) {
@@ -420,9 +625,28 @@ class Grove_Plasma_Import_Mar {
                     });
                 }
 
+                // Update range selection buttons dynamically based on page count
+                updateRangeSelectionButtons(pages.length);
+
                 // Handle select all checkbox
                 $('#select-all-pages').change(function() {
                     $('.page-checkbox').prop('checked', this.checked);
+                });
+                
+                // Handle clear all button
+                $('#clear-all-btn').click(function() {
+                    $('.page-checkbox').prop('checked', false);
+                    $('#select-all-pages').prop('checked', false);
+                    $('.range-select-btn, .range-select-btn-10').css('background-color', '').css('color', '');
+                    
+                    // Visual feedback
+                    const originalText = $(this).text();
+                    $(this).text('✓ Cleared');
+                    $(this).css('color', '#28a745');
+                    setTimeout(() => {
+                        $(this).text(originalText);
+                        $(this).css('color', '#d63384');
+                    }, 1000);
                 });
                 
                 // Handle editable input changes to update data for all editable columns
@@ -455,47 +679,22 @@ class Grove_Plasma_Import_Mar {
                     return;
                 }
 
-                // Define the sitespren fields in order
-                const sitesprenFields = [
-                    'sitespren_base',
-                    'driggs_brand_name',
-                    'driggs_revenue_goal',
-                    'driggs_phone_country_code',
-                    'driggs_phone1_platform_id',
-                    'driggs_phone_1',
-                    'driggs_address_species_id',
-                    'driggs_address_species_note',
-                    'driggs_address_full',
-                    'driggs_street_1',
-                    'driggs_street_2',
-                    'driggs_city',
-                    'driggs_state_code',
-                    'driggs_zip',
-                    'driggs_state_full',
-                    'driggs_country',
-                    'driggs_gmaps_widget_location_1',
-                    'driggs_cgig_id',
-                    'driggs_citations_done',
-                    'driggs_social_profiles_done',
-                    'driggs_industry',
-                    'driggs_keywords',
-                    'driggs_category',
-                    'driggs_site_type_purpose',
-                    'driggs_email_1',
-                    'driggs_hours',
-                    'driggs_owner_name',
-                    'driggs_short_descr',
-                    'driggs_long_descr',
-                    'driggs_footer_blurb',
-                    'driggs_year_opened',
-                    'driggs_employees_qty',
-                    'driggs_payment_methods',
-                    'driggs_special_note_for_ai_tool',
-                    'driggs_social_media_links'
-                ];
+                // Dynamic field detection - get all fields from the JSON driggs_data
+                const sitesprenFields = Object.keys(driggsData).filter(field => {
+                    // Basic validation: field names should be alphanumeric with underscores
+                    return /^[a-zA-Z0-9_]+$/.test(field);
+                }).sort(); // Sort alphabetically for consistent display
+                
+                console.log(`Dynamic Driggs Import: Found ${sitesprenFields.length} fields in JSON data:`, sitesprenFields);
+
+                // Build summary info
+                let summaryHTML = '<div style="margin-bottom: 15px; padding: 10px; background-color: #e1f5fe; border-left: 4px solid #0277bd; border-radius: 3px;">';
+                summaryHTML += '<strong>🔄 Dynamic Field Detection:</strong> ';
+                summaryHTML += `Found <strong>${sitesprenFields.length} fields</strong> in JSON driggs_data that will be matched against wp_zen_sitespren database columns by exact name.`;
+                summaryHTML += '</div>';
 
                 // Build table
-                let tableHTML = '<table class="widefat striped" style="margin-top: 15px;">';
+                let tableHTML = summaryHTML + '<table class="widefat striped" style="margin-top: 15px;">';
                 
                 // Header
                 tableHTML += '<thead><tr>';
@@ -549,6 +748,29 @@ class Grove_Plasma_Import_Mar {
                     return;
                 }
 
+                // Check homepage assignment option
+                const setHomepageOption = $('#set-homepage-option').is(':checked');
+                
+                // Get the empty fields update setting
+                const updateEmptyFields = $('#update-empty-fields').is(':checked');
+                
+                // Get the F582 date processing setting
+                const runF582Option = $('#run-f582-option').is(':checked');
+                
+                // Check if we're using file-based import
+                const isFileBased = importedData && importedData.file_id;
+                
+                if (isFileBased) {
+                    // File-based import: process in batches
+                    handleFileBasedPageImport(selectedIndexes, setHomepageOption, updateEmptyFields, runF582Option);
+                } else {
+                    // Direct import: use existing method
+                    handleDirectPageImport(selectedIndexes, setHomepageOption, updateEmptyFields, runF582Option);
+                }
+            });
+            
+            // Direct page import (existing method)
+            function handleDirectPageImport(selectedIndexes, setHomepageOption, updateEmptyFields, runF582Option) {
                 // Prepare the data for import
                 const selectedPages = [];
                 selectedIndexes.forEach(function(index) {
@@ -556,9 +778,6 @@ class Grove_Plasma_Import_Mar {
                         selectedPages.push(importedData.pages[index]);
                     }
                 });
-
-                // Check homepage assignment option
-                const setHomepageOption = $('#set-homepage-option').is(':checked');
                 
                 if (setHomepageOption) {
                     // Count pages with page_archetype = "homepage" among selected pages
@@ -572,7 +791,7 @@ class Grove_Plasma_Import_Mar {
                     }
                 }
 
-                if (!confirm('Create ' + selectedIndexes.length + ' pages/posts in WordPress?')) {
+                if (!confirm('Create ' + selectedIndexes.length + ' pages/posts in WordPress? (Direct method)')) {
                     return;
                 }
 
@@ -580,12 +799,6 @@ class Grove_Plasma_Import_Mar {
                 const $btn = $('#create-pages-btn');
                 const originalText = $btn.text();
                 $btn.prop('disabled', true).text('Creating pages...');
-
-                // Get the empty fields update setting
-                const updateEmptyFields = $('#update-empty-fields').is(':checked');
-                
-                // Get the F582 date processing setting
-                const runF582Option = $('#run-f582-option').is(':checked');
 
                 // Make AJAX call to import pages
                 $.ajax({
@@ -674,7 +887,90 @@ class Grove_Plasma_Import_Mar {
                         $btn.prop('disabled', false).text(originalText);
                     }
                 });
-            });
+            }
+            
+            // File-based page import (new method)
+            function handleFileBasedPageImport(selectedIndexes, setHomepageOption, updateEmptyFields, runF582Option) {
+                if (!confirm('Create ' + selectedIndexes.length + ' pages/posts in WordPress? (File-based method - will process in batches)')) {
+                    return;
+                }
+
+                // Disable button during processing
+                const $btn = $('#create-pages-btn');
+                const originalText = $btn.text();
+                $btn.prop('disabled', true).text('Processing in batches...');
+                
+                // Show progress
+                $('#consolidated-import-status').show();
+                $('#import-progress-details').html('Starting file-based batch import...');
+                
+                const batchSize = 15; // Process 15 pages per batch
+                let currentBatch = 0;
+                let totalProcessed = 0;
+                let totalErrors = 0;
+                
+                function processBatch() {
+                    const batchStart = currentBatch * batchSize;
+                    const batchEnd = Math.min(batchStart + batchSize, selectedIndexes.length);
+                    
+                    if (batchStart >= selectedIndexes.length) {
+                        // All batches complete
+                        $btn.prop('disabled', false).text(originalText);
+                        const finalMsg = `✅ File-based import completed! ${totalProcessed} pages processed with ${totalErrors} errors.`;
+                        $('#import-progress-details').append('<br><br><strong>' + finalMsg + '</strong>');
+                        alert(finalMsg);
+                        return;
+                    }
+                    
+                    $('#import-progress-details').append('<br>Processing batch ' + (currentBatch + 1) + ' (pages ' + (batchStart + 1) + '-' + batchEnd + ')...');
+                    
+                    $.ajax({
+                        url: ajaxurl,
+                        type: 'POST',
+                        data: {
+                            action: 'grove_process_file_batch',
+                            file_id: importedData.file_id,
+                            batch_start: batchStart,
+                            batch_size: batchSize,
+                            selected_indexes: selectedIndexes.slice(batchStart, batchEnd),
+                            update_empty_fields: updateEmptyFields ? 'true' : 'false',
+                            set_homepage_option: setHomepageOption ? 'true' : 'false',
+                            run_f582_option: runF582Option ? 'true' : 'false',
+                            nonce: '<?php echo wp_create_nonce("grove_plasma_import"); ?>'
+                        },
+                        success: function(response) {
+                            if (response.success) {
+                                totalProcessed += response.data.pages_processed;
+                                totalErrors += response.data.error_count || 0;
+                                
+                                $('#import-progress-details').append('<br>✅ Batch ' + (currentBatch + 1) + ': ' + response.data.message);
+                                
+                                // Process next batch
+                                currentBatch++;
+                                setTimeout(processBatch, 500); // Small delay between batches
+                            } else {
+                                $('#import-progress-details').append('<br>❌ Batch ' + (currentBatch + 1) + ' failed: ' + response.data);
+                                totalErrors += batchSize; // Assume all failed
+                                
+                                // Continue with next batch anyway
+                                currentBatch++;
+                                setTimeout(processBatch, 500);
+                            }
+                        },
+                        error: function(xhr, status, error) {
+                            $('#import-progress-details').append('<br>❌ Batch ' + (currentBatch + 1) + ' AJAX error: ' + error);
+                            totalErrors += batchSize;
+                            
+                            // Continue with next batch
+                            currentBatch++;
+                            setTimeout(processBatch, 500);
+                        }
+                    });
+                }
+                
+                // Start processing
+                processBatch();
+            }
 
             // Handle driggs data import button
             $('#import-driggs-data').click(function() {
@@ -683,25 +979,48 @@ class Grove_Plasma_Import_Mar {
                     return;
                 }
 
-                const selectedFields = [];
-                $('.driggs-checkbox:checked').each(function() {
-                    selectedFields.push($(this).data('field'));
-                });
+                // Check import mode (auto or manual)
+                const importMode = $('input[name="driggs_import_mode"]:checked').val();
+                let selectedFields = [];
+                let driggsDataForImport = {};
+                
+                if (importMode === 'auto') {
+                    // Auto mode: use ALL fields from JSON driggs_data
+                    selectedFields = Object.keys(importedData.driggs_data).filter(field => {
+                        // Same validation as the dynamic table display
+                        return /^[a-zA-Z0-9_]+$/.test(field);
+                    });
+                    
+                    // Use all validated fields
+                    selectedFields.forEach(function(field) {
+                        driggsDataForImport[field] = importedData.driggs_data[field];
+                    });
+                    
+                    console.log('Auto mode: importing all', selectedFields.length, 'fields from JSON:', selectedFields);
+                    
+                } else {
+                    // Manual mode: use only selected fields from table
+                    $('.driggs-checkbox:checked').each(function() {
+                        selectedFields.push($(this).data('field'));
+                    });
 
-                if (selectedFields.length === 0) {
-                    alert('Please select at least one driggs data field to import.');
-                    return;
+                    if (selectedFields.length === 0) {
+                        alert('Please select at least one driggs data field to import, or switch to "Auto" mode.');
+                        return;
+                    }
+                    
+                    // Prepare driggs data for import
+                    selectedFields.forEach(function(field) {
+                        driggsDataForImport[field] = importedData.driggs_data[field];
+                    });
+                    
+                    console.log('Manual mode: importing', selectedFields.length, 'selected fields:', selectedFields);
                 }
 
-                if (!confirm('Import ' + selectedFields.length + ' driggs data fields to wp_zen_sitespren table?')) {
+                const modeText = importMode === 'auto' ? 'ALL available' : 'selected';
+                if (!confirm(`Import ${selectedFields.length} ${modeText} driggs data fields to wp_zen_sitespren table?`)) {
                     return;
                 }
-
-                // Prepare driggs data for import
-                const driggsDataForImport = {};
-                selectedFields.forEach(function(field) {
-                    driggsDataForImport[field] = importedData.driggs_data[field];
-                });
 
                 // Disable button during processing
                 const $btn = $('#import-driggs-data');
@@ -776,9 +1095,38 @@ class Grove_Plasma_Import_Mar {
                 // Prepare driggs data if it exists
                 let driggsDataForImport = null;
                 if (importedData.driggs_data && Object.keys(importedData.driggs_data).length > 0) {
-                    // Auto-select all driggs fields
-                    $('.driggs-checkbox').prop('checked', true);
-                    driggsDataForImport = importedData.driggs_data;
+                    // Check import mode for driggs data
+                    const importMode = $('input[name="driggs_import_mode"]:checked').val();
+                    
+                    if (importMode === 'auto') {
+                        // Auto mode: use ALL fields from JSON driggs_data  
+                        const validFields = Object.keys(importedData.driggs_data).filter(field => {
+                            return /^[a-zA-Z0-9_]+$/.test(field);
+                        });
+                        
+                        driggsDataForImport = {};
+                        validFields.forEach(function(field) {
+                            driggsDataForImport[field] = importedData.driggs_data[field];
+                        });
+                        
+                        console.log('Consolidated import - Auto mode: using all', validFields.length, 'driggs fields');
+                    } else {
+                        // Manual mode: use only selected fields
+                        const selectedFields = [];
+                        $('.driggs-checkbox:checked').each(function() {
+                            selectedFields.push($(this).data('field'));
+                        });
+                        
+                        if (selectedFields.length > 0) {
+                            driggsDataForImport = {};
+                            selectedFields.forEach(function(field) {
+                                driggsDataForImport[field] = importedData.driggs_data[field];
+                            });
+                            console.log('Consolidated import - Manual mode: using', selectedFields.length, 'selected driggs fields');
+                        } else {
+                            console.log('Consolidated import - Manual mode: no driggs fields selected');
+                        }
+                    }
                 }
                 
                 const totalOperations = driggsDataForImport ? 2 : 1;

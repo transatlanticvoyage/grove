@@ -385,8 +385,15 @@ class Grove_Plasma_Import_Processor {
         
         // Return results
         if ($results['success']) {
+            // Build detailed success message
+            $message = sprintf('Successfully imported %d valid fields to wp_zen_sitespren', $results['valid_fields_imported']);
+            
+            if ($results['invalid_fields_skipped'] > 0) {
+                $message .= sprintf(' (%d fields skipped - not found in database)', $results['invalid_fields_skipped']);
+            }
+            
             wp_send_json_success([
-                'message' => sprintf('Successfully imported %d driggs data fields to wp_zen_sitespren', count($driggs_data)),
+                'message' => $message,
                 'details' => $results
             ]);
         } else {
@@ -416,13 +423,28 @@ class Grove_Plasma_Import_Processor {
             ));
             
             if ($existing_record) {
+                // Get actual table columns to validate field existence
+                $table_columns = $wpdb->get_col("DESCRIBE $sitespren_table");
+                
                 // Update existing record
                 $update_data = [];
+                $invalid_fields = [];
+                
                 foreach ($driggs_data as $field => $value) {
                     // Sanitize the field name to prevent SQL injection
                     if (preg_match('/^[a-zA-Z0-9_]+$/', $field)) {
-                        $update_data[$field] = $value;
+                        // Check if column actually exists in database
+                        if (in_array($field, $table_columns)) {
+                            $update_data[$field] = $value;
+                        } else {
+                            $invalid_fields[] = $field;
+                        }
                     }
+                }
+                
+                // Log invalid fields for debugging
+                if (!empty($invalid_fields)) {
+                    error_log('Driggs Import: Skipping fields that don\'t exist in wp_zen_sitespren: ' . implode(', ', $invalid_fields));
                 }
                 
                 if (!empty($update_data)) {
@@ -444,7 +466,11 @@ class Grove_Plasma_Import_Processor {
                     return [
                         'success' => true,
                         'updated_fields' => array_keys($update_data),
-                        'record_id' => 1
+                        'skipped_fields' => $invalid_fields,
+                        'record_id' => 1,
+                        'total_fields_processed' => count($driggs_data),
+                        'valid_fields_imported' => count($update_data),
+                        'invalid_fields_skipped' => count($invalid_fields)
                     ];
                 } else {
                     return [
@@ -615,6 +641,283 @@ class Grove_Plasma_Import_Processor {
                 'success' => false,
                 'message' => 'F582 processing failed: ' . $e->getMessage()
             ];
+        }
+    }
+    
+    /**
+     * Handle file upload for file-based import
+     */
+    public function handle_file_upload() {
+        // Security check
+        if (!wp_verify_nonce($_POST['nonce'], 'grove_file_upload')) {
+            wp_send_json_error('Security check failed');
+            return;
+        }
+        
+        // Check permissions
+        if (!current_user_can('manage_options')) {
+            wp_send_json_error('Insufficient permissions');
+            return;
+        }
+        
+        // Validate file upload
+        if (!isset($_FILES['json_file']) || $_FILES['json_file']['error'] !== UPLOAD_ERR_OK) {
+            wp_send_json_error('File upload failed');
+            return;
+        }
+        
+        $file = $_FILES['json_file'];
+        
+        // Validate file type
+        if (!in_array($file['type'], ['application/json', 'text/plain']) && 
+            !preg_match('/\.json$/i', $file['name'])) {
+            wp_send_json_error('Invalid file type. Please upload a JSON file.');
+            return;
+        }
+        
+        // Validate file size (max 50MB for file-based method)
+        if ($file['size'] > 50 * 1024 * 1024) {
+            wp_send_json_error('File too large. Maximum size is 50MB.');
+            return;
+        }
+        
+        try {
+            // Read and parse JSON
+            $json_content = file_get_contents($file['tmp_name']);
+            $json_data = json_decode($json_content, true);
+            
+            if (json_last_error() !== JSON_ERROR_NONE) {
+                wp_send_json_error('Invalid JSON format: ' . json_last_error_msg());
+                return;
+            }
+            
+            if (!isset($json_data['pages']) || !is_array($json_data['pages'])) {
+                wp_send_json_error('Invalid JSON structure. Expected "pages" array.');
+                return;
+            }
+            
+            // Generate unique file ID
+            $file_id = uniqid('grove_import_', true);
+            
+            // Store file in uploads directory
+            $upload_dir = wp_upload_dir();
+            $grove_temp_dir = $upload_dir['basedir'] . '/grove-temp/';
+            
+            if (!file_exists($grove_temp_dir)) {
+                wp_mkdir_p($grove_temp_dir);
+            }
+            
+            $temp_file_path = $grove_temp_dir . $file_id . '.json';
+            
+            if (!file_put_contents($temp_file_path, $json_content)) {
+                wp_send_json_error('Failed to save uploaded file');
+                return;
+            }
+            
+            // Clean up old temp files (older than 24 hours)
+            $this->cleanup_temp_files($grove_temp_dir);
+            
+            wp_send_json_success([
+                'message' => 'File uploaded successfully',
+                'file_id' => $file_id,
+                'json_data' => $json_data,
+                'pages_count' => count($json_data['pages']),
+                'file_size' => $file['size']
+            ]);
+            
+        } catch (Exception $e) {
+            wp_send_json_error('Processing failed: ' . $e->getMessage());
+        }
+    }
+    
+    /**
+     * Handle file-based batch import
+     */
+    public function handle_file_batch_import() {
+        // Security check
+        if (!wp_verify_nonce($_POST['nonce'], 'grove_plasma_import')) {
+            wp_send_json_error('Security check failed');
+            return;
+        }
+        
+        // Check permissions
+        if (!current_user_can('manage_options')) {
+            wp_send_json_error('Insufficient permissions');
+            return;
+        }
+        
+        $file_id = sanitize_text_field($_POST['file_id']);
+        $batch_start = intval($_POST['batch_start']);
+        $batch_size = intval($_POST['batch_size']);
+        $selected_indexes = isset($_POST['selected_indexes']) ? array_map('intval', $_POST['selected_indexes']) : [];
+        
+        if (empty($file_id)) {
+            wp_send_json_error('File ID required');
+            return;
+        }
+        
+        try {
+            // Load file data
+            $upload_dir = wp_upload_dir();
+            $temp_file_path = $upload_dir['basedir'] . '/grove-temp/' . $file_id . '.json';
+            
+            if (!file_exists($temp_file_path)) {
+                wp_send_json_error('Temporary file not found. Please re-upload.');
+                return;
+            }
+            
+            $json_content = file_get_contents($temp_file_path);
+            $json_data = json_decode($json_content, true);
+            
+            if (!$json_data || !isset($json_data['pages'])) {
+                wp_send_json_error('Invalid file data');
+                return;
+            }
+            
+            // Get the batch of pages to process based on selected indexes
+            $all_pages = $json_data['pages'];
+            $pages_batch = [];
+            
+            if (!empty($selected_indexes)) {
+                // Use selected indexes
+                foreach ($selected_indexes as $index) {
+                    if (isset($all_pages[$index])) {
+                        $pages_batch[] = $all_pages[$index];
+                    }
+                }
+            } else {
+                // Fallback to batch slice if no selected indexes
+                $pages_batch = array_slice($all_pages, $batch_start, $batch_size);
+            }
+            
+            if (empty($pages_batch)) {
+                wp_send_json_success([
+                    'message' => 'Batch completed',
+                    'pages_processed' => 0,
+                    'is_complete' => true
+                ]);
+                return;
+            }
+            
+            // Process this batch using existing import logic
+            $results = $this->process_pages_import($pages_batch, [
+                'update_empty_fields' => $_POST['update_empty_fields'] ?? 'false',
+                'set_homepage_option' => $_POST['set_homepage_option'] ?? 'false',
+                'run_f582_option' => $_POST['run_f582_option'] ?? 'false'
+            ]);
+            
+            $is_complete = ($batch_start + $batch_size) >= count($all_pages);
+            
+            // Clean up temp file if this is the last batch
+            if ($is_complete) {
+                unlink($temp_file_path);
+            }
+            
+            wp_send_json_success([
+                'message' => "Batch processed: {$results['success_count']} created, {$results['error_count']} errors",
+                'pages_processed' => count($pages_batch),
+                'success_count' => $results['success_count'],
+                'error_count' => $results['error_count'],
+                'errors' => $results['errors'],
+                'is_complete' => $is_complete,
+                'total_processed' => $batch_start + count($pages_batch),
+                'total_pages' => count($all_pages)
+            ]);
+            
+        } catch (Exception $e) {
+            wp_send_json_error('Batch processing failed: ' . $e->getMessage());
+        }
+    }
+    
+    /**
+     * Process pages import (extracted from existing handle_ajax_import)
+     */
+    private function process_pages_import($pages, $options) {
+        $results = [
+            'success_count' => 0,
+            'error_count' => 0,
+            'errors' => [],
+            'created_posts' => []
+        ];
+        
+        $homepage_post_id = null;
+        $should_set_homepage = ($options['set_homepage_option'] === 'true');
+        $should_update_empty_fields = ($options['update_empty_fields'] === 'true');
+        
+        foreach ($pages as $index => $page) {
+            try {
+                // Create WordPress post/page
+                $post_id = $this->create_wordpress_post($page);
+                
+                if ($post_id && !is_wp_error($post_id)) {
+                    // Create pylon record
+                    $pylon_result = $this->create_pylon_record($post_id, $page);
+                    
+                    if ($pylon_result) {
+                        $results['success_count']++;
+                        $results['created_posts'][] = [
+                            'post_id' => $post_id,
+                            'title' => $page['page_title'] ?? 'Untitled'
+                        ];
+                        
+                        // Check if this is the homepage
+                        if ($should_set_homepage && isset($page['page_archetype']) && $page['page_archetype'] === 'homepage') {
+                            $homepage_post_id = $post_id;
+                        }
+                        
+                        // Handle page template assignment if needed
+                        // $this->assign_page_template($post_id, $page);
+                    } else {
+                        // Post created but pylon record failed
+                        $results['error_count']++;
+                        $results['errors'][] = [
+                            'title' => $page['page_title'] ?? 'Untitled',
+                            'message' => 'Post created but pylon record failed',
+                            'post_id' => $post_id
+                        ];
+                    }
+                } else {
+                    // Post creation failed
+                    $error_message = is_wp_error($post_id) ? $post_id->get_error_message() : 'Unknown error creating post';
+                    $results['error_count']++;
+                    $results['errors'][] = [
+                        'title' => $page['page_title'] ?? 'Untitled',
+                        'message' => $error_message
+                    ];
+                }
+            } catch (Exception $e) {
+                $results['error_count']++;
+                $results['errors'][] = [
+                    'title' => $page['page_title'] ?? 'Untitled',
+                    'message' => $e->getMessage()
+                ];
+            }
+        }
+        
+        // Set the homepage if we found one
+        if ($should_set_homepage && $homepage_post_id) {
+            update_option('show_on_front', 'page');
+            update_option('page_on_front', $homepage_post_id);
+        }
+        
+        return $results;
+    }
+    
+    /**
+     * Clean up temporary files older than 24 hours
+     */
+    private function cleanup_temp_files($temp_dir) {
+        if (!is_dir($temp_dir)) {
+            return;
+        }
+        
+        $files = glob($temp_dir . '*.json');
+        $cutoff_time = time() - (24 * 60 * 60); // 24 hours ago
+        
+        foreach ($files as $file) {
+            if (filemtime($file) < $cutoff_time) {
+                unlink($file);
+            }
         }
     }
 }
