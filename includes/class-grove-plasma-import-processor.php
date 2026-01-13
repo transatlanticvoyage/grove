@@ -431,6 +431,12 @@ class Grove_Plasma_Import_Processor {
                 $invalid_fields = [];
                 
                 foreach ($driggs_data as $field => $value) {
+                    // Skip "id" columns - never import these
+                    if (strtolower($field) === 'id') {
+                        $invalid_fields[] = $field . ' (excluded: id columns not allowed)';
+                        continue;
+                    }
+                    
                     // Sanitize the field name to prevent SQL injection
                     if (preg_match('/^[a-zA-Z0-9_]+$/', $field)) {
                         // Check if column actually exists in database
@@ -482,6 +488,11 @@ class Grove_Plasma_Import_Processor {
                 // Create new record with driggs data
                 $insert_data = ['wppma_id' => 1];
                 foreach ($driggs_data as $field => $value) {
+                    // Skip "id" columns - never import these
+                    if (strtolower($field) === 'id') {
+                        continue;
+                    }
+                    
                     // Sanitize the field name to prevent SQL injection
                     if (preg_match('/^[a-zA-Z0-9_]+$/', $field)) {
                         $insert_data[$field] = $value;
