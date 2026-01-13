@@ -361,10 +361,31 @@ class Grove_Plasma_Import_Processor {
         }
         
         // Get the pages data from POST
-        $pages_data = isset($_POST['pages']) ? $_POST['pages'] : [];
+        $pages_data_raw = isset($_POST['pages']) ? $_POST['pages'] : [];
         
-        if (empty($pages_data)) {
+        if (empty($pages_data_raw)) {
             wp_send_json_error(['message' => 'No pages data provided']);
+            return;
+        }
+        
+        // Decode JSON if it's a string
+        if (is_string($pages_data_raw)) {
+            error_log("Grove Debug: Raw pages data: " . $pages_data_raw);
+            // Strip slashes that WordPress adds to POST data
+            $clean_json = stripslashes($pages_data_raw);
+            error_log("Grove Debug: Clean pages data: " . $clean_json);
+            $pages_data = json_decode($clean_json, true);
+            if (json_last_error() !== JSON_ERROR_NONE) {
+                error_log("Grove Debug: JSON decode error: " . json_last_error_msg());
+                wp_send_json_error(['message' => 'Invalid JSON in pages data: ' . json_last_error_msg()]);
+                return;
+            }
+        } else {
+            $pages_data = $pages_data_raw;
+        }
+        
+        if (empty($pages_data) || !is_array($pages_data)) {
+            wp_send_json_error(['message' => 'No valid pages data provided']);
             return;
         }
         
