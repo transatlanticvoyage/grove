@@ -291,6 +291,15 @@ class Grove_Admin {
         
         add_submenu_page(
             'grovehub',
+            'Grove CORS Mar',
+            'Grove_Cors_Mar',
+            'manage_options',
+            'grove_cors_mar',
+            array($this, 'grove_cors_mar_page')
+        );
+        
+        add_submenu_page(
+            'grovehub',
             'Dark Mode Test',
             'darkmodetest',
             'manage_options',
@@ -11234,6 +11243,12 @@ class Grove_Admin {
         // Delegate to the dedicated Grove Plasma Import Mar class
         $grove_plasma_import_mar = new Grove_Plasma_Import_Mar();
         $grove_plasma_import_mar->plasma_import_mar_page();
+    }
+    
+    public function grove_cors_mar_page() {
+        // Delegate to the dedicated Grove CORS Mar class
+        $grove_cors_mar = new Grove_Cors_Mar();
+        $grove_cors_mar->grove_cors_mar_page();
     }
     
     /**

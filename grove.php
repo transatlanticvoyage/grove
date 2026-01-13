@@ -67,6 +67,7 @@ class GrovePlugin {
         require_once GROVE_PLUGIN_PATH . 'includes/class-grove-streamflow-mar.php';
         require_once GROVE_PLUGIN_PATH . 'includes/class-grove-plasma-import-mar.php';
         require_once GROVE_PLUGIN_PATH . 'includes/class-grove-plasma-import-processor.php';
+        require_once GROVE_PLUGIN_PATH . 'includes/class-grove-cors-mar.php';
         
         // Load the Vault Keeper for cross-plugin sacred text access
         require_once GROVE_PLUGIN_PATH . 'vaults/class-grove-vault-keeper.php';
@@ -80,6 +81,9 @@ class GrovePlugin {
         new Grove_Quilter();
         new Grove_Panzer();
         new Grove_Chimp();
+        
+        // Initialize CORS handler
+        new Grove_Cors_Mar();
         
         // Initialize plasma import processor and AJAX handlers
         $this->init_plasma_import();
