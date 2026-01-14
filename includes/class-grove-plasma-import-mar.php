@@ -30,6 +30,12 @@ class Grove_Plasma_Import_Mar {
                         <img src="<?php echo plugin_dir_url(__FILE__) . '../grove-shenzi-asset-mirror/grove-logo-1.png'; ?>" alt="Grove Logo" style="height: 40px; width: auto;">
                         Plasma Import Mar
                     </h1>
+                    <div style="display: flex; align-items: center; margin-left: 20px; padding: 8px 12px; background: #f8f9fa; border: 1px solid #ddd; border-radius: 4px;">
+                        <label style="display: flex; align-items: center; cursor: pointer; font-size: 13px; margin: 0;">
+                            <input type="checkbox" id="disable-slash-removal" style="margin-right: 8px;">
+                            <span style="color: #666;">Disable slash removal (for "\" characters on db insert)</span>
+                        </label>
+                    </div>
                 </div>
                 
                 <!-- Error Reporting Section (initially hidden) -->
@@ -392,6 +398,7 @@ class Grove_Plasma_Import_Mar {
                 const formData = new FormData();
                 formData.append('action', 'grove_upload_json_file');
                 formData.append('json_file', file);
+                formData.append('disable_slash_removal', $('#disable-slash-removal').is(':checked') ? 'true' : 'false');
                 formData.append('nonce', '<?php echo wp_create_nonce("grove_file_upload"); ?>');
                 
                 $.ajax({
@@ -810,6 +817,7 @@ class Grove_Plasma_Import_Mar {
                         update_empty_fields: updateEmptyFields ? 'true' : 'false',
                         set_homepage_option: setHomepageOption ? 'true' : 'false',
                         run_f582_option: runF582Option ? 'true' : 'false',
+                        disable_slash_removal: $('#disable-slash-removal').is(':checked') ? 'true' : 'false',
                         nonce: '<?php echo wp_create_nonce("grove_plasma_import"); ?>'
                     },
                     success: function(response) {
@@ -936,6 +944,7 @@ class Grove_Plasma_Import_Mar {
                             update_empty_fields: updateEmptyFields ? 'true' : 'false',
                             set_homepage_option: setHomepageOption ? 'true' : 'false',
                             run_f582_option: runF582Option ? 'true' : 'false',
+                            disable_slash_removal: $('#disable-slash-removal').is(':checked') ? 'true' : 'false',
                             nonce: '<?php echo wp_create_nonce("grove_plasma_import"); ?>'
                         },
                         success: function(response) {
@@ -1037,6 +1046,7 @@ class Grove_Plasma_Import_Mar {
                     data: {
                         action: 'grove_driggs_data_import',
                         driggs_data: driggsDataForImport,
+                        disable_slash_removal: $('#disable-slash-removal').is(':checked') ? 'true' : 'false',
                         nonce: '<?php echo wp_create_nonce("grove_driggs_import"); ?>'
                     },
                     success: function(response) {
@@ -1189,6 +1199,7 @@ class Grove_Plasma_Import_Mar {
                         update_empty_fields: updateEmptyFields ? 'true' : 'false',
                         set_homepage_option: setHomepageOption ? 'true' : 'false',
                         run_f582_option: runF582Option ? 'true' : 'false',
+                        disable_slash_removal: $('#disable-slash-removal').is(':checked') ? 'true' : 'false',
                         nonce: '<?php echo wp_create_nonce("grove_plasma_import"); ?>'
                     },
                     success: function(response) {

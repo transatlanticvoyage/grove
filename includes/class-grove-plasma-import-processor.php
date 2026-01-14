@@ -46,6 +46,35 @@ class Grove_Plasma_Import_Processor {
     }
     
     /**
+     * Remove slashes from data if slash removal is enabled (default behavior)
+     * 
+     * @param mixed $data Data to process (string, array, or object)
+     * @return mixed Processed data with slashes removed or original data
+     */
+    private function maybe_remove_slashes($data) {
+        // Check if slash removal is disabled via POST parameter
+        $disable_slash_removal = isset($_POST['disable_slash_removal']) && $_POST['disable_slash_removal'] === 'true';
+        
+        if ($disable_slash_removal) {
+            return $data; // Return original data without slash removal
+        }
+        
+        // Default behavior: remove slashes
+        if (is_string($data)) {
+            return wp_unslash($data);
+        } elseif (is_array($data)) {
+            return array_map(array($this, 'maybe_remove_slashes'), $data);
+        } elseif (is_object($data)) {
+            foreach ($data as $key => $value) {
+                $data->$key = $this->maybe_remove_slashes($value);
+            }
+            return $data;
+        }
+        
+        return $data;
+    }
+    
+    /**
      * Check if empty fields should be updated based on user setting
      * 
      * @return bool True if empty fields should be set to empty in database
@@ -75,12 +104,15 @@ class Grove_Plasma_Import_Processor {
         
         foreach ($pages_data as $index => $page) {
             try {
+                // Apply slash removal if enabled (default behavior)
+                $clean_page = $this->maybe_remove_slashes($page);
+                
                 // Create WordPress post/page
-                $post_id = $this->create_wordpress_post($page);
+                $post_id = $this->create_wordpress_post($clean_page);
                 
                 if ($post_id && !is_wp_error($post_id)) {
                     // Create pylon record
-                    $pylon_result = $this->create_pylon_record($post_id, $page);
+                    $pylon_result = $this->create_pylon_record($post_id, $clean_page);
                     
                     if ($pylon_result) {
                         $results['success'][] = [
@@ -566,15 +598,31 @@ class Grove_Plasma_Import_Processor {
         }
         
         // Get the driggs data from POST
-        $driggs_data = isset($_POST['driggs_data']) ? $_POST['driggs_data'] : [];
+        $driggs_data_raw = isset($_POST['driggs_data']) ? $_POST['driggs_data'] : [];
         
-        if (empty($driggs_data)) {
+        if (empty($driggs_data_raw)) {
             wp_send_json_error(['message' => 'No driggs data provided']);
             return;
         }
         
+        // Decode JSON if it's a string (for API requests)
+        if (is_string($driggs_data_raw)) {
+            // Strip slashes that WordPress adds to POST data
+            $clean_json = stripslashes($driggs_data_raw);
+            $driggs_data = json_decode($clean_json, true);
+            if (json_last_error() !== JSON_ERROR_NONE) {
+                wp_send_json_error(['message' => 'Invalid JSON in driggs data: ' . json_last_error_msg()]);
+                return;
+            }
+        } else {
+            $driggs_data = $driggs_data_raw;
+        }
+        
+        // Apply slash removal if enabled (default behavior)
+        $clean_driggs_data = $this->maybe_remove_slashes($driggs_data);
+        
         // Process the driggs data import
-        $results = $this->import_driggs_data($driggs_data);
+        $results = $this->import_driggs_data($clean_driggs_data);
         
         // Return results
         if ($results['success']) {
