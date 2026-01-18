@@ -271,6 +271,11 @@ class Grove_Plasma_Import_Processor {
             }
         }
         
+        // Apply OSB rule: If page_archetype is 'homepage', set osb_is_enabled to 1
+        if (isset($pylon_data['pylon_archetype']) && $pylon_data['pylon_archetype'] === 'homepage') {
+            $pylon_data['osb_is_enabled'] = 1;
+        }
+        
         // Insert the pylon record
         $result = $this->wpdb->insert(
             $pylons_table,
