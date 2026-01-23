@@ -819,7 +819,10 @@ class Grove_Plasma_Import_Processor {
                 $random_seconds = rand($min_seconds, $max_seconds);
                 
                 // Add random hours, minutes, seconds for more natural distribution
-                $random_seconds += rand(0, 24 * 60 * 60);
+                $random_hours = rand(0, 23);
+                $random_minutes = rand(0, 59);
+                $random_seconds_component = rand(0, 59);
+                $random_seconds += ($random_hours * 3600) + ($random_minutes * 60) + $random_seconds_component;
                 
                 // Go back in time
                 $backdate_time -= $random_seconds;
@@ -855,8 +858,11 @@ class Grove_Plasma_Import_Processor {
                 $max_seconds = $interval_to * 24 * 60 * 60;
                 $random_seconds = rand($min_seconds, $max_seconds);
                 
-                // Add random hours, minutes, seconds
-                $random_seconds += rand(0, 24 * 60 * 60);
+                // Add random hours, minutes, seconds for more natural distribution
+                $random_hours = rand(0, 23);
+                $random_minutes = rand(0, 59);
+                $random_seconds_component = rand(0, 59);
+                $random_seconds += ($random_hours * 3600) + ($random_minutes * 60) + $random_seconds_component;
                 
                 // Go forward in time
                 $future_time += $random_seconds;
