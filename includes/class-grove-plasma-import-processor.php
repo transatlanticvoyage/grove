@@ -778,14 +778,18 @@ class Grove_Plasma_Import_Processor {
     private function run_f582_date_processing($import_results) {
         try {
             // Get only the posts (page_type = 'post') from the successfully imported items
-            $post_ids = [];
+            // Also collect their jchronology_order values
+            $post_data = [];
             foreach ($import_results['success'] as $item) {
                 if (isset($item['page_type']) && $item['page_type'] === 'post' && isset($item['post_id'])) {
-                    $post_ids[] = $item['post_id'];
+                    $post_data[] = [
+                        'post_id' => $item['post_id'],
+                        'jchronology_order' => isset($item['jchronology_order_for_blog_posts']) ? $item['jchronology_order_for_blog_posts'] : 0
+                    ];
                 }
             }
             
-            if (empty($post_ids)) {
+            if (empty($post_data)) {
                 return [
                     'success' => true,
                     'message' => 'No blog posts found for F582 processing'
@@ -794,18 +798,26 @@ class Grove_Plasma_Import_Processor {
             
             global $wpdb;
             
+            // Sort posts by jchronology_order_for_blog_posts (ascending: 1, 2, 3...)
+            usort($post_data, function($a, $b) {
+                return ($a['jchronology_order'] ?: 0) - ($b['jchronology_order'] ?: 0);
+            });
+            
+            // Extract just the post IDs after sorting
+            $post_ids = array_column($post_data, 'post_id');
+            
             // F582 settings - using the same defaults as the Date Worshipper
             $backdate_count = min(8, count($post_ids)); // Default to 8 or total posts if less
             $future_count = count($post_ids) - $backdate_count;
             $interval_from = 4; // Default interval from 4 days
             $interval_to = 11;  // Default interval to 11 days
             
-            // Shuffle the post IDs for random distribution
-            shuffle($post_ids);
-            
-            // Split posts into backdate and future groups
+            // Split posts into backdate and future groups (no shuffle - respect jchronology order)
             $backdate_posts = array_slice($post_ids, 0, $backdate_count);
             $future_posts = array_slice($post_ids, $backdate_count, $future_count);
+            
+            // Reverse backdated posts so jchronology=1 is farthest in past
+            $backdate_posts = array_reverse($backdate_posts);
             
             $current_time = current_time('timestamp');
             $updated_count = 0;
