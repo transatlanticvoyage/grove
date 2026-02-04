@@ -235,7 +235,7 @@ class Grove_Plasma_Import_Processor {
         // Start with required relational fields
         $pylon_data = [
             'rel_wp_post_id' => $post_id,
-            'rel_plasma_page_id' => isset($page_data['page_id']) ? intval($page_data['page_id']) : null
+            'plasma_page_id' => isset($page_data['page_id']) ? intval($page_data['page_id']) : null
         ];
         
         // Apply explicit field mappings (for fields with different names)
