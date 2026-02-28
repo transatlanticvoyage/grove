@@ -8,6 +8,7 @@ class Grove_Admin {
     public function __construct() {
         add_action('admin_menu', array($this, 'add_admin_menu'));
         add_action('admin_enqueue_scripts', array($this, 'enqueue_admin_styles'));
+        add_action('admin_head', array($this, 'add_plasma_import_menu_styles'));
         
         // Initialize PageBender
         $this->pagebender = new Grove_PageBender();
@@ -94,6 +95,47 @@ class Grove_Admin {
         }
     }
     
+    /**
+     * Add custom styles for Plasma Import menu item
+     */
+    public function add_plasma_import_menu_styles() {
+        ?>
+        <style type="text/css">
+            /* Style for Plasma Import top-level menu */
+            #toplevel_page_plasma_import_mar_toplevel > a {
+                background: #28a745 !important; /* Green background */
+                color: #fff !important;
+            }
+            
+            #toplevel_page_plasma_import_mar_toplevel > a:hover,
+            #toplevel_page_plasma_import_mar_toplevel.wp-has-current-submenu > a,
+            #toplevel_page_plasma_import_mar_toplevel.current > a {
+                background: #218838 !important; /* Darker green on hover/active */
+                color: #fff !important;
+            }
+            
+            #toplevel_page_plasma_import_mar_toplevel .wp-menu-image:before {
+                color: #fff !important;
+            }
+            
+            /* Ensure text stays white */
+            #toplevel_page_plasma_import_mar_toplevel .wp-menu-name {
+                color: #fff !important;
+            }
+            
+            /* Style the submenu if any */
+            #toplevel_page_plasma_import_mar_toplevel ul.wp-submenu li a {
+                color: rgba(240, 246, 252, 0.7);
+            }
+            
+            #toplevel_page_plasma_import_mar_toplevel ul.wp-submenu li a:hover,
+            #toplevel_page_plasma_import_mar_toplevel ul.wp-submenu li.current a {
+                color: #fff !important;
+            }
+        </style>
+        <?php
+    }
+    
     public function add_admin_menu() {
         // Main menu page (parent only - no actual page)
         add_menu_page(
@@ -104,6 +146,17 @@ class Grove_Admin {
             '', // No callback - makes it non-clickable
             'dashicons-palmtree',
             3.3
+        );
+        
+        // Add Plasma Import as top-level menu with green background
+        add_menu_page(
+            'Plasma Import Mar',
+            'Plasma Import',
+            'manage_options',
+            'plasma_import_mar_toplevel',
+            array($this, 'plasma_import_mar_page'),
+            'data:image/svg+xml;base64,' . base64_encode('<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="white"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-2 15l-5-5 1.41-1.41L10 14.17l7.59-7.59L19 8l-9 9z"/></svg>'),
+            3.35 // Position just after Grove Hub (3.3)
         );
         
         // Remove the auto-generated submenu link to the parent page
