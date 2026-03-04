@@ -235,8 +235,16 @@ class Grove_Plasma_Import_Processor {
         // Start with required relational fields
         $pylon_data = [
             'rel_wp_post_id' => $post_id,
-            'rel_plasma_page_id' => isset($page_data['page_id']) ? intval($page_data['page_id']) : null
         ];
+        
+        // Check which plasma page ID column exists for backwards compatibility
+        if (in_array('rel_plasma_page_id', $pylons_columns)) {
+            // Old schema - use rel_plasma_page_id
+            $pylon_data['rel_plasma_page_id'] = isset($page_data['page_id']) ? intval($page_data['page_id']) : null;
+        } elseif (in_array('plasma_page_id', $pylons_columns)) {
+            // New schema (Ruplin standard) - use plasma_page_id
+            $pylon_data['plasma_page_id'] = isset($page_data['page_id']) ? intval($page_data['page_id']) : null;
+        }
         
         // Apply explicit field mappings (for fields with different names)
         foreach ($this->wp_pylons_mapping as $plasma_field => $pylon_field) {
