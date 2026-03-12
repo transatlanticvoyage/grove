@@ -865,7 +865,13 @@ class Grove_Admin {
                     {key: 'screenshot_status', label: 'screenshot_status', type: 'text'},
                     {key: 'rel_cncglub_id', label: 'rel_cncglub_id', type: 'number'},
                     {key: 'rel_city_id', label: 'rel_city_id', type: 'number'},
-                    {key: 'rel_industry_id', label: 'rel_industry_id', type: 'number'}
+                    {key: 'rel_industry_id', label: 'rel_industry_id', type: 'number'},
+                    
+                    // Rating and Review fields section
+                    {key: 'rating_section_separator', label: 'rating & review section', type: 'separator'},
+                    {key: 'ratingvalue_for_schema', label: 'ratingvalue_for_schema', type: 'decimal'},
+                    {key: 'reviewcount_for_schema', label: 'reviewcount_for_schema', type: 'number'},
+                    {key: 'avg_rating_box_hide_sitewide', label: 'avg_rating_box_hide_sitewide', type: 'boolean'}
                 ];
                 
                 fields.forEach(function(field) {
@@ -1076,9 +1082,9 @@ class Grove_Admin {
                         // Use closure to capture current value properly
                         valueTd.click(function(capturedValue, capturedKey, capturedType) {
                             return function() {
-                                // Debug logging for number fields
-                                if (capturedType === 'number') {
-                                    console.log('Number field clicked:', {
+                                // Debug logging for numeric fields
+                                if (capturedType === 'number' || capturedType === 'decimal') {
+                                    console.log('Numeric field clicked:', {
                                         fieldKey: capturedKey,
                                         capturedValue: capturedValue,
                                         actualCurrentDataValue: currentData[capturedKey]
@@ -1293,9 +1299,9 @@ class Grove_Admin {
             }
             
             function startInlineEdit(cell, currentValue, fieldKey, fieldType) {
-                // Debug logging for number fields
-                if (fieldType === 'number') {
-                    console.log('startInlineEdit called for number field:', {
+                // Debug logging for number and decimal fields
+                if (fieldType === 'number' || fieldType === 'decimal') {
+                    console.log('startInlineEdit called for numeric field:', {
                         fieldKey: fieldKey,
                         currentValue: currentValue,
                         fieldType: fieldType,
@@ -1317,6 +1323,8 @@ class Grove_Admin {
                     input = $('<input type="email" style="width: 100%; padding: 4px; border: 1px solid #ddd; border-radius: 3px; font-family: inherit; font-size: 14px;">');
                 } else if (fieldType === 'number') {
                     input = $('<input type="number" style="width: 100%; padding: 4px; border: 1px solid #ddd; border-radius: 3px; font-family: inherit; font-size: 14px;">');
+                } else if (fieldType === 'decimal') {
+                    input = $('<input type="number" step="0.01" min="0" max="5" style="width: 100%; padding: 4px; border: 1px solid #ddd; border-radius: 3px; font-family: inherit; font-size: 14px;">');
                 } else if (fieldType === 'password') {
                     input = $('<input type="password" style="width: 100%; padding: 4px; border: 1px solid #ddd; border-radius: 3px; font-family: inherit; font-size: 14px;">');
                 } else {
@@ -1328,8 +1336,8 @@ class Grove_Admin {
                 input.focus();
                 
                 // Position cursor at end of text instead of selecting all
-                // Note: Number inputs don't support text selection APIs
-                if (fieldType !== 'number') {
+                // Note: Number and decimal inputs don't support text selection APIs
+                if (fieldType !== 'number' && fieldType !== 'decimal') {
                     try {
                         if (input[0].setSelectionRange) {
                             let len = currentValue ? currentValue.length : 0;
@@ -1384,9 +1392,9 @@ class Grove_Admin {
                         currentData[fieldKey] = newValue.trim() === '' ? null : newValue;
                         hasChanges = true;
                         
-                        // Debug logging for number fields
-                        if (fieldType === 'number') {
-                            console.log('Number field saved:', {
+                        // Debug logging for numeric fields
+                        if (fieldType === 'number' || fieldType === 'decimal') {
+                            console.log('Numeric field saved:', {
                                 fieldKey: fieldKey,
                                 currentValue: currentValue,
                                 newValue: newValue,
@@ -1466,13 +1474,184 @@ class Grove_Admin {
                     },
                     success: function(response) {
                         if (!response.success) {
-                            alert('Error updating field: ' + response.data);
+                            // Enhanced error handling with styled popup
+                            let errorData = response.data;
+                            let debugInfo = '';
+                            
+                            if (typeof errorData === 'object' && errorData.debug) {
+                                debugInfo = JSON.stringify(errorData.debug, null, 2);
+                                showDebugPopup(errorData.message || 'Unknown error', debugInfo);
+                            } else {
+                                showDebugPopup('Error updating field', 'Field: ' + field + '\nError: ' + (typeof errorData === 'string' ? errorData : JSON.stringify(errorData)));
+                            }
                         }
                     },
-                    error: function() {
-                        alert('Error updating field');
+                    error: function(xhr, status, error) {
+                        // Enhanced error for network/server issues
+                        let debugInfo = 'Field: ' + field + '\n' +
+                                       'Status: ' + status + '\n' +
+                                       'Error: ' + error + '\n' +
+                                       'Response: ' + xhr.responseText;
+                        showDebugPopup('Network/Server Error', debugInfo);
                     }
                 });
+            }
+            
+            function showDebugPopup(title, debugInfo) {
+                // Remove any existing popup
+                $('#grove-debug-popup').remove();
+                
+                // Create styled popup
+                let popup = $(`
+                    <div id="grove-debug-popup" style="
+                        position: fixed;
+                        top: 50%;
+                        left: 50%;
+                        transform: translate(-50%, -50%);
+                        background: white;
+                        border: 2px solid #dc3545;
+                        border-radius: 8px;
+                        box-shadow: 0 10px 40px rgba(0,0,0,0.3);
+                        z-index: 999999;
+                        max-width: 600px;
+                        width: 90%;
+                        max-height: 80vh;
+                        display: flex;
+                        flex-direction: column;
+                    ">
+                        <div style="
+                            background: #dc3545;
+                            color: white;
+                            padding: 15px 20px;
+                            font-size: 16px;
+                            font-weight: bold;
+                            border-radius: 6px 6px 0 0;
+                            display: flex;
+                            justify-content: space-between;
+                            align-items: center;
+                        ">
+                            <span>⚠️ ${title}</span>
+                            <button id="grove-debug-close" style="
+                                background: transparent;
+                                border: none;
+                                color: white;
+                                font-size: 24px;
+                                cursor: pointer;
+                                padding: 0;
+                                width: 30px;
+                                height: 30px;
+                                line-height: 1;
+                            ">×</button>
+                        </div>
+                        <div style="
+                            padding: 20px;
+                            overflow-y: auto;
+                            flex: 1;
+                        ">
+                            <div style="
+                                background: #f8f9fa;
+                                border: 1px solid #dee2e6;
+                                border-radius: 4px;
+                                padding: 15px;
+                                margin-bottom: 15px;
+                            ">
+                                <pre id="grove-debug-content" style="
+                                    margin: 0;
+                                    font-family: 'Courier New', monospace;
+                                    font-size: 13px;
+                                    white-space: pre-wrap;
+                                    word-wrap: break-word;
+                                    color: #212529;
+                                ">${debugInfo}</pre>
+                            </div>
+                            <div style="
+                                display: flex;
+                                gap: 10px;
+                                justify-content: center;
+                            ">
+                                <button id="grove-debug-copy" style="
+                                    background: #28a745;
+                                    color: white;
+                                    border: none;
+                                    padding: 10px 20px;
+                                    border-radius: 4px;
+                                    cursor: pointer;
+                                    font-size: 14px;
+                                    font-weight: 500;
+                                    transition: background 0.2s;
+                                ">
+                                    📋 Copy Debug Info
+                                </button>
+                                <button id="grove-debug-ok" style="
+                                    background: #6c757d;
+                                    color: white;
+                                    border: none;
+                                    padding: 10px 20px;
+                                    border-radius: 4px;
+                                    cursor: pointer;
+                                    font-size: 14px;
+                                    font-weight: 500;
+                                    transition: background 0.2s;
+                                ">
+                                    OK
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                `);
+                
+                // Add overlay
+                let overlay = $(`
+                    <div id="grove-debug-overlay" style="
+                        position: fixed;
+                        top: 0;
+                        left: 0;
+                        right: 0;
+                        bottom: 0;
+                        background: rgba(0,0,0,0.5);
+                        z-index: 999998;
+                    "></div>
+                `);
+                
+                $('body').append(overlay).append(popup);
+                
+                // Event handlers
+                $('#grove-debug-close, #grove-debug-ok, #grove-debug-overlay').on('click', function() {
+                    $('#grove-debug-popup, #grove-debug-overlay').remove();
+                });
+                
+                $('#grove-debug-copy').on('click', function() {
+                    let debugText = $('#grove-debug-content').text();
+                    if (navigator.clipboard && navigator.clipboard.writeText) {
+                        navigator.clipboard.writeText(debugText).then(function() {
+                            $('#grove-debug-copy').text('✓ Copied!').css('background', '#17a2b8');
+                            setTimeout(function() {
+                                $('#grove-debug-copy').text('📋 Copy Debug Info').css('background', '#28a745');
+                            }, 2000);
+                        });
+                    } else {
+                        // Fallback
+                        let temp = $('<textarea>');
+                        $('body').append(temp);
+                        temp.val(debugText).select();
+                        document.execCommand('copy');
+                        temp.remove();
+                        $('#grove-debug-copy').text('✓ Copied!').css('background', '#17a2b8');
+                        setTimeout(function() {
+                            $('#grove-debug-copy').text('📋 Copy Debug Info').css('background', '#28a745');
+                        }, 2000);
+                    }
+                });
+                
+                // Hover effects
+                $('#grove-debug-copy').hover(
+                    function() { $(this).css('background', '#218838'); },
+                    function() { $(this).css('background', '#28a745'); }
+                );
+                $('#grove-debug-ok').hover(
+                    function() { $(this).css('background', '#5a6268'); },
+                    function() { $(this).css('background', '#6c757d'); }
+                );
             }
             
             function copyShortcodeToClipboardFallback(shortcode, element) {
@@ -2047,25 +2226,41 @@ class Grove_Admin {
             'screenshot_url', 'screenshot_taken_at', 'screenshot_status',
             
             // Relationships (some may need DB columns added)
-            'rel_cncglub_id', 'rel_city_id', 'rel_industry_id'
+            'rel_cncglub_id', 'rel_city_id', 'rel_industry_id',
+            
+            // Rating and Review fields
+            'ratingvalue_for_schema', 'reviewcount_for_schema', 'avg_rating_box_hide_sitewide'
         ];
         
         if (!in_array($field, $allowed_fields)) {
-            wp_send_json_error('Invalid field name');
+            // Enhanced error with debugging info
+            $debug_info = [
+                'field_attempted' => $field,
+                'allowed_fields_count' => count($allowed_fields),
+                'table' => 'wp_zen_sitespren',
+                'timestamp' => current_time('mysql')
+            ];
+            wp_send_json_error([
+                'message' => 'Invalid field name: ' . $field,
+                'debug' => $debug_info
+            ]);
             return;
         }
         
         // Sanitize value based on field type (updated for all new fields)
         $number_fields = ['driggs_phone_country_code', 'driggs_phone1_platform_id', 'driggs_cgig_id', 'driggs_revenue_goal', 'driggs_address_species_id', 
-                         'driggs_year_opened', 'driggs_employees_qty', 'rel_cncglub_id', 'rel_city_id', 'rel_industry_id'];
+                         'driggs_year_opened', 'driggs_employees_qty', 'rel_cncglub_id', 'rel_city_id', 'rel_industry_id', 'reviewcount_for_schema'];
+        $decimal_fields = ['ratingvalue_for_schema'];
         $boolean_fields = ['wp_plugin_installed1', 'wp_plugin_connected2', 'is_wp_site', 'is_bulldozer', 'driggs_citations_done', 
                           'driggs_social_profiles_done', 'is_competitor', 'is_external', 'is_internal', 'is_ppx', 'is_ms', 
-                          'is_wayback_rebuild', 'is_naked_wp_build', 'is_rnr', 'is_aff', 'is_other1', 'is_other2', 'is_flylocal'];
+                          'is_wayback_rebuild', 'is_naked_wp_build', 'is_rnr', 'is_aff', 'is_other1', 'is_other2', 'is_flylocal', 'avg_rating_box_hide_sitewide'];
         $email_fields = ['driggs_email_1'];
         $datetime_fields = ['created_at', 'updated_at', 'screenshot_taken_at'];
         
         if (in_array($field, $number_fields)) {
             $value = $value === '' ? NULL : intval($value);
+        } elseif (in_array($field, $decimal_fields)) {
+            $value = $value === '' ? NULL : floatval($value);
         } elseif (in_array($field, $boolean_fields)) {
             $value = $value ? 1 : 0;
         } elseif (in_array($field, $email_fields)) {
@@ -2099,7 +2294,18 @@ class Grove_Admin {
             );
             
             if ($result === false) {
-                wp_send_json_error('Database update failed: ' . $wpdb->last_error);
+                // Enhanced database error with debugging
+                $debug_info = [
+                    'field' => $field,
+                    'value_attempted' => $value,
+                    'table' => $table_name,
+                    'last_error' => $wpdb->last_error,
+                    'last_query' => $wpdb->last_query
+                ];
+                wp_send_json_error([
+                    'message' => 'Database update failed',
+                    'debug' => $debug_info
+                ]);
                 return;
             }
             
