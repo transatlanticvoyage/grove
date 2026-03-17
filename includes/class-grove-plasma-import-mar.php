@@ -19,6 +19,19 @@ class Grove_Plasma_Import_Mar {
         // AGGRESSIVE NOTICE SUPPRESSION - Remove ALL WordPress admin notices
         $this->suppress_all_admin_notices();
         
+        // Get post counts
+        $page_counts = wp_count_posts('page');
+        $post_counts = wp_count_posts('post');
+        
+        // Calculate totals
+        $pages_published = $page_counts->publish ?? 0;
+        $pages_draft = $page_counts->draft ?? 0;
+        $pages_all = $pages_published + $pages_draft + ($page_counts->private ?? 0) + ($page_counts->future ?? 0) + ($page_counts->pending ?? 0);
+        
+        $posts_published = $post_counts->publish ?? 0;
+        $posts_draft = $post_counts->draft ?? 0;
+        $posts_all = $posts_published + $posts_draft + ($post_counts->private ?? 0) + ($post_counts->future ?? 0) + ($post_counts->pending ?? 0);
+        
         ?>
         <div class="wrap" style="margin: 0; padding: 0;">
             <!-- Allow space for WordPress notices -->
@@ -30,11 +43,86 @@ class Grove_Plasma_Import_Mar {
                         <img src="<?php echo plugin_dir_url(__FILE__) . '../grove-shenzi-asset-mirror/grove-logo-1.png'; ?>" alt="Grove Logo" style="height: 40px; width: auto;">
                         Plasma Import Mar
                     </h1>
-                    <div style="display: flex; align-items: center; margin-left: 20px; padding: 8px 12px; background: #f8f9fa; border: 1px solid #ddd; border-radius: 4px;">
-                        <label style="display: flex; align-items: center; cursor: pointer; font-size: 13px; margin: 0;">
-                            <input type="checkbox" id="disable-slash-removal" style="margin-right: 8px;">
-                            <span style="color: #666;">Disable slash removal (for "\" characters on db insert)</span>
-                        </label>
+                    
+                    <!-- Counter Badges Container -->
+                    <div style="display: flex; gap: 15px; align-items: center; margin-left: auto;">
+                        <!-- Pages Counter Badge -->
+                        <div style="display: flex; align-items: center; gap: 8px; padding: 8px 12px; background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); border-radius: 8px; box-shadow: 0 2px 4px rgba(0,0,0,0.1);">
+                            <a href="<?php echo admin_url('edit.php?post_type=page'); ?>" 
+                               style="color: white; font-weight: 600; font-size: 13px; text-decoration: none; transition: opacity 0.2s;"
+                               title="View all pages"
+                               onmouseover="this.style.opacity='0.8';"
+                               onmouseout="this.style.opacity='1';">Pages:</a>
+                            <div style="display: flex; gap: 6px; align-items: center;">
+                                <span style="color: rgba(255,255,255,0.8); font-size: 11px; font-weight: normal;">pub:</span>
+                                <a href="<?php echo admin_url('edit.php?post_type=page&post_status=publish'); ?>" 
+                                   style="background: rgba(255,255,255,0.9); color: #667eea; padding: 2px 8px; border-radius: 4px; font-size: 12px; font-weight: 500; text-decoration: none; display: inline-block; transition: all 0.2s;" 
+                                   title="View published pages"
+                                   onmouseover="this.style.background='rgba(255,255,255,1)'; this.style.transform='scale(1.05)';"
+                                   onmouseout="this.style.background='rgba(255,255,255,0.9)'; this.style.transform='scale(1)';">
+                                   <?php echo number_format($pages_published); ?>
+                                </a>
+                                <span style="color: rgba(255,255,255,0.8); font-size: 11px; font-weight: normal;">drafts:</span>
+                                <a href="<?php echo admin_url('edit.php?post_type=page&post_status=draft'); ?>" 
+                                   style="background: rgba(255,255,255,0.7); color: #764ba2; padding: 2px 8px; border-radius: 4px; font-size: 12px; font-weight: 500; text-decoration: none; display: inline-block; transition: all 0.2s;" 
+                                   title="View draft pages"
+                                   onmouseover="this.style.background='rgba(255,255,255,0.9)'; this.style.transform='scale(1.05)';"
+                                   onmouseout="this.style.background='rgba(255,255,255,0.7)'; this.style.transform='scale(1)';">
+                                   <?php echo number_format($pages_draft); ?>
+                                </a>
+                                <span style="color: rgba(255,255,255,0.8); font-size: 11px; font-weight: normal;">all:</span>
+                                <a href="<?php echo admin_url('edit.php?post_type=page'); ?>" 
+                                   style="background: rgba(255,255,255,0.5); color: #333; padding: 2px 8px; border-radius: 4px; font-size: 12px; font-weight: 500; text-decoration: none; display: inline-block; transition: all 0.2s;" 
+                                   title="View all pages"
+                                   onmouseover="this.style.background='rgba(255,255,255,0.7)'; this.style.transform='scale(1.05)';"
+                                   onmouseout="this.style.background='rgba(255,255,255,0.5)'; this.style.transform='scale(1)';">
+                                   <?php echo number_format($pages_all); ?>
+                                </a>
+                            </div>
+                        </div>
+                        
+                        <!-- Posts Counter Badge -->
+                        <div style="display: flex; align-items: center; gap: 8px; padding: 8px 12px; background: linear-gradient(135deg, #10b981 0%, #059669 100%); border-radius: 8px; box-shadow: 0 2px 4px rgba(0,0,0,0.1);">
+                            <a href="<?php echo admin_url('edit.php'); ?>" 
+                               style="color: white; font-weight: 600; font-size: 13px; text-decoration: none; transition: opacity 0.2s;"
+                               title="View all posts"
+                               onmouseover="this.style.opacity='0.8';"
+                               onmouseout="this.style.opacity='1';">Posts:</a>
+                            <div style="display: flex; gap: 6px; align-items: center;">
+                                <span style="color: rgba(255,255,255,0.8); font-size: 11px; font-weight: normal;">pub:</span>
+                                <a href="<?php echo admin_url('edit.php?post_status=publish'); ?>" 
+                                   style="background: rgba(255,255,255,0.9); color: #10b981; padding: 2px 8px; border-radius: 4px; font-size: 12px; font-weight: 500; text-decoration: none; display: inline-block; transition: all 0.2s;" 
+                                   title="View published posts"
+                                   onmouseover="this.style.background='rgba(255,255,255,1)'; this.style.transform='scale(1.05)';"
+                                   onmouseout="this.style.background='rgba(255,255,255,0.9)'; this.style.transform='scale(1)';">
+                                   <?php echo number_format($posts_published); ?>
+                                </a>
+                                <span style="color: rgba(255,255,255,0.8); font-size: 11px; font-weight: normal;">drafts:</span>
+                                <a href="<?php echo admin_url('edit.php?post_status=draft'); ?>" 
+                                   style="background: rgba(255,255,255,0.7); color: #059669; padding: 2px 8px; border-radius: 4px; font-size: 12px; font-weight: 500; text-decoration: none; display: inline-block; transition: all 0.2s;" 
+                                   title="View draft posts"
+                                   onmouseover="this.style.background='rgba(255,255,255,0.9)'; this.style.transform='scale(1.05)';"
+                                   onmouseout="this.style.background='rgba(255,255,255,0.7)'; this.style.transform='scale(1)';">
+                                   <?php echo number_format($posts_draft); ?>
+                                </a>
+                                <span style="color: rgba(255,255,255,0.8); font-size: 11px; font-weight: normal;">all:</span>
+                                <a href="<?php echo admin_url('edit.php'); ?>" 
+                                   style="background: rgba(255,255,255,0.5); color: #333; padding: 2px 8px; border-radius: 4px; font-size: 12px; font-weight: 500; text-decoration: none; display: inline-block; transition: all 0.2s;" 
+                                   title="View all posts"
+                                   onmouseover="this.style.background='rgba(255,255,255,0.7)'; this.style.transform='scale(1.05)';"
+                                   onmouseout="this.style.background='rgba(255,255,255,0.5)'; this.style.transform='scale(1)';">
+                                   <?php echo number_format($posts_all); ?>
+                                </a>
+                            </div>
+                        </div>
+                        
+                        <!-- Checkbox Container -->
+                        <div style="display: flex; align-items: center; padding: 8px 12px; background: #f8f9fa; border: 1px solid #ddd; border-radius: 4px;">
+                            <label style="display: flex; align-items: center; cursor: pointer; font-size: 13px; margin: 0;">
+                                <input type="checkbox" id="disable-slash-removal" style="margin-right: 8px;">
+                                <span style="color: #666;">Disable slash removal (for "\" characters on db insert)</span>
+                            </label>
+                        </div>
                     </div>
                 </div>
                 
