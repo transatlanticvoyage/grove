@@ -32,6 +32,12 @@ class Grove_Plasma_Import_Mar {
         $posts_draft = $post_counts->draft ?? 0;
         $posts_all = $posts_published + $posts_draft + ($post_counts->private ?? 0) + ($post_counts->future ?? 0) + ($post_counts->pending ?? 0);
         
+        // Get total pylons count
+        $pylons_count = $wpdb->get_var("SELECT COUNT(*) FROM {$wpdb->prefix}pylons");
+        if ($pylons_count === null) {
+            $pylons_count = 0; // Table might not exist
+        }
+        
         ?>
         <div class="wrap" style="margin: 0; padding: 0;">
             <!-- Allow space for WordPress notices -->
@@ -114,6 +120,14 @@ class Grove_Plasma_Import_Mar {
                                    <?php echo number_format($posts_all); ?>
                                 </a>
                             </div>
+                        </div>
+                        
+                        <!-- Pylons Counter Badge -->
+                        <div style="display: flex; align-items: center; gap: 8px; padding: 8px 12px; background: linear-gradient(135deg, #ff6f00 0%, #ff9100 100%); border-radius: 8px; box-shadow: 0 2px 4px rgba(0,0,0,0.1);">
+                            <span style="color: white; font-weight: 600; font-size: 13px;">Total Pylons</span>
+                            <span style="background: rgba(255,255,255,0.9); color: #ff6f00; padding: 4px 10px; border-radius: 4px; font-size: 14px; font-weight: bold;">
+                                <?php echo number_format($pylons_count); ?>
+                            </span>
                         </div>
                         
                         <!-- Checkbox Container -->
