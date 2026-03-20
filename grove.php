@@ -10,6 +10,7 @@
  * 
  * Test comment: VSCode source control test - 2025-09-19 15:33
  * Test comment 8: Grove dual visibility test - 2025-09-19 16:48
+ * Test comment 9: VSCode source control pane test - 2026-03-20
  */
 
 // Prevent direct access
