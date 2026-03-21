@@ -309,6 +309,16 @@ class Grove_Plasma_Import_Mar {
                         </div>
                     </div>
                     
+                    <div style="margin-bottom: 15px; padding: 10px; background-color: #f0f8ff; border-left: 4px solid #2196F3; border-radius: 3px;">
+                        <label style="font-weight: 500; display: flex; align-items: center; cursor: pointer;">
+                            <input type="checkbox" id="update-site-title" checked style="margin-right: 8px;">
+                            Update WP Native Site Title with "driggs_brand_name" value
+                        </label>
+                        <div style="font-size: 12px; color: #666; margin-top: 5px; margin-left: 20px;">
+                            When checked: The WordPress site title (Settings > General) will be updated with the driggs_brand_name value from the import
+                        </div>
+                    </div>
+                    
                     <div id="driggs-table-container">
                         <!-- Driggs data table will be populated via JavaScript -->
                     </div>
@@ -1149,6 +1159,7 @@ class Grove_Plasma_Import_Mar {
                         action: 'grove_driggs_data_import',
                         driggs_data: driggsDataForImport,
                         disable_slash_removal: $('#disable-slash-removal').is(':checked') ? 'true' : 'false',
+                        update_site_title: $('#update-site-title').is(':checked') ? 'true' : 'false',
                         nonce: '<?php echo wp_create_nonce("grove_driggs_import"); ?>'
                     },
                     success: function(response) {

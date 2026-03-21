@@ -634,8 +634,18 @@ class Grove_Plasma_Import_Processor {
         // Apply slash removal if enabled (default behavior)
         $clean_driggs_data = $this->maybe_remove_slashes($driggs_data);
         
+        // Check if we should update the site title
+        $update_site_title = isset($_POST['update_site_title']) && $_POST['update_site_title'] === 'true';
+        
         // Process the driggs data import
         $results = $this->import_driggs_data($clean_driggs_data);
+        
+        // Update WordPress site title if the option is checked and driggs_brand_name exists
+        $site_title_updated = false;
+        if ($update_site_title && $results['success'] && isset($clean_driggs_data['driggs_brand_name']) && !empty($clean_driggs_data['driggs_brand_name'])) {
+            update_option('blogname', $clean_driggs_data['driggs_brand_name']);
+            $site_title_updated = true;
+        }
         
         // Return results
         if ($results['success']) {
@@ -646,9 +656,14 @@ class Grove_Plasma_Import_Processor {
                 $message .= sprintf(' (%d fields skipped - not found in database)', $results['invalid_fields_skipped']);
             }
             
+            if ($site_title_updated) {
+                $message .= sprintf('. Site title updated to: "%s"', $clean_driggs_data['driggs_brand_name']);
+            }
+            
             wp_send_json_success([
                 'message' => $message,
-                'details' => $results
+                'details' => $results,
+                'site_title_updated' => $site_title_updated
             ]);
         } else {
             wp_send_json_error([
