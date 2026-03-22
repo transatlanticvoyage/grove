@@ -19,6 +19,9 @@ class Grove_Plasma_Import_Mar {
         // AGGRESSIVE NOTICE SUPPRESSION - Remove ALL WordPress admin notices
         $this->suppress_all_admin_notices();
         
+        // Load Jezel Navigation component
+        require_once plugin_dir_path(__FILE__) . 'jezel-navigation/class-jezel-navigation.php';
+        
         // Get post counts
         $page_counts = wp_count_posts('page');
         $post_counts = wp_count_posts('post');
@@ -42,6 +45,14 @@ class Grove_Plasma_Import_Mar {
         <div class="wrap" style="margin: 0; padding: 0;">
             <!-- Allow space for WordPress notices -->
             <div style="height: 20px;"></div>
+            
+            <?php
+            // Render Jezel Navigation
+            Grove_Jezel_Navigation::render(array(
+                'position_left' => '180px',
+                'position_top' => '120px'
+            ));
+            ?>
             
             <div style="padding: 20px;">
                 <div style="display: flex; align-items: flex-start; gap: 20px; margin-bottom: 20px;">
